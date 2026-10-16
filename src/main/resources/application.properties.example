@@ -1,0 +1,23 @@
+# ==============================================================================
+# STUDYWITHME API - TEMPLATE CẤU HÌNH MẪU (APPLICATION PROPERTIES EXAMPLE)
+# Copy file này thành application.properties và điều chỉnh thông tin phù hợp
+# ==============================================================================
+spring.application.name=studywithme-api
+server.port=8080
+
+# Cấu hình DataSource Microsoft SQL Server
+spring.datasource.url=jdbc:sqlserver://localhost;instanceName=SQLEXPRESS;databaseName=studywithme_db;integratedSecurity=true;encrypt=true;trustServerCertificate=true
+spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+# Cấu hình JPA / Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.open-in-view=false
+
+# Cấu hình MongoDB
+spring.data.mongodb.uri=mongodb://localhost:27017/studywithme_chat
+
+# Cấu hình Upload File
+spring.servlet.multipart.max-file-size=100MB
+spring.servlet.multipart.max-request-size=100MB

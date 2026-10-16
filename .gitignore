@@ -1,4 +1,13 @@
 HELP.md
+*.md
+*.dll
+
+# Configuration & Sensitive files
+src/main/resources/application.properties
+src/main/resources/application-*.properties
+src/main/resources/application*.yml
+.env
+
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar

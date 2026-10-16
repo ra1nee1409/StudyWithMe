@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/head :: common-head('EdTech Center - Hệ thống Quản trị StudyWithMe')}"></head>
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside class="fixed left-0 top-0 h-screen w-72 bg-surface-card z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-r border-surface-container">
+    <div class="flex flex-col flex-1 min-h-0">
+      
+      <!-- Admin Profile Box -->
+      <div class="p-5 bg-surface-container-low/60 border-b border-surface-container/40">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0 shadow-sm text-on-primary font-bold">
+            <span class="material-symbols-outlined text-[22px]">admin_panel_settings</span>
+          </div>
+          <div class="flex flex-col min-w-0 flex-1">
+            <span class="font-bold text-sm text-on-surface truncate" th:text="${adminName ?: 'Quản Trị Viên'}">Quản Trị Viên</span>
+            <span class="text-xs text-on-surface-variant truncate">Hệ thống StudyWithMe</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-status-success/10 text-status-success font-semibold">
+            <span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>Trực tuyến
+          </span>
+          <span class="text-secondary bg-secondary-fixed/50 px-2 py-0.5 rounded-full font-medium">Toàn quyền Admin</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <a th:href="@{/admin}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary-container text-on-primary font-bold shadow-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">dashboard</span>
+          <span>Tổng quan</span>
+        </a>
+        <a href="#ho-so-gia-su" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all">
+          <span class="material-symbols-outlined text-[20px]">school</span>
+          <span>Duyệt Gia sư</span>
+          <span th:if="${hoSoChoDuyet > 0}" th:text="${hoSoChoDuyet}" class="ml-auto px-2 py-0.5 rounded-full bg-tertiary-container text-white text-xs font-bold"></span>
+        </a>
+        <a href="#danh-sach-nguoi-dung" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all">
+          <span class="material-symbols-outlined text-[20px]">manage_accounts</span>
+          <span>Quản lý Người dùng</span>
+        </a>
+        <a href="#lop-hoc-truc-tuyen" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all">
+          <span class="material-symbols-outlined text-[20px]">video_camera_front</span>
+          <span>Lớp học trực tuyến</span>
+        </a>
+        <a th:href="@{/}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-secondary hover:bg-accent-cyan-subtle transition-all mt-4">
+          <span class="material-symbols-outlined text-[20px]">open_in_new</span>
+          <span>Xem Trang chủ</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Logout -->
+    <div class="p-3 border-t border-surface-container/50">
+      <a th:href="@{/login}" href="/login" onclick="logoutAdmin()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-error hover:bg-error-container hover:text-on-error-container transition-all">
+        <span class="material-symbols-outlined text-[20px]">logout</span>
+        <span>Đăng xuất</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar -->
+    <header class="fixed top-0 left-72 right-0 h-16 bg-surface-card/90 backdrop-blur-xl shadow-sm z-40 flex items-center justify-between px-6 border-b border-surface-container/30">
+      <div class="flex items-center gap-2 text-sm">
+        <span class="material-symbols-outlined text-secondary text-[20px]">home</span>
+        <span class="text-outline-variant">/</span>
+        <span class="text-on-surface-variant">Hệ thống Quản trị</span>
+        <span class="text-outline-variant">/</span>
+        <span class="text-primary font-semibold">Bảng điều khiển thực tế</span>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <!-- Live Date Badge -->
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low text-xs text-on-surface-variant">
+          <span class="material-symbols-outlined text-[16px] text-secondary">calendar_today</span>
+          <span id="header-today-date">Hôm nay</span>
+        </div>
+        <!-- User Avatar -->
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-xs">
+          AD
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Flash Notification Message -->
+      <div th:if="${message}" class="p-4 rounded-xl bg-accent-cyan-subtle border border-primary-container text-primary flex items-center gap-3 shadow-sm">
+        <span class="material-symbols-outlined text-[22px] text-status-success">check_circle</span>
+        <span class="text-sm font-semibold" th:text="${message}"></span>
+      </div>
+
+      <!-- 1. Header Banner -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-xl shadow-sm border border-surface-container/40">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-primary text-xs font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+              Kết nối SQL Server thành công
+            </span>
+            <span class="text-outline-variant">•</span>
+            <span class="text-xs text-on-surface-variant" id="live-clock">Đang tải thời gian...</span>
+          </div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">
+            Bảng Điều Khiển Quản Trị Hệ Thống
+          </h1>
+          <p class="text-xs text-on-surface-variant">
+            Dữ liệu trực tiếp từ cơ sở dữ liệu `studywithme_db` - Phục vụ duyệt hồ sơ gia sư và quản lý tài khoản.
+          </p>
+        </div>
+      </section>
+
+      <!-- 2. Real Database Statistics KPI Cards -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <!-- Metric 1: Tổng người dùng -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-medium">Tổng người dùng hệ thống</span>
+            <div class="w-10 h-10 rounded-xl bg-accent-cyan-subtle text-primary flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px]">group</span>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${tongNguoiDung}">0</span>
+            <span class="text-xs text-on-surface-variant font-medium">tài khoản</span>
+          </div>
+        </div>
+
+        <!-- Metric 2: Gia sư đã duyệt -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-medium">Gia sư đang hoạt động</span>
+            <div class="w-10 h-10 rounded-xl bg-accent-navy-subtle text-secondary flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px]">school</span>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-secondary tracking-tight" th:text="${tongGiaSu}">0</span>
+            <span class="text-xs text-on-surface-variant font-medium">hồ sơ đã duyệt</span>
+          </div>
+        </div>
+
+        <!-- Metric 3: Hồ sơ chờ duyệt -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-medium">Hồ sơ gia sư chờ duyệt</span>
+            <div class="w-10 h-10 rounded-xl bg-accent-coral-subtle text-tertiary-container flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px]">pending_actions</span>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-tertiary-container tracking-tight" th:text="${hoSoChoDuyet}">0</span>
+            <span class="text-xs text-on-surface-variant font-medium">cần xử lý</span>
+          </div>
+        </div>
+
+        <!-- Metric 4: Tổng lớp học -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-medium">Lớp học trực tuyến</span>
+            <div class="w-10 h-10 rounded-xl bg-surface-container text-status-success flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px]">video_camera_front</span>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-status-success tracking-tight" th:text="${tongLopHoc}">0</span>
+            <span class="text-xs text-on-surface-variant font-medium">lớp đã tạo</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Real Section: Hồ Sơ Gia Sư Chờ Duyệt -->
+      <section class="bg-surface-card rounded-xl p-6 shadow-sm border border-surface-container/30 flex flex-col gap-4" id="ho-so-gia-su">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary text-[22px]">verified_user</span>
+            <h2 class="text-base font-bold text-on-surface">Danh sách Hồ sơ Gia sư Cần Phê duyệt</h2>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full bg-tertiary-container/10 text-tertiary text-xs font-bold"
+                th:text="${hoSoChoDuyet} + ' hồ sơ đang chờ'">
+            0 hồ sơ đang chờ
+          </span>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(danhSachGiaSuChoDuyet)}" class="p-8 text-center bg-surface-container-low/40 rounded-xl border border-dashed border-surface-container">
+          <span class="material-symbols-outlined text-4xl text-outline mb-2">task_alt</span>
+          <p class="text-sm font-medium text-on-surface">Hiện không có hồ sơ gia sư nào đang chờ xét duyệt.</p>
+          <p class="text-xs text-on-surface-variant mt-1">Khi người dùng đăng ký vai trò gia sư từ trang Đăng ký, hồ sơ sẽ tự động hiển thị tại đây.</p>
+        </div>
+
+        <!-- Real Tutors Table -->
+        <div th:if="${!#lists.isEmpty(danhSachGiaSuChoDuyet)}" class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="bg-surface-container-low text-on-surface-variant font-semibold">
+                <th class="py-3 px-3 rounded-l-lg">ID</th>
+                <th class="py-3 px-3">Họ và tên</th>
+                <th class="py-3 px-3">Email liên hệ</th>
+                <th class="py-3 px-3">Số điện thoại</th>
+                <th class="py-3 px-3">Tiêu đề chuyên môn</th>
+                <th class="py-3 px-3">Ngày gửi hồ sơ</th>
+                <th class="py-3 px-3 text-right rounded-r-lg">Thao tác duyệt</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-container-low">
+              <tr th:each="hoSo : ${danhSachGiaSuChoDuyet}" class="hover:bg-surface-container-low/30 transition-colors">
+                <td class="py-3 px-3 font-bold text-on-surface" th:text="${hoSo.id}"></td>
+                <td class="py-3 px-3 font-semibold text-primary" th:text="${hoSo.nguoiDung != null ? hoSo.nguoiDung.hoTen : 'Chưa cập nhật'}"></td>
+                <td class="py-3 px-3 text-on-surface-variant" th:text="${hoSo.nguoiDung != null ? hoSo.nguoiDung.email : ''}"></td>
+                <td class="py-3 px-3 text-on-surface-variant" th:text="${hoSo.nguoiDung != null ? hoSo.nguoiDung.soDienThoai : 'N/A'}"></td>
+                <td class="py-3 px-3">
+                  <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-medium" th:text="${hoSo.tieuDeChuyenMon ?: 'Gia sư mới'}"></span>
+                </td>
+                <td class="py-3 px-3 text-outline text-[11px]" th:text="${#temporals.format(hoSo.ngayTao, 'dd/MM/yyyy HH:mm')}"></td>
+                <td class="py-3 px-3 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <form th:action="@{'/admin/duyet-gia-su/' + ${hoSo.id}}" method="post" class="inline">
+                      <button type="submit" class="px-3 py-1 rounded-full bg-status-success text-white font-bold text-xs hover:opacity-90 shadow-sm transition-all">
+                        Phê duyệt
+                      </button>
+                    </form>
+                    <form th:action="@{'/admin/tu-choi-gia-su/' + ${hoSo.id}}" method="post" class="inline">
+                      <button type="submit" class="px-3 py-1 rounded-full bg-error-container text-error font-medium text-xs hover:bg-error hover:text-white transition-all">
+                        Từ chối
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 4. Real Section: Quản Lý Tài Khoản Người Dùng -->
+      <section class="bg-surface-card rounded-xl p-6 shadow-sm border border-surface-container/30 flex flex-col gap-4" id="danh-sach-nguoi-dung">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[22px]">manage_accounts</span>
+            <h2 class="text-base font-bold text-on-surface">Danh sách Người dùng trong Database</h2>
+          </div>
+          <span class="text-xs text-on-surface-variant font-medium" th:text="'Tổng cộng: ' + ${tongNguoiDung} + ' tài khoản'"></span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="bg-surface-container-low text-on-surface-variant font-semibold">
+                <th class="py-3 px-3 rounded-l-lg">ID</th>
+                <th class="py-3 px-3">Họ và tên</th>
+                <th class="py-3 px-3">Email đăng nhập</th>
+                <th class="py-3 px-3">Số điện thoại</th>
+                <th class="py-3 px-3">Vai trò</th>
+                <th class="py-3 px-3">Trạng thái</th>
+                <th class="py-3 px-3">Ngày tạo</th>
+                <th class="py-3 px-3 text-right rounded-r-lg">Hành động</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-container-low">
+              <tr th:each="user : ${danhSachNguoiDung}" class="hover:bg-surface-container-low/30 transition-colors">
+                <td class="py-3 px-3 font-bold text-on-surface" th:text="${user.id}"></td>
+                <td class="py-3 px-3 font-semibold text-on-surface" th:text="${user.hoTen}"></td>
+                <td class="py-3 px-3 text-secondary font-medium" th:text="${user.email}"></td>
+                <td class="py-3 px-3 text-on-surface-variant" th:text="${user.soDienThoai ?: 'Chưa cập nhật'}"></td>
+                <td class="py-3 px-3">
+                  <div class="flex flex-wrap gap-1">
+                    <span th:each="vt : ${user.danhSachVaiTro}"
+                          th:text="${vt.tenVaiTro}"
+                          th:classappend="${vt.tenVaiTro.name() == 'ROLE_QUAN_TRI'} ? 'bg-tertiary-container/10 text-tertiary' : (${vt.tenVaiTro.name() == 'ROLE_GIANG_VIEN'} ? 'bg-secondary-fixed text-secondary' : 'bg-accent-cyan-subtle text-primary')"
+                          class="px-2 py-0.5 rounded-full font-bold text-[10px]">
+                    </span>
+                  </div>
+                </td>
+                <td class="py-3 px-3">
+                  <span th:if="${user.trangThai.name() == 'HOAT_DONG'}" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-status-success/15 text-status-success font-semibold text-[11px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-status-success"></span> Hoạt động
+                  </span>
+                  <span th:if="${user.trangThai.name() == 'TAM_KHOA' || user.trangThai.name() == 'BI_CAM'}" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-error font-semibold text-[11px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-error"></span> Tạm khóa
+                  </span>
+                </td>
+                <td class="py-3 px-3 text-outline text-[11px]" th:text="${#temporals.format(user.ngayTao, 'dd/MM/yyyy HH:mm')}"></td>
+                <td class="py-3 px-3 text-right">
+                  <form th:action="@{'/admin/doi-trang-thai-nguoi-dung/' + ${user.id}}" method="post" class="inline">
+                    <button type="submit"
+                            th:classappend="${user.trangThai.name() == 'HOAT_DONG'} ? 'bg-surface-container text-error hover:bg-error hover:text-white' : 'bg-status-success text-white hover:opacity-90'"
+                            class="px-3 py-1 rounded-full text-xs font-semibold shadow-xs transition-all"
+                            th:text="${user.trangThai.name() == 'HOAT_DONG'} ? 'Khóa' : 'Mở khóa'">
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 5. Real Section: Lớp Học Trực Tuyến & Đánh Giá -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="lop-hoc-truc-tuyen">
+        <!-- Lớp học trực tuyến -->
+        <div class="bg-surface-card rounded-xl p-6 shadow-sm border border-surface-container/30 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-[22px]">video_camera_front</span>
+              <h2 class="text-base font-bold text-on-surface">Lớp học trực tuyến trong DB</h2>
+            </div>
+            <span class="text-xs text-outline" th:text="${tongLopHoc} + ' lớp'">0 lớp</span>
+          </div>
+
+          <div th:if="${#lists.isEmpty(danhSachLopHoc)}" class="p-6 text-center bg-surface-container-low/40 rounded-lg">
+            <span class="material-symbols-outlined text-3xl text-outline mb-1">class</span>
+            <p class="text-xs text-on-surface-variant">Chưa có lớp học trực tuyến nào được tạo.</p>
+          </div>
+
+          <div th:if="${!#lists.isEmpty(danhSachLopHoc)}" class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="bg-surface-container-low text-on-surface-variant font-semibold">
+                  <th class="py-2 px-2.5">Tên lớp</th>
+                  <th class="py-2 px-2.5">Học phí</th>
+                  <th class="py-2 px-2.5">Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-surface-container-low">
+                <tr th:each="lop : ${danhSachLopHoc}">
+                  <td class="py-2.5 px-2.5 font-medium text-on-surface" th:text="${lop.tieuDeLop}"></td>
+                  <td class="py-2.5 px-2.5 font-bold text-tertiary" th:text="${lop.hocPhiMoiHocVien} + 'đ'"></td>
+                  <td class="py-2.5 px-2.5 text-on-surface-variant" th:text="${lop.trangThai}"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Đánh giá nhận xét -->
+        <div class="bg-surface-card rounded-xl p-6 shadow-sm border border-surface-container/30 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-tertiary-container text-[22px]">star</span>
+              <h2 class="text-base font-bold text-on-surface">Đánh giá &amp; Nhận xét từ học viên</h2>
+            </div>
+          </div>
+
+          <div th:if="${#lists.isEmpty(danhSachDanhGia)}" class="p-6 text-center bg-surface-container-low/40 rounded-lg">
+            <span class="material-symbols-outlined text-3xl text-outline mb-1">rate_review</span>
+            <p class="text-xs text-on-surface-variant">Chưa có đánh giá nào được ghi nhận trong cơ sở dữ liệu.</p>
+          </div>
+
+          <div th:if="${!#lists.isEmpty(danhSachDanhGia)}" class="flex flex-col gap-2">
+            <div th:each="dg : ${danhSachDanhGia}" class="p-3 rounded-lg bg-surface-container-low text-xs flex flex-col gap-1">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-on-surface" th:text="${dg.nguoiDung != null ? dg.nguoiDung.hoTen : 'Ẩn danh'}"></span>
+                <span class="text-status-warning" th:text="${'★ ' + dg.soSaoDanhGia + '/5'}"></span>
+              </div>
+              <p class="text-on-surface-variant italic" th:text="${dg.noiDungNhanXet}"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // Live clock
+    function updateLiveClock() {
+      const clockEl = document.getElementById('live-clock');
+      const todayEl = document.getElementById('header-today-date');
+      const now = new Date();
+      const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+      const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+      
+      if (clockEl) clockEl.textContent = `${days[now.getDay()]}, ${dateStr} — ${timeStr}`;
+      if (todayEl) todayEl.textContent = `Hôm nay: ${dateStr}`;
+    }
+    updateLiveClock();
+    setInterval(updateLiveClock, 1000);
+
+    function logoutAdmin() {
+      localStorage.removeItem('studywithme_token');
+      localStorage.removeItem('studywithme_user');
+      window.location.href = '/login';
+    }
+  </script>
+</body>
+</html>

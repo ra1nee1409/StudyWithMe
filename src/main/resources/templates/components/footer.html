@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <!-- Full Main Footer -->
+  <footer th:fragment="main-footer" class="w-full bg-surface-container-lowest text-on-surface pt-space-xl pb-space-lg shadow-[0_-1px_12px_rgba(28,105,154,0.04)] border-t border-surface-container">
+    <div class="max-w-7xl mx-auto px-6 lg:px-margin-desktop">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-lg mb-space-xl">
+        <div class="lg:col-span-2 space-y-space-md">
+          <div class="flex items-center gap-space-sm">
+            <span class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold">S</span>
+            <span class="font-headline-sm text-headline-sm text-primary font-bold">StudyWithMe Vietnam</span>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant pr-space-md">
+            Hệ sinh thái EdTech kết nối gia sư và lớp học 1-kèm-1 cá nhân hóa hàng đầu Việt Nam. Đồng hành cùng 250,000+ học sinh xây dựng sự tự tin và bứt phá điểm số toàn diện.
+          </p>
+          <div class="flex items-center gap-space-sm text-body-sm font-body-sm text-on-surface-variant">
+            <span class="material-symbols-outlined text-primary text-[20px]">verified</span>
+            <span>Hệ thống đạt chuẩn kiểm định sư phạm từ chuyên gia giáo dục</span>
+          </div>
+          <div class="flex items-center gap-space-sm text-body-sm font-body-sm text-on-surface-variant">
+            <span class="material-symbols-outlined text-status-success text-[20px]">shield</span>
+            <span>Cam kết tiến bộ rõ rệt sau 8 tuần - Hoàn tiền 100% nếu không hài lòng</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-label-lg text-label-lg text-on-surface font-bold uppercase tracking-wider mb-space-md">Chương Trình Lớp 1 - 12</h4>
+          <ul class="space-y-space-sm font-body-md text-body-md text-on-surface-variant">
+            <li><a class="hover:text-primary transition-colors" href="#">Toán - Tiếng Việt Tiểu học (Lớp 1-5)</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#">Bứt phá THCS (Lớp 6-9)</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#">Ôn thi vào lớp 10 trường chuyên</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#">Chương trình THPT (Lớp 10-12)</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#">Khoa học tự nhiên &amp; Xã hội</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-label-lg text-label-lg text-on-surface font-bold uppercase tracking-wider mb-space-md">Luyện Thi &amp; Ngoại Ngữ</h4>
+          <ul class="space-y-space-sm font-body-md text-body-md text-on-surface-variant">
+            <li><a class="hover:text-primary transition-colors" href="#">Luyện thi Tốt nghiệp THPT Quốc gia</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#">Luyện thi IELTS Academic 1-on-1</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#">Giao tiếp Tiếng Anh theo khung CEFR</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#">Ôn thi Đánh giá năng lực ĐHQG</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#">Luyện thi học sinh giỏi các cấp</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-label-lg text-label-lg text-on-surface font-bold uppercase tracking-wider mb-space-md">Về StudyWithMe</h4>
+          <ul class="space-y-space-sm font-body-md text-body-md text-on-surface-variant">
+            <li><a class="hover:text-primary transition-colors" href="#">Quy trình kiểm định gia sư 5 bước</a></li>
+            <li><a class="hover:text-primary transition-colors" th:href="@{/register}">Đăng ký ứng tuyển gia sư</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#so-sanh">Bảng giá &amp; Gói quyền lợi học tập</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#">Chính sách hoàn tiền &amp; Đổi gia sư</a></li>
+            <li><a class="hover:text-primary transition-colors" th:href="@{/admin}">Cổng Quản trị viên (Admin)</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md text-on-surface-variant font-body-sm text-body-sm border-t border-surface-container">
+        <div class="flex flex-wrap items-center gap-space-md">
+          <span>© 2025 StudyWithMe EdTech Vietnam Corporation. Bảo lưu mọi quyền.</span>
+          <span class="hidden md:inline-block">•</span>
+          <a class="hover:text-primary transition-colors" href="#">Điều khoản &amp; Bảo mật</a>
+          <span class="hidden md:inline-block">•</span>
+          <span class="text-status-success font-semibold flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">task_alt</span>
+            Đã đăng ký Bộ Công Thương &amp; Khung GD&amp;ĐT
+          </span>
+        </div>
+        <div class="flex items-center gap-space-sm">
+          <span class="text-on-surface-variant font-label-md text-label-md">Hotline hỗ trợ 24/7:</span>
+          <a class="font-bold text-tertiary-container hover:text-tertiary font-label-lg text-label-lg" href="tel:19008888">1900 8888</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Simple Footer for Auth / Minimal Pages -->
+  <footer th:fragment="simple-footer" class="w-full bg-surface-container-lowest text-on-surface py-6 shadow-[0_-1px_12px_rgba(28,105,154,0.04)] border-t border-surface-container">
+    <div class="max-w-7xl mx-auto px-6 lg:px-margin-desktop text-center text-body-sm text-on-surface-variant">
+      © 2025 StudyWithMe EdTech Vietnam Corporation. Bảo lưu mọi quyền.
+    </div>
+  </footer>
+</body>
+</html>

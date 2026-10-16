@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <header th:fragment="main-header(activePage)" class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(28,105,154,0.06)]">
+    <div class="h-20 max-w-7xl mx-auto px-6 lg:px-margin-desktop flex items-center justify-between gap-space-md">
+      <!-- Logo -->
+      <div class="flex items-center gap-space-md shrink-0">
+        <a class="flex items-center gap-space-sm" th:href="@{/}">
+          <span class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center text-white font-black text-xl shadow-md">S</span>
+          <span class="font-headline-sm text-headline-sm text-primary tracking-tight font-bold hidden sm:inline-block">StudyWithMe</span>
+        </a>
+      </div>
+
+      <!-- Quick Search Bar -->
+      <div class="hidden xl:flex items-center flex-1 max-w-xs relative">
+        <input class="w-full pl-9 pr-4 py-2 bg-surface-container-low rounded-full text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container transition-all" placeholder="Tìm môn học, gia sư hoặc lớp..." type="text">
+        <span class="material-symbols-outlined text-outline absolute left-3 top-1/2 -translate-y-1/2 text-[18px]">search</span>
+      </div>
+
+      <!-- Main Navigation -->
+      <nav class="hidden lg:flex items-center gap-1 xl:gap-space-xs">
+        <a class="px-3 py-2 rounded-lg font-label-lg text-label-lg transition-colors"
+           th:classappend="${activePage == 'home'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
+           th:href="@{/#tim-gia-su}">Tìm Gia Sư</a>
+        <a class="px-3 py-2 rounded-lg text-on-surface-variant font-label-lg text-label-lg hover:text-primary hover:bg-surface-container-low transition-colors"
+           th:href="@{/#lop-1-kem-1}">Lớp 1-kèm-1</a>
+        <a class="px-3 py-2 rounded-lg text-on-surface-variant font-label-lg text-label-lg hover:text-primary hover:bg-surface-container-low transition-colors"
+           th:href="@{/#luyen-thi}">Luyện Thi &amp; Bồi Dưỡng</a>
+        <a class="px-3 py-2 rounded-lg text-on-surface-variant font-label-lg text-label-lg hover:text-primary hover:bg-surface-container-low transition-colors"
+           th:href="@{/#so-sanh}">Bảng Giá</a>
+        <a class="px-3 py-2 rounded-lg font-label-lg text-label-lg transition-colors"
+           th:classappend="${activePage == 'tutor'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
+           th:href="@{/register}">Trở Thành Gia Sư</a>
+        <a class="px-3 py-2 rounded-lg font-label-lg text-label-lg transition-colors"
+           th:classappend="${activePage == 'admin'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
+           th:href="@{/admin}">Quản Trị</a>
+      </nav>
+
+      <!-- Auth & Actions -->
+      <div class="flex items-center gap-space-sm shrink-0">
+        <a class="hidden 2xl:flex items-center gap-1 text-secondary font-label-md text-label-md px-2 py-1.5 rounded-lg hover:bg-accent-navy-subtle hover:text-primary transition-colors" href="tel:19008888">
+          <span class="material-symbols-outlined text-[18px] text-tertiary-container">call</span>
+          <span class="font-bold">1900 8888</span>
+        </a>
+        <a class="hidden sm:inline-flex px-3.5 py-2 rounded-full font-label-lg text-label-lg transition-colors"
+           th:classappend="${activePage == 'login'} ? 'bg-accent-cyan-subtle text-primary font-bold' : 'text-secondary hover:text-on-primary-container hover:bg-accent-cyan-subtle'"
+           th:href="@{/login}">Đăng nhập</a>
+        <a class="hidden md:inline-flex px-3.5 py-2 rounded-full font-label-lg text-label-lg transition-colors"
+           th:classappend="${activePage == 'register'} ? 'bg-accent-cyan-subtle text-primary font-bold' : 'text-secondary hover:text-on-primary-container hover:bg-accent-cyan-subtle'"
+           th:href="@{/register}">Đăng ký</a>
+        <a class="inline-flex items-center justify-center px-4 py-2 bg-tertiary-container text-on-tertiary font-label-lg text-label-lg rounded-full shadow-[0_2px_8px_-2px_rgba(255,109,32,0.4)] hover:bg-tertiary hover:text-on-tertiary transition-all" th:href="@{/#dang-ky-hoc-thu}">Học thử 0đ</a>
+      </div>
+    </div>
+  </header>
+</body>
+</html>

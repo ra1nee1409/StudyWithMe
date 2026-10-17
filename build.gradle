@@ -19,7 +19,6 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
@@ -34,7 +33,6 @@ dependencies {
 	runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
 	runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc_auth:13.4.0.x64'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-data-mongodb-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
@@ -47,3 +45,17 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.named('bootRun') {
+	classpath = files(classpath.files.collect { File f ->
+		file(f.absolutePath.replace('\u0111atn', 'datn'))
+	})
+	workingDir = file(workingDir.absolutePath.replace('\u0111atn', 'datn'))
+	jvmArgs = [
+		"-Djava.library.path=" + file('.').absolutePath.replace('\u0111atn', 'datn'),
+		"-Xms256m",
+		"-Xmx512m",
+		"-XX:TieredStopAtLevel=1"
+	]
+}
+

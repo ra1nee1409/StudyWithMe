@@ -7,12 +7,43 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class ApiResponse<T> {
     private boolean thanhCong;
     private String thongBao;
     private T duLieu;
+
+    public ApiResponse() {
+    }
+
+    public ApiResponse(boolean thanhCong, String thongBao, T duLieu) {
+        this.thanhCong = thanhCong;
+        this.thongBao = thongBao;
+        this.duLieu = duLieu;
+    }
+
+    public boolean isThanhCong() {
+        return thanhCong;
+    }
+
+    public void setThanhCong(boolean thanhCong) {
+        this.thanhCong = thanhCong;
+    }
+
+    public String getThongBao() {
+        return thongBao;
+    }
+
+    public void setThongBao(String thongBao) {
+        this.thongBao = thongBao;
+    }
+
+    public T getDuLieu() {
+        return duLieu;
+    }
+
+    public void setDuLieu(T duLieu) {
+        this.duLieu = duLieu;
+    }
 
     public static <T> ApiResponse<T> success(String thongBao, T duLieu) {
         return ApiResponse.<T>builder()

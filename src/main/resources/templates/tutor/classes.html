@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Quản lý Lớp học Trực tuyến - StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== TUTOR SIDEBAR ==================== -->
+  <aside th:replace="~{components/tutor/sidebar :: tutor-sidebar('classes')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar -->
+    <header th:replace="~{components/tutor/header :: tutor-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Breadcrumbs & Header -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">Quản Lý Lớp Học Trực Tuyến</h1>
+          <p class="text-xs text-on-surface-variant">Tạo lớp học mới, thiết lập lịch học định kỳ và link phòng học trực tuyến (Google Meet / Zoom).</p>
+        </div>
+        <button type="button" onclick="document.getElementById('modal-create-class').classList.remove('hidden')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-sm transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          <span>Tạo Lớp Học Trực Tuyến Mới</span>
+        </button>
+      </section>
+
+      <!-- Filter bar -->
+      <div class="flex flex-wrap items-center justify-between gap-4 bg-surface-card p-4 rounded-xl border border-surface-container/30">
+        <div class="flex items-center gap-2">
+          <span class="px-3 py-1.5 rounded-lg bg-tertiary-container text-white text-xs font-bold" th:text="'Tất cả (' + ${#lists.size(danhSachLop)} + ')'">Tất cả (0)</span>
+        </div>
+        <div class="relative w-full sm:w-64">
+          <input type="text" placeholder="Tìm kiếm lớp học..." class="w-full pl-9 pr-3 py-1.5 rounded-lg bg-surface-container-low text-xs border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+          <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-outline">search</span>
+        </div>
+      </div>
+
+      <!-- Danh sách lớp học dạng Cards -->
+      <div th:if="${#lists.isEmpty(danhSachLop)}" class="p-12 text-center bg-surface-card rounded-2xl border border-dashed border-surface-container/60 shadow-sm">
+        <span class="material-symbols-outlined text-4xl text-outline mb-2">video_camera_front</span>
+        <h3 class="text-base font-bold text-on-surface">Bạn chưa có lớp học trực tuyến nào</h3>
+        <p class="text-xs text-on-surface-variant max-w-md mx-auto mt-1 mb-4">Khởi tạo lớp học mới để thiết lập môn học, thời khóa biểu và link phòng học trực tuyến (Google Meet/Zoom).</p>
+        <button type="button" onclick="document.getElementById('modal-create-class').classList.remove('hidden')" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-sm transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          <span>Tạo Lớp Học Ngay</span>
+        </button>
+      </div>
+
+      <div th:unless="${#lists.isEmpty(danhSachLop)}" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div th:each="lop : ${danhSachLop}" class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-5 flex flex-col justify-between gap-4 hover:shadow-md transition-all">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-0.5 rounded-full bg-status-success/10 text-status-success text-[11px] font-bold"
+                    th:text="${lop.trangThai.name() == 'DANG_MO_DANG_KY' ? 'Đang tuyển sinh' : 'Đang diễn ra'}">Đang diễn ra</span>
+              <span class="text-xs font-bold text-tertiary-container"
+                    th:text="${#numbers.formatDecimal(lop.hocPhiMoiHocVien, 0, 'COMMA', 0, 'POINT')} + ' đ/khóa'">0 đ/khóa</span>
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-primary uppercase"
+                    th:text="${lop.danhMuc != null ? lop.danhMuc.tenDanhMuc : 'Trực tuyến'}">Môn học</span>
+              <h2 class="text-base font-bold text-on-surface mt-0.5 line-clamp-1" th:text="${lop.tieuDeLop}">Tên lớp</h2>
+            </div>
+            <p class="text-xs text-on-surface-variant line-clamp-2" th:text="${lop.moTaLop ?: 'Lớp học trực tuyến chất lượng cao cùng giảng viên.'}">Mô tả</p>
+            <div class="p-3 rounded-xl bg-surface-container-low text-xs space-y-1.5">
+              <div class="flex items-center justify-between text-on-surface-variant">
+                <span>Lịch học:</span>
+                <span class="font-bold text-on-surface" th:text="${lop.lichHocTrongTuan ?: 'Linh hoạt'}">Thứ 3, Thứ 5</span>
+              </div>
+              <div class="flex items-center justify-between text-on-surface-variant">
+                <span>Sĩ số:</span>
+                <span class="font-bold text-on-surface" th:text="${#lists.size(lop.danhSachHocVien)} + ' / ' + ${lop.siSoToiDa} + ' học sinh'">0 / 1 học sinh</span>
+              </div>
+              <div class="flex items-center justify-between text-on-surface-variant">
+                <span>Trạng thái:</span>
+                <span class="font-bold text-status-success">Đang kích hoạt</span>
+              </div>
+            </div>
+          </div>
+          <div class="pt-3 border-t border-surface-container/40 flex items-center gap-2">
+            <a th:href="${lop.linkPhongHoc ?: 'https://meet.google.com/new'}" target="_blank" class="flex-1 py-2 rounded-xl bg-tertiary-container text-white text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-tertiary transition-all">
+              <span class="material-symbols-outlined text-[16px]">videocam</span>
+              <span>Vào Lớp Học</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal tạo lớp học mới -->
+      <div id="modal-create-class" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-surface-card rounded-2xl max-w-lg w-full p-6 shadow-xl border border-surface-container space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
+            <h3 class="text-base font-bold text-on-surface">Tạo Lớp Học Trực Tuyến Mới</h3>
+            <button onclick="document.getElementById('modal-create-class').classList.add('hidden')" class="p-1 rounded-lg hover:bg-surface-container text-outline">
+              <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+          </div>
+          <form onsubmit="event.preventDefault(); alert('Đã tạo lớp học trực tuyến thành công!'); document.getElementById('modal-create-class').classList.add('hidden');" class="space-y-3 text-xs">
+            <div>
+              <label class="block font-bold text-on-surface mb-1">Tên lớp học</label>
+              <input type="text" required placeholder="VD: Toán 12 Cơ Bản & Luyện Đề" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-on-surface mb-1">Môn học</label>
+                <select class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+                  <option>Toán học</option>
+                  <option>Vật lý</option>
+                  <option>Hóa học</option>
+                  <option>Tiếng Anh</option>
+                  <option>Sinh học</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-on-surface mb-1">Học phí (VNĐ)</label>
+                <input type="number" required placeholder="VD: 1500000" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+              </div>
+            </div>
+            <div>
+              <label class="block font-bold text-on-surface mb-1">Lịch học hàng tuần</label>
+              <input type="text" required placeholder="VD: Thứ 2 - Thứ 6 (19:30 - 21:00)" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+            </div>
+            <div>
+              <label class="block font-bold text-on-surface mb-1">Link phòng học trực tuyến (Google Meet / Zoom)</label>
+              <input type="url" placeholder="https://meet.google.com/xxx-yyyy-zzz" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+            </div>
+            <div class="pt-3 border-t border-surface-container/40 flex items-center justify-end gap-2">
+              <button type="button" onclick="document.getElementById('modal-create-class').classList.add('hidden')" class="px-4 py-2 rounded-lg bg-surface-container-low text-on-surface-variant font-bold hover:bg-surface-container">Hủy</button>
+              <button type="submit" class="px-5 py-2 rounded-lg bg-tertiary-container text-white font-bold hover:bg-tertiary shadow-sm">Tạo Lớp Học</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

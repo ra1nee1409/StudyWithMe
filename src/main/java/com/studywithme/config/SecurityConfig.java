@@ -1,5 +1,6 @@
 package com.studywithme.config;
 
+import com.studywithme.security.CustomAccessDeniedHandler;
 import com.studywithme.security.JwtAuthenticationEntryPoint;
 import com.studywithme.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
@@ -28,11 +29,14 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationEntryPoint unauthorizedHandler;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(JwtAuthenticationEntryPoint unauthorizedHandler,
+                          CustomAccessDeniedHandler accessDeniedHandler,
                           JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.unauthorizedHandler = unauthorizedHandler;
+        this.accessDeniedHandler = accessDeniedHandler;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
@@ -51,7 +55,10 @@ public class SecurityConfig {
         http
             .cors(Customizer.withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
-            .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(unauthorizedHandler)
+                .accessDeniedHandler(accessDeniedHandler)
+            )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(
@@ -61,8 +68,6 @@ public class SecurityConfig {
                     "/auth",
                     "/login",
                     "/register",
-                    "/admin",
-                    "/admin/**",
                     "/*.html",
                     "/css/**",
                     "/js/**",
@@ -75,9 +80,9 @@ public class SecurityConfig {
                     "/swagger-ui.html",
                     "/v3/api-docs/**"
                 ).permitAll()
-                .requestMatchers("/api/admin/**").hasAuthority("ROLE_QUAN_TRI")
-                .requestMatchers("/api/giang-vien/**").hasAuthority("ROLE_GIANG_VIEN")
-                .requestMatchers("/api/hoc-vien/**").hasAuthority("ROLE_HOC_VIEN")
+                .requestMatchers("/admin", "/admin/**", "/api/admin/**").hasAuthority("ROLE_QUAN_TRI")
+                .requestMatchers("/tutor", "/tutor/**", "/api/giang-vien/**").hasAnyAuthority("ROLE_GIANG_VIEN", "ROLE_QUAN_TRI")
+                .requestMatchers("/student", "/student/**", "/api/hoc-vien/**").authenticated()
                 .anyRequest().authenticated()
             );
 

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Hồ sơ & Bằng cấp - StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== TUTOR SIDEBAR ==================== -->
+  <aside th:replace="~{components/tutor/sidebar :: tutor-sidebar('profile')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar -->
+    <header th:replace="~{components/tutor/header :: tutor-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">Hồ Sơ Giảng Dạy & Bằng Cấp</h1>
+          <p class="text-xs text-on-surface-variant">Thông tin hiển thị công khai trên cổng Tìm gia sư của học sinh và phụ huynh.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-status-success/10 text-status-success text-xs font-bold">
+            <span class="material-symbols-outlined text-[16px]">verified</span>
+            <span>Hồ sơ đã xác minh</span>
+          </span>
+        </div>
+      </section>
+
+      <!-- Profile Form & Credentials -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Cột 1: Thông tin cá nhân & Giới thiệu -->
+        <div class="lg:col-span-2 bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 space-y-6">
+          <h2 class="text-base font-bold text-on-surface pb-3 border-b border-surface-container/40">Thông Tin Giảng Viên</h2>
+          
+          <form onsubmit="event.preventDefault(); alert('Đã cập nhật hồ sơ thành công!');" class="space-y-4 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-bold text-on-surface mb-1">Họ và tên</label>
+                <input type="text" th:value="${tutorName ?: 'Thầy Hoàng Văn Nam'}" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container font-semibold">
+              </div>
+              <div>
+                <label class="block font-bold text-on-surface mb-1">Học vị / Chuyên môn</label>
+                <input type="text" value="Thạc sĩ Sư Phạm Toán" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-bold text-on-surface mb-1">Môn giảng dạy chính</label>
+                <input type="text" value="Toán học (Lớp 10, 11, 12, Luyện thi ĐH)" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+              </div>
+              <div>
+                <label class="block font-bold text-on-surface mb-1">Mức học phí đề xuất (đ/giờ)</label>
+                <input type="text" value="250.000 đ/giờ" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-bold text-on-surface mb-1">Kinh nghiệm giảng dạy</label>
+              <input type="text" value="7 năm luyện thi học sinh giỏi & THPT Quốc gia trường chuyên" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+            </div>
+
+            <div>
+              <label class="block font-bold text-on-surface mb-1">Giới thiệu bản thân & Phương pháp giảng dạy</label>
+              <textarea rows="4" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container leading-relaxed">Tốt nghiệp thủ khoa ĐH Sư Phạm Hà Nội khoa Toán. Phương pháp giảng dạy trực quan, giúp học sinh mất gốc lấy lại căn bản trong 2 tuần và nâng cao tư duy giải nhanh trắc nghiệm môn Toán với máy tính Casio và sơ đồ tư duy Mindmap.</textarea>
+            </div>
+
+            <div class="pt-3 border-t border-surface-container/40 flex items-center justify-end">
+              <button type="submit" class="px-5 py-2.5 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-sm transition-all">
+                Lưu Thay Đổi
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Cột 2: Bằng cấp & Chứng chỉ -->
+        <div class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 space-y-5">
+          <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
+            <h2 class="text-base font-bold text-on-surface">Chứng Chỉ Đã Nộp</h2>
+            <button type="button" onclick="alert('Mở hộp thoại tải lên bằng cấp / chứng chỉ mới!')" class="text-xs font-bold text-tertiary-container hover:underline flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">upload_file</span>
+              <span>Tải lên</span>
+            </button>
+          </div>
+
+          <div class="space-y-3">
+            <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[20px]">verified</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-bold text-on-surface truncate">Bằng Thạc Sĩ Sư Phạm Toán</p>
+                <p class="text-[11px] text-status-success font-medium">Đã được BQT phê duyệt</p>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[20px]">verified</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-bold text-on-surface truncate">Chứng chỉ Nghiệp Vụ Sư Phạm Giỏi</p>
+                <p class="text-[11px] text-status-success font-medium">Đã được BQT phê duyệt</p>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[20px]">verified</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-bold text-on-surface truncate">Chứng chỉ Tiếng Anh C1 CEFR</p>
+                <p class="text-[11px] text-status-success font-medium">Đã được BQT phê duyệt</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

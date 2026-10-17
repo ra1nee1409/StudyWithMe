@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Bàn làm việc Giảng viên - StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== TUTOR SIDEBAR ==================== -->
+  <aside th:replace="~{components/tutor/sidebar :: tutor-sidebar('dashboard')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar -->
+    <header th:replace="~{components/tutor/header :: tutor-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Flash Notification Message -->
+      <div th:if="${message}" class="p-4 rounded-xl bg-accent-coral-subtle border border-tertiary-container text-tertiary flex items-center gap-3 shadow-sm">
+        <span class="material-symbols-outlined text-[22px] text-tertiary-container">check_circle</span>
+        <span class="text-sm font-semibold" th:text="${message}"></span>
+      </div>
+
+      <!-- 1. Header Banner: Chào mừng giảng viên -->
+      <section class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-surface-card via-surface-card to-accent-coral-subtle/40 p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-status-success/10 text-status-success text-xs font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse"></span>
+              Trạng thái: Sẵn sàng nhận lớp trực tuyến
+            </span>
+            <span class="text-outline-variant">•</span>
+            <span class="text-xs text-on-surface-variant font-medium">Hồ sơ đã phê duyệt chính thức</span>
+          </div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">
+            Xin chào, <span class="text-tertiary-container" th:text="${tutorName ?: 'Giảng viên'}">Thầy/Cô</span>! 👋
+          </h1>
+          <p class="text-xs text-on-surface-variant">
+            Chúc bạn có một buổi dạy truyền cảm hứng. Kiểm tra lịch dạy và danh sách học viên bên dưới để chuẩn bị tốt nhất.
+          </p>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <a th:href="@{/tutor/lop-hoc}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-sm transition-all">
+            <span class="material-symbols-outlined text-[18px]">add_circle</span>
+            <span>Mở Lớp Học Mới</span>
+          </a>
+          <a th:href="@{/tutor/lich-day}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface text-xs font-bold hover:bg-surface-container border border-surface-container transition-all">
+            <span class="material-symbols-outlined text-[18px]">calendar_month</span>
+            <span>Lịch Dạy Tuần</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- 2. Thống kê KPI Giảng viên -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <!-- Metric 1: Lớp học trực tuyến -->
+        <a th:href="@{/tutor/lop-hoc}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-tertiary-container transition-all group">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-medium group-hover:text-tertiary-container transition-colors">Lớp học trực tuyến đang mở</span>
+            <div class="w-10 h-10 rounded-xl bg-accent-coral-subtle text-tertiary-container flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px]">video_camera_front</span>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${tongLopHoc ?: '3'}">3</span>
+            <span class="text-xs text-on-surface-variant font-medium">lớp trực tuyến</span>
+          </div>
+        </a>
+
+        <!-- Metric 2: Tổng học viên -->
+        <a th:href="@{/tutor/hoc-vien}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-tertiary-container transition-all group">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-medium group-hover:text-tertiary-container transition-colors">Tổng học viên đang dạy</span>
+            <div class="w-10 h-10 rounded-xl bg-accent-cyan-subtle text-primary flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px]">group</span>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${tongHocVien ?: '18'}">18</span>
+            <span class="text-xs text-on-surface-variant font-medium">học viên</span>
+          </div>
+        </a>
+
+        <!-- Metric 3: Số dư ví & Thu nhập -->
+        <a th:href="@{/tutor/vi-tien}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-tertiary-container transition-all group">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-medium group-hover:text-tertiary-container transition-colors">Số dư ví khả dụng</span>
+            <div class="w-10 h-10 rounded-xl bg-status-success/10 text-status-success flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px]">account_balance_wallet</span>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl font-extrabold text-status-success tracking-tight" th:text="${soDuViFormat ?: '4.850.000'}">4.850.000</span>
+            <span class="text-xs text-on-surface-variant font-medium">VNĐ</span>
+          </div>
+        </a>
+
+        <!-- Metric 4: Đánh giá sao -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-medium">Đánh giá trung bình</span>
+            <div class="w-10 h-10 rounded-xl bg-status-warning/10 text-status-warning flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px]">star</span>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-on-surface tracking-tight">5.0</span>
+            <span class="text-xs text-on-surface-variant font-medium">/ 5.0 (Hồ sơ tiêu chuẩn)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Alert: Lớp học trực tuyến sắp tới / Chào mừng -->
+      <section th:if="${!#lists.isEmpty(danhSachLop)}" class="bg-gradient-to-r from-tertiary-container/10 via-surface-card to-tertiary-container/5 border-2 border-tertiary-container/30 p-5 rounded-2xl flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-sm">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-xl bg-tertiary-container text-white flex items-center justify-center shrink-0 shadow-md">
+            <span class="material-symbols-outlined text-[26px]">podium</span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-full bg-tertiary-container text-white text-[11px] font-bold uppercase tracking-wider">Lớp Đang Phụ Trách</span>
+              <span class="text-xs font-bold text-tertiary-container" th:text="${danhSachLop[0].lichHocTrongTuan ?: 'Lịch học linh hoạt'}">Lịch học</span>
+            </div>
+            <h2 class="text-base font-bold text-on-surface" th:text="${danhSachLop[0].tieuDeLop}">Tên lớp học</h2>
+            <p class="text-xs text-on-surface-variant flex items-center gap-3">
+              <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">group</span> Sĩ số: <span th:text="${#lists.size(danhSachLop[0].danhSachHocVien)} + '/' + ${danhSachLop[0].siSoToiDa} + ' học sinh'"></span></span>
+              <span>•</span>
+              <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">meeting_room</span> Nền tảng: Google Meet / Trực tuyến</span>
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <a th:href="${danhSachLop[0].linkPhongHoc ?: 'https://meet.google.com/new'}" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-md transition-all">
+            <span class="material-symbols-outlined text-[18px]">videocam</span>
+            <span>Vào Phòng Dạy Học</span>
+          </a>
+        </div>
+      </section>
+
+      <section th:if="${#lists.isEmpty(danhSachLop)}" class="bg-surface-card border border-dashed border-surface-container p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4 text-center sm:text-left">
+          <div class="w-12 h-12 rounded-xl bg-accent-coral-subtle text-tertiary-container flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[26px]">school</span>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-on-surface">Chào mừng bạn gia nhập đội ngũ Giảng viên StudyWithMe!</h2>
+            <p class="text-xs text-on-surface-variant">Tạo lớp học trực tuyến đầu tiên để bắt đầu chiêu sinh và nhận học viên vào lớp.</p>
+          </div>
+        </div>
+        <a th:href="@{/tutor/lop-hoc}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-sm transition-all shrink-0">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          <span>Tạo Lớp Học Đầu Tiên</span>
+        </a>
+      </section>
+
+      <!-- 4. Lưới 2 cột nội dung: Lớp đang mở & Học viên mới -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Cột 1 & 2: Danh sách lớp học trực tuyến -->
+        <div class="lg:col-span-2 bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 flex flex-col gap-4">
+          <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
+            <div>
+              <h2 class="text-base font-bold text-on-surface">Lớp Học Trực Tuyến Đang Giảng Dạy</h2>
+              <p class="text-xs text-on-surface-variant">Danh sách các lớp bạn đang phụ trách trên hệ thống</p>
+            </div>
+            <a th:href="@{/tutor/lop-hoc}" class="text-xs font-bold text-tertiary-container hover:underline flex items-center gap-1">
+              <span>Xem tất cả</span>
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </a>
+          </div>
+
+          <div th:if="${#lists.isEmpty(danhSachLop)}" class="p-8 text-center bg-surface-container-low/40 rounded-xl border border-dashed border-surface-container">
+            <span class="material-symbols-outlined text-3xl text-outline mb-1">video_camera_front</span>
+            <p class="text-xs font-semibold text-on-surface">Bạn chưa có lớp học trực tuyến nào</p>
+            <p class="text-[11px] text-on-surface-variant mt-0.5 mb-3">Tạo lớp học trực tuyến để mở đăng ký và tiếp nhận học viên.</p>
+            <a th:href="@{/tutor/lop-hoc}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary transition-all">
+              <span class="material-symbols-outlined text-[16px]">add_circle</span>
+              <span>Tạo lớp ngay</span>
+            </a>
+          </div>
+
+          <div th:unless="${#lists.isEmpty(danhSachLop)}" class="space-y-3">
+            <div th:each="lop : ${danhSachLop}" class="p-4 rounded-xl bg-surface-container-low/60 border border-surface-container/50 hover:border-tertiary-container/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-accent-coral-subtle text-tertiary-container font-black flex items-center justify-center shrink-0 uppercase text-xs"
+                     th:text="${#strings.length(lop.tieuDeLop) > 3 ? #strings.substring(lop.tieuDeLop, 0, 3) : lop.tieuDeLop}">
+                  LOP
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-on-surface" th:text="${lop.tieuDeLop}">Tên lớp</h3>
+                  <p class="text-xs text-on-surface-variant flex items-center gap-2 mt-0.5">
+                    <span th:text="${lop.lichHocTrongTuan ?: 'Lịch linh hoạt'}">Thứ 3 - Thứ 5</span>
+                    <span>•</span>
+                    <span class="text-status-success font-semibold" th:text="'Sĩ số: ' + ${#lists.size(lop.danhSachHocVien)} + '/' + ${lop.siSoToiDa} + ' học viên'">Sĩ số: 0/1</span>
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="px-2.5 py-1 rounded-full bg-status-success/10 text-status-success text-xs font-semibold" th:text="${lop.trangThai.name() == 'DANG_MO_DANG_KY' ? 'Đang mở đăng ký' : 'Đang diễn ra'}">Đang dạy</span>
+                <a th:href="@{/tutor/lop-hoc}" class="p-2 rounded-lg hover:bg-surface-container text-on-surface-variant">
+                  <span class="material-symbols-outlined text-[18px]">visibility</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cột 3: Học viên mới đăng ký & Phím tắt -->
+        <div class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 flex flex-col justify-between gap-5">
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
+              <h2 class="text-base font-bold text-on-surface">Đăng Ký Mới Gần Đây</h2>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-accent-coral-subtle text-tertiary-container" th:text="${#lists.size(danhSachHocVien)} + ' học viên'">0 học viên</span>
+            </div>
+
+            <div th:if="${#lists.isEmpty(danhSachHocVien)}" class="p-6 text-center bg-surface-container-low/40 rounded-xl border border-dashed border-surface-container">
+              <span class="material-symbols-outlined text-3xl text-outline mb-1">group_off</span>
+              <p class="text-xs font-semibold text-on-surface">Chưa có học viên nào đăng ký</p>
+              <p class="text-[11px] text-on-surface-variant mt-0.5">Khi học viên đăng ký vào lớp, thông tin sẽ hiển thị ở đây.</p>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(danhSachHocVien)}" class="space-y-3">
+              <div th:each="dk : ${danhSachHocVien}" class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-primary text-white font-bold text-xs flex items-center justify-center shrink-0 uppercase"
+                     th:text="${dk.hocVien != null && dk.hocVien.hoTen != null ? #strings.substring(dk.hocVien.hoTen.trim(), 0, 1) : 'H'}">
+                  HV
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-xs font-bold text-on-surface truncate" th:text="${dk.hocVien != null ? (dk.hocVien.hoTen ?: dk.hocVien.email) : 'Học viên'}">Nguyễn Văn A</p>
+                  <p class="text-[11px] text-on-surface-variant truncate" th:text="${dk.lopHoc != null ? dk.lopHoc.tieuDeLop : ''}">Toán 12</p>
+                </div>
+                <span class="material-symbols-outlined text-[18px] text-status-success">check_circle</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lối tắt thao tác nhanh -->
+          <div class="pt-4 border-t border-surface-container/40 space-y-2">
+            <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Thao tác nhanh</span>
+            <a th:href="@{/tutor/vi-tien}" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-xs font-bold text-on-surface transition-all">
+              <span class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-status-success">payments</span>
+                <span>Rút tiền học phí về tài khoản</span>
+              </span>
+              <span class="material-symbols-outlined text-[16px] text-outline">arrow_forward</span>
+            </a>
+            <a th:href="@{/tutor/ho-so}" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-xs font-bold text-on-surface transition-all">
+              <span class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-tertiary-container">badge</span>
+                <span>Cập nhật bằng cấp & học phí</span>
+              </span>
+              <span class="material-symbols-outlined text-[16px] text-outline">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

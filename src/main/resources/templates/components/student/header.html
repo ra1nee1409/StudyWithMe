@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <!-- ==================== STUDENT HEADER COMPONENT ==================== -->
+  <header th:fragment="student-header" class="fixed top-0 left-72 right-0 h-16 bg-surface-card/90 backdrop-blur-xl shadow-sm z-40 flex items-center justify-between px-6 border-b border-surface-container/30">
+    <div class="flex items-center gap-2 text-sm">
+      <span class="material-symbols-outlined text-primary text-[20px]">school</span>
+      <span class="text-outline-variant">/</span>
+      <span class="text-on-surface-variant">Cổng Học Viên</span>
+      <span class="text-outline-variant">/</span>
+      <span class="text-primary font-semibold">Góc học tập & Lớp trực tuyến</span>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <!-- Live Date Badge -->
+      <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low text-xs text-on-surface-variant font-medium">
+        <span class="material-symbols-outlined text-[16px] text-primary">calendar_today</span>
+        <span id="student-header-today-date">Đang cập nhật...</span>
+      </div>
+
+      <!-- Quick Action: Search Tutor -->
+      <a th:href="@{/#tim-gia-su}" class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent-cyan-subtle text-primary text-xs font-semibold hover:bg-accent-cyan-subtle/80 transition-colors">
+        <span class="material-symbols-outlined text-[16px]">search</span>
+        <span>Tìm gia sư</span>
+      </a>
+
+      <!-- Student Avatar -->
+      <div class="flex items-center gap-2">
+        <div id="student-header-avatar" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xs shadow-xs"
+             th:text="${studentName != null and studentName.length() > 0 ? #strings.substring(studentName, 0, 1).toUpperCase() : 'H'}">
+          H
+        </div>
+        <span class="text-xs font-bold text-on-surface hidden lg:inline-block max-w-[120px] truncate" th:text="${studentName ?: 'Học viên'}">
+          Học viên
+        </span>
+      </div>
+    </div>
+
+    <script>
+      (function initStudentHeaderDate() {
+        const update = () => {
+          const dateEl = document.getElementById('student-header-today-date');
+          if (dateEl) {
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' };
+            dateEl.textContent = today.toLocaleDateString('vi-VN', options);
+          }
+        };
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', update);
+        } else {
+          update();
+        }
+      })();
+    </script>
+  </header>
+</body>
+</html>

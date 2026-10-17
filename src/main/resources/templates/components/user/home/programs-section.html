@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <!-- ==================== SECTION 2: GRADE QUICK SELECTOR ==================== -->
+  <section th:fragment="programs-section" class="py-space-xl bg-surface-canvas relative" id="lop-1-kem-1">
+    <div class="max-w-7xl mx-auto px-6 lg:px-margin-desktop">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div>
+          <div
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent-navy-subtle text-primary font-label-md text-label-md mb-2">
+            <span class="material-symbols-outlined text-[16px]">category</span>
+            <span>CHƯƠNG TRÌNH ĐA DẠNG MỌI CẤP HỌC</span>
+          </div>
+          <h2 class="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
+            Chọn Lớp Của Con Để Xem Lộ Trình Phù Hợp
+          </h2>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+          Chương trình bám sát theo bộ sách mới nhất của Bộ GD&ĐT (Cánh Diều, Kết Nối Tri Thức, Chân Trời Sáng Tạo).
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- CẤP 1 -->
+        <div
+          class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between border border-surface-container">
+          <div>
+            <div
+              class="w-full h-32 rounded-lg bg-gradient-to-br from-accent-cyan-subtle via-surface-container-low to-secondary-fixed/40 p-4 flex flex-col justify-between mb-4 relative overflow-hidden">
+              <span
+                class="inline-block px-2.5 py-0.5 rounded-full bg-surface-container-lowest/90 font-label-sm text-label-sm text-primary font-bold self-start shadow-xs">
+                CẤP TIỂU HỌC
+              </span>
+              <div class="flex items-end justify-between">
+                <div>
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Lớp 1 - Lớp 5</h3>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant">Rèn nếp học, tư duy logic sớm</p>
+                </div>
+                <span class="material-symbols-outlined text-primary text-[36px] opacity-75">extension</span>
+              </div>
+            </div>
+            <div class="space-y-2 mb-4">
+              <div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-status-success text-[18px]">check_circle</span>
+                <span>Toán tư duy Singapore & Soroban cơ bản</span>
+              </div>
+              <div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-status-success text-[18px]">check_circle</span>
+                <span>Tiếng Việt rèn chữ & Đọc hiểu cảm thụ</span>
+              </div>
+              <div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-status-success text-[18px]">check_circle</span>
+                <span>Tiếng Anh chuẩn Cambridge Starters/Movers</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-5 gap-1.5 mb-4">
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-primary-container hover:text-on-primary text-secondary font-label-md text-label-md flex items-center justify-center transition-all"
+                href="#tim-gia-su">Lớp 1</a>
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-primary-container hover:text-on-primary text-secondary font-label-md text-label-md flex items-center justify-center transition-all"
+                href="#tim-gia-su">Lớp 2</a>
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-primary-container hover:text-on-primary text-secondary font-label-md text-label-md flex items-center justify-center transition-all"
+                href="#tim-gia-su">Lớp 3</a>
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-primary-container hover:text-on-primary text-secondary font-label-md text-label-md flex items-center justify-center transition-all"
+                href="#tim-gia-su">Lớp 4</a>
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-primary-container hover:text-on-primary text-secondary font-label-md text-label-md flex items-center justify-center transition-all"
+                href="#tim-gia-su">Lớp 5</a>
+            </div>
+          </div>
+          <a class="w-full py-2.5 rounded-lg bg-accent-cyan-subtle text-primary font-label-lg text-label-lg text-center hover:bg-primary hover:text-on-primary transition-colors flex items-center justify-center gap-1"
+            href="#tim-gia-su">
+            <span>Khám phá khóa Tiểu học</span>
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </a>
+        </div>
+
+        <!-- CẤP 2 -->
+        <div
+          class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between border border-surface-container">
+          <div>
+            <div
+              class="w-full h-32 rounded-lg bg-gradient-to-br from-accent-coral-subtle via-tertiary-fixed/30 to-tertiary-fixed-dim/40 p-4 flex flex-col justify-between mb-4 relative overflow-hidden">
+              <span
+                class="inline-block px-2.5 py-0.5 rounded-full bg-surface-container-lowest/90 font-label-sm text-label-sm text-tertiary font-bold self-start shadow-xs">
+                CẤP TRUNG HỌC CƠ SỞ
+              </span>
+              <div class="flex items-end justify-between">
+                <div>
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Lớp 6 - Lớp 9</h3>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant">Bứt phá điểm số & Thi vào 10 chuyên</p>
+                </div>
+                <span
+                  class="material-symbols-outlined text-tertiary-container text-[36px] opacity-75">rocket_launch</span>
+              </div>
+            </div>
+            <div class="space-y-2 mb-4">
+              <div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-status-success text-[18px]">check_circle</span>
+                <span>Toán 9 chuyên sâu ôn thi vào trường chuyên</span>
+              </div>
+              <div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-status-success text-[18px]">check_circle</span>
+                <span>Khoa học Tự nhiên (Lý - Hóa - Sinh) mới</span>
+              </div>
+              <div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-status-success text-[18px]">check_circle</span>
+                <span>Luyện cấu trúc ngữ pháp & Viết luận Văn 9</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-4 gap-2 mb-4">
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-tertiary-container hover:text-on-tertiary text-tertiary font-label-md text-label-md flex items-center justify-center transition-all"
+                href="#tim-gia-su">Lớp 6</a>
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-tertiary-container hover:text-on-tertiary text-tertiary font-label-md text-label-md flex items-center justify-center transition-all"
+                href="#tim-gia-su">Lớp 7</a>
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-tertiary-container hover:text-on-tertiary text-tertiary font-label-md text-label-md flex items-center justify-center transition-all"
+                href="#tim-gia-su">Lớp 8</a>
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-tertiary-container hover:text-on-tertiary text-tertiary font-label-md text-label-md flex items-center justify-center font-bold transition-all"
+                href="#tim-gia-su">Lớp 9 ⭐</a>
+            </div>
+          </div>
+          <a class="w-full py-2.5 rounded-lg bg-accent-coral-subtle text-tertiary font-label-lg text-label-lg text-center hover:bg-tertiary-container hover:text-on-tertiary transition-colors flex items-center justify-center gap-1"
+            href="#tim-gia-su">
+            <span>Khám phá khóa Lớp 6 - 9</span>
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </a>
+        </div>
+
+        <!-- CẤP 3 -->
+        <div
+          class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between border border-surface-container">
+          <div>
+            <div
+              class="w-full h-32 rounded-lg bg-gradient-to-br from-accent-navy-subtle via-secondary-fixed/50 to-secondary-container/40 p-4 flex flex-col justify-between mb-4 relative overflow-hidden">
+              <span
+                class="inline-block px-2.5 py-0.5 rounded-full bg-surface-container-lowest/90 font-label-sm text-label-sm text-secondary font-bold self-start shadow-xs">
+                CẤP THPT & LUYỆN THI
+              </span>
+              <div class="flex items-end justify-between">
+                <div>
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Lớp 10 - Lớp 12</h3>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant">Luyện thi ĐH, ĐGNL ĐHQG</p>
+                </div>
+                <span class="material-symbols-outlined text-secondary text-[36px] opacity-75">military_tech</span>
+              </div>
+            </div>
+            <div class="space-y-2 mb-4">
+              <div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-status-success text-[18px]">check_circle</span>
+                <span>Toán 12 & Luyện đề giải nhanh trắc nghiệm</span>
+              </div>
+              <div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-status-success text-[18px]">check_circle</span>
+                <span>Vật lý - Hóa học bám sát cấu trúc Đề thi mới</span>
+              </div>
+              <div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-status-success text-[18px]">check_circle</span>
+                <span>Đánh giá tư duy Bách Khoa & ĐGNL VNU</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mb-4">
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-secondary hover:text-on-secondary text-secondary font-label-md text-label-md flex items-center justify-center transition-all"
+                href="#tim-gia-su">Lớp 10</a>
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-secondary hover:text-on-secondary text-secondary font-label-md text-label-md flex items-center justify-center transition-all"
+                href="#tim-gia-su">Lớp 11</a>
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-secondary hover:text-on-secondary text-secondary font-label-md text-label-md flex items-center justify-center font-bold transition-all"
+                href="#tim-gia-su">Lớp 12 🔥</a>
+            </div>
+          </div>
+          <a class="w-full py-2.5 rounded-lg bg-accent-navy-subtle text-secondary font-label-lg text-label-lg text-center hover:bg-secondary hover:text-on-secondary transition-colors flex items-center justify-center gap-1"
+            href="#tim-gia-su">
+            <span>Khám phá khóa Lớp 10 - 12</span>
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </a>
+        </div>
+
+        <!-- NGOẠI NGỮ & KỸ NĂNG -->
+        <div
+          class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between border border-surface-container">
+          <div>
+            <div
+              class="w-full h-32 rounded-lg bg-gradient-to-br from-surface-variant via-surface-container-high to-primary-fixed/60 p-4 flex flex-col justify-between mb-4 relative overflow-hidden">
+              <span
+                class="inline-block px-2.5 py-0.5 rounded-full bg-surface-container-lowest/90 font-label-sm text-label-sm text-primary font-bold self-start shadow-xs">
+                CHỨNG CHỈ & KỸ NĂNG
+              </span>
+              <div class="flex items-end justify-between">
+                <div>
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">IELTS & Lập Trình</h3>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant">Hành trang hội nhập toàn cầu</p>
+                </div>
+                <span class="material-symbols-outlined text-primary text-[36px] opacity-75">language</span>
+              </div>
+            </div>
+            <div class="space-y-2 mb-4">
+              <div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-status-success text-[18px]">check_circle</span>
+                <span>Lộ trình IELTS 6.5+ / 7.5+ cam kết đầu ra</span>
+              </div>
+              <div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-status-success text-[18px]">check_circle</span>
+                <span>Tiếng Anh giao tiếp phản xạ 1-kèm-1</span>
+              </div>
+              <div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-status-success text-[18px]">check_circle</span>
+                <span>Lập trình tư duy Scratch, Python, Tin học trẻ</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 mb-4">
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-primary hover:text-on-primary text-primary font-label-md text-label-md flex items-center justify-center transition-all"
+                href="#tim-gia-su">IELTS 1-1</a>
+              <a class="h-9 rounded-lg bg-surface-container-low hover:bg-primary hover:text-on-primary text-primary font-label-md text-label-md flex items-center justify-center transition-all"
+                href="#tim-gia-su">Coding AI</a>
+            </div>
+          </div>
+          <a class="w-full py-2.5 rounded-lg bg-surface-container text-on-surface font-label-lg text-label-lg text-center hover:bg-primary-container hover:text-on-primary transition-colors flex items-center justify-center gap-1"
+            href="#tim-gia-su">
+            <span>Xem khóa Ngoại Ngữ & Tin Học</span>
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

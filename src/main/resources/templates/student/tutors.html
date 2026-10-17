@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Gia sư của tôi - StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== STUDENT SIDEBAR ==================== -->
+  <aside th:replace="~{components/student/sidebar :: student-sidebar('tutors')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar -->
+    <header th:replace="~{components/student/header :: student-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">Gia Sư Của Tôi</h1>
+          <p class="text-xs text-on-surface-variant">Danh sách các thầy cô đang trực tiếp giảng dạy và gia sư bạn đã lưu vào mục yêu thích.</p>
+        </div>
+        <a th:href="@{/#tim-gia-su}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container shadow-sm transition-all">
+          <span class="material-symbols-outlined text-[18px]">search</span>
+          <span>Tìm Thêm Gia Sư Mới</span>
+        </a>
+      </section>
+
+      <!-- Tutors Grid / Empty State -->
+      <div th:if="${#lists.isEmpty(danhSachDangKy)}" class="p-12 text-center bg-surface-card rounded-2xl border border-dashed border-surface-container/60 shadow-sm">
+        <span class="material-symbols-outlined text-4xl text-outline mb-2">person_off</span>
+        <h3 class="text-base font-bold text-on-surface">Bạn chưa có gia sư đồng hành</h3>
+        <p class="text-xs text-on-surface-variant max-w-md mx-auto mt-1 mb-4">Khi bạn đăng ký lớp học, thông tin thầy cô trực tiếp phụ trách chuyên môn sẽ hiển thị tại đây để bạn tiện trao đổi và theo dõi tiến độ.</p>
+        <a th:href="@{/#tim-gia-su}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container shadow-sm transition-all">
+          <span class="material-symbols-outlined text-[18px]">search</span>
+          <span>Tìm Gia Sư Phù Hợp</span>
+        </a>
+      </div>
+
+      <div th:unless="${#lists.isEmpty(danhSachDangKy)}" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div th:each="dk : ${danhSachDangKy}" class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-5 flex flex-col justify-between gap-4 hover:shadow-md transition-all">
+          <div class="flex items-start gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-tertiary-container text-white font-bold flex items-center justify-center text-xl shrink-0 shadow-sm uppercase"
+                 th:text="${dk.lopHoc.giangVien != null && dk.lopHoc.giangVien.nguoiDung != null && dk.lopHoc.giangVien.nguoiDung.hoTen != null ? #strings.substring(dk.lopHoc.giangVien.nguoiDung.hoTen.trim(), 0, 1) : 'G'}">
+              G
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-1 text-xs text-status-success font-semibold mb-0.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+                <span>Gia sư trực tiếp</span>
+              </div>
+              <h2 class="text-base font-bold text-on-surface truncate"
+                  th:text="${dk.lopHoc.giangVien != null && dk.lopHoc.giangVien.nguoiDung != null ? (dk.lopHoc.giangVien.nguoiDung.hoTen ?: dk.lopHoc.giangVien.nguoiDung.email) : 'Giảng viên'}">Tên gia sư</h2>
+              <p class="text-xs text-on-surface-variant line-clamp-1"
+                 th:text="${dk.lopHoc.giangVien != null ? (dk.lopHoc.giangVien.tieuDeChuyenMon ?: 'Gia sư chuyên môn') : 'Chuyên môn'}">Chuyên môn</p>
+              <div class="flex items-center gap-1 mt-1 text-xs text-status-warning font-bold">
+                <span class="material-symbols-outlined text-[16px]">star</span>
+                <span>5.0 / 5.0 (Giảng viên đã kiểm định)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-surface-container-low text-xs space-y-1">
+            <span class="text-on-surface-variant block">Lớp phụ trách: <b class="text-on-surface" th:text="${dk.lopHoc.tieuDeLop}">Toán Nâng Cao 12</b></span>
+            <span class="text-on-surface-variant block">Lịch dạy: <b class="text-on-surface" th:text="${dk.lopHoc.lichHocTrongTuan ?: 'Lịch thỏa thuận'}">Lịch học</b></span>
+          </div>
+
+          <div class="pt-3 border-t border-surface-container/40 flex items-center gap-2">
+            <a th:href="@{/student/lop-hoc}" class="w-full py-2 rounded-xl bg-primary text-white text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-primary-container transition-all">
+              <span class="material-symbols-outlined text-[16px]">visibility</span>
+              <span>Xem Lớp Học Của Thầy/Cô</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

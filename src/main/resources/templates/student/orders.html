@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Lịch sử học phí & Đơn hàng - StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== STUDENT SIDEBAR ==================== -->
+  <aside th:replace="~{components/student/sidebar :: student-sidebar('orders')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar -->
+    <header th:replace="~{components/student/header :: student-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">Lịch Sử Thanh Toán & Học Phí</h1>
+          <p class="text-xs text-on-surface-variant">Tra cứu biên lai nộp học phí, các khóa học và lớp học trực tuyến bạn đã đăng ký.</p>
+        </div>
+      </section>
+
+      <!-- Orders Table -->
+      <div class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 overflow-hidden">
+        <div class="p-4 border-b border-surface-container/40 flex items-center justify-between">
+          <h2 class="text-sm font-bold text-on-surface">Danh Sách Đơn Hàng & Học Phí</h2>
+          <span class="text-xs text-on-surface-variant" th:text="'Tổng: ' + ${#lists.size(danhSachDonHang)} + ' đơn hàng'">Tổng: 0 đơn hàng</span>
+        </div>
+
+        <div th:if="${#lists.isEmpty(danhSachDonHang)}" class="p-12 text-center bg-surface-container-low/30">
+          <span class="material-symbols-outlined text-4xl text-outline mb-2">receipt_long</span>
+          <p class="text-sm font-bold text-on-surface">Bạn chưa có đơn hàng hoặc hóa đơn nào</p>
+          <p class="text-xs text-on-surface-variant mt-1">Khi bạn đăng ký học hoặc nộp học phí, các giao dịch và biên lai sẽ hiển thị tại đây.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(danhSachDonHang)}" class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-surface-container-low/80 text-on-surface-variant uppercase text-[11px] font-bold border-b border-surface-container/40">
+              <tr>
+                <th class="py-3.5 px-6">Mã Đơn Hàng</th>
+                <th class="py-3.5 px-6">Dịch Vụ / Khóa Học</th>
+                <th class="py-3.5 px-6">Học Phí</th>
+                <th class="py-3.5 px-6">Phương Thức</th>
+                <th class="py-3.5 px-6">Ngày Tạo</th>
+                <th class="py-3.5 px-6">Trạng Thái</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-container/30">
+              <tr th:each="dh : ${danhSachDonHang}" class="hover:bg-surface-container-low/40">
+                <td class="py-3.5 px-6 font-mono font-bold text-primary" th:text="${dh.maDonHang}">SWM-ORD-001</td>
+                <td class="py-3.5 px-6">
+                  <span class="font-bold text-on-surface block"
+                        th:text="${!#lists.isEmpty(dh.danhSachChiTiet) ? dh.danhSachChiTiet[0].tenSanPham : 'Đăng ký lớp học trực tuyến'}">Học phí</span>
+                </td>
+                <td class="py-3.5 px-6 font-bold text-on-surface"
+                    th:text="${#numbers.formatDecimal(dh.tongTienThanhToan, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</td>
+                <td class="py-3.5 px-6 text-on-surface-variant" th:text="${dh.phuongThucThanhToan != null ? dh.phuongThucThanhToan.name() : 'VNPAY'}">VNPAY</td>
+                <td class="py-3.5 px-6 text-on-surface-variant" th:text="${#temporals.format(dh.ngayTaoDon, 'dd/MM/yyyy HH:mm')}">17/10/2026</td>
+                <td class="py-3.5 px-6">
+                  <span class="px-2.5 py-0.5 rounded-full font-semibold text-[11px]"
+                        th:classappend="${dh.trangThaiThanhToan != null && dh.trangThaiThanhToan.name() == 'DA_THANH_TOAN'} ? 'bg-status-success/10 text-status-success' : 'bg-status-warning/10 text-status-warning'"
+                        th:text="${dh.trangThaiThanhToan != null ? dh.trangThaiThanhToan.name() : 'CHO_THANH_TOAN'}">DA_THANH_TOAN</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

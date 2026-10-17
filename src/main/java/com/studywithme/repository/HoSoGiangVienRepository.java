@@ -4,6 +4,7 @@ import com.studywithme.entity.HoSoGiangVien;
 import com.studywithme.entity.enums.TrangThaiGiangVien;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +16,11 @@ public interface HoSoGiangVienRepository extends JpaRepository<HoSoGiangVien, Lo
     Optional<HoSoGiangVien> findByNguoiDungId(Long nguoiDungId);
     Page<HoSoGiangVien> findByTrangThaiDuyet(TrangThaiGiangVien trangThaiDuyet, Pageable pageable);
     long countByTrangThaiDuyet(TrangThaiGiangVien trangThaiDuyet);
+
+    @EntityGraph(attributePaths = {"nguoiDung"})
     List<HoSoGiangVien> findByTrangThaiDuyetOrderByNgayTaoDesc(TrangThaiGiangVien trangThaiDuyet);
+
+    @EntityGraph(attributePaths = {"nguoiDung"})
     List<HoSoGiangVien> findTop4ByTrangThaiDuyetOrderByNgayTaoDesc(TrangThaiGiangVien trangThaiDuyet);
 }
+

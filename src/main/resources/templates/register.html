@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{components/head :: common-head(${title})}"></head>
+<head th:replace="~{components/common/head :: common-head(${title})}"></head>
 <body class="bg-background font-body-md text-body-md text-on-surface antialiased">
 
   <!-- HEADER COMPONENT -->
-  <header th:replace="~{components/header :: main-header('register')}"></header>
+  <header th:replace="~{components/user/header :: main-header('register')}"></header>
 
   <main class="w-full pt-20 bg-background min-h-screen">
     <div class="relative w-full overflow-hidden py-8 lg:py-12 px-4 sm:px-6 lg:px-margin-desktop">
@@ -82,11 +82,11 @@
                 <label class="block font-label-lg text-label-lg text-on-surface font-semibold mb-1.5">
                   Mật khẩu <span class="text-error">*</span>
                 </label>
-                <div class="relative">
-                  <span class="material-symbols-outlined text-outline absolute left-3.5 top-1/2 -translate-y-1/2 text-[20px]">lock</span>
-                  <input class="w-full pl-11 pr-10 py-2.5 bg-surface-container-low rounded-lg text-body-md font-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container transition-all" id="pwd" name="matKhau" placeholder="Tối thiểu 6 ký tự" required type="password">
-                  <button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface" onclick="togglePass('pwd', this)" type="button">
-                    <span class="material-symbols-outlined text-[18px]">visibility</span>
+                <div class="relative flex items-center">
+                  <span class="material-symbols-outlined text-outline absolute left-3.5 pointer-events-none text-[20px]">lock</span>
+                  <input class="w-full pl-11 pr-11 py-2.5 bg-surface-container-low rounded-lg text-body-md font-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container transition-all" id="pwd" name="matKhau" placeholder="Tối thiểu 6 ký tự" required type="password">
+                  <button class="absolute right-3 text-outline hover:text-primary cursor-pointer p-1 rounded-full transition-colors flex items-center justify-center" onclick="togglePass('pwd', this)" type="button" title="Hiển thị hoặc ẩn mật khẩu">
+                    <span class="material-symbols-outlined text-[20px]">visibility_off</span>
                   </button>
                 </div>
               </div>
@@ -95,11 +95,11 @@
                 <label class="block font-label-lg text-label-lg text-on-surface font-semibold mb-1.5">
                   Xác nhận mật khẩu <span class="text-error">*</span>
                 </label>
-                <div class="relative">
-                  <span class="material-symbols-outlined text-outline absolute left-3.5 top-1/2 -translate-y-1/2 text-[20px]">lock_reset</span>
-                  <input class="w-full pl-11 pr-10 py-2.5 bg-surface-container-low rounded-lg text-body-md font-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container transition-all" id="pwd-confirm" placeholder="Nhập lại mật khẩu" required type="password">
-                  <button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface" onclick="togglePass('pwd-confirm', this)" type="button">
-                    <span class="material-symbols-outlined text-[18px]">visibility</span>
+                <div class="relative flex items-center">
+                  <span class="material-symbols-outlined text-outline absolute left-3.5 pointer-events-none text-[20px]">lock_reset</span>
+                  <input class="w-full pl-11 pr-11 py-2.5 bg-surface-container-low rounded-lg text-body-md font-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container transition-all" id="pwd-confirm" placeholder="Nhập lại mật khẩu" required type="password">
+                  <button class="absolute right-3 text-outline hover:text-primary cursor-pointer p-1 rounded-full transition-colors flex items-center justify-center" onclick="togglePass('pwd-confirm', this)" type="button" title="Hiển thị hoặc ẩn mật khẩu">
+                    <span class="material-symbols-outlined text-[20px]">visibility_off</span>
                   </button>
                 </div>
               </div>
@@ -130,7 +130,7 @@
   </main>
 
   <!-- FOOTER COMPONENT -->
-  <footer th:replace="~{components/footer :: simple-footer}"></footer>
+  <footer th:replace="~{components/user/footer :: simple-footer}"></footer>
 
   <script>
     function togglePass(inputId, btn) {
@@ -138,10 +138,10 @@
       const icon = btn.querySelector('.material-symbols-outlined');
       if (input.type === 'password') {
         input.type = 'text';
-        icon.textContent = 'visibility_off';
+        icon.textContent = 'visibility';
       } else {
         input.type = 'password';
-        icon.textContent = 'visibility';
+        icon.textContent = 'visibility_off';
       }
     }
 
@@ -197,14 +197,14 @@
 
         if (response.ok) {
           alertBox.className = "mb-4 p-3 rounded-lg text-body-sm font-body-sm flex items-center gap-2 bg-accent-cyan-subtle text-status-success";
-          alertBox.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>' + (data.message || 'Đăng ký thành công! Đang chuyển đến trang đăng nhập...') + '</span>';
+          alertBox.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>' + (data.thongBao || data.message || 'Đăng ký thành công! Đang chuyển đến trang đăng nhập...') + '</span>';
           alertBox.classList.remove('hidden');
           setTimeout(() => {
             window.location.href = '/login';
           }, 1500);
         } else {
           alertBox.className = "mb-4 p-3 rounded-lg text-body-sm font-body-sm flex items-center gap-2 bg-error-container text-error";
-          alertBox.innerHTML = '<span class="material-symbols-outlined text-[18px]">error</span><span>' + (data.message || 'Đăng ký thất bại. Vui lòng thử lại!') + '</span>';
+          alertBox.innerHTML = '<span class="material-symbols-outlined text-[18px]">error</span><span>' + (data.thongBao || data.message || 'Đăng ký thất bại. Vui lòng thử lại!') + '</span>';
           alertBox.classList.remove('hidden');
           btn.disabled = false;
           btn.innerHTML = '<span>Đăng ký ngay</span><span class="material-symbols-outlined text-[20px]">arrow_forward</span>';

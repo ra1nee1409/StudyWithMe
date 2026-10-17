@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Lớp học trực tuyến của tôi - StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== STUDENT SIDEBAR ==================== -->
+  <aside th:replace="~{components/student/sidebar :: student-sidebar('classes')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar -->
+    <header th:replace="~{components/student/header :: student-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">Lớp Học Trực Tuyến Của Tôi</h1>
+          <p class="text-xs text-on-surface-variant">Danh sách các lớp học trực tuyến 1-kèm-1 và lớp nhóm bạn đã đăng ký trên hệ thống StudyWithMe.</p>
+        </div>
+        <a th:href="@{/#tim-gia-su}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container shadow-sm transition-all">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          <span>Đăng Ký Lớp Mới</span>
+        </a>
+      </section>
+
+      <!-- Danh sách lớp học dạng Cards / Empty State -->
+      <div th:if="${#lists.isEmpty(danhSachDangKy)}" class="p-12 text-center bg-surface-card rounded-2xl border border-dashed border-surface-container/60 shadow-sm">
+        <span class="material-symbols-outlined text-4xl text-outline mb-2">school</span>
+        <h3 class="text-base font-bold text-on-surface">Bạn chưa tham gia lớp học trực tuyến nào</h3>
+        <p class="text-xs text-on-surface-variant max-w-md mx-auto mt-1 mb-4">Khám phá các khóa học trực tuyến 1-kèm-1 và lớp nhóm với các gia sư hàng đầu ngay hôm nay.</p>
+        <a th:href="@{/#tim-gia-su}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container shadow-sm transition-all">
+          <span class="material-symbols-outlined text-[18px]">search</span>
+          <span>Tìm Lớp Học Ngay</span>
+        </a>
+      </div>
+
+      <div th:unless="${#lists.isEmpty(danhSachDangKy)}" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div th:each="dk : ${danhSachDangKy}" class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 flex flex-col justify-between gap-5 hover:shadow-md transition-all">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-0.5 rounded-full bg-status-success/10 text-status-success text-xs font-bold"
+                    th:text="${dk.trangThaiThamGia != null ? dk.trangThaiThamGia.name() : 'DA_XAC_NHAN'}">Đang theo học</span>
+              <span class="text-xs font-bold text-primary">Phòng học trực tuyến</span>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-primary uppercase"
+                    th:text="${dk.lopHoc.danhMuc != null ? dk.lopHoc.danhMuc.tenDanhMuc : 'Trực tuyến'}">Toán học</span>
+              <h2 class="text-lg font-bold text-on-surface mt-0.5 line-clamp-1" th:text="${dk.lopHoc.tieuDeLop}">Tên lớp học</h2>
+            </div>
+            
+            <!-- Gia sư phụ trách -->
+            <div class="p-3.5 rounded-xl bg-surface-container-low flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-tertiary-container text-white font-bold flex items-center justify-center text-sm shadow-xs uppercase"
+                     th:text="${dk.lopHoc.giangVien != null && dk.lopHoc.giangVien.nguoiDung != null && dk.lopHoc.giangVien.nguoiDung.hoTen != null ? #strings.substring(dk.lopHoc.giangVien.nguoiDung.hoTen.trim(), 0, 1) : 'G'}">
+                  G
+                </div>
+                <div>
+                  <span class="text-xs font-bold text-on-surface block"
+                        th:text="${dk.lopHoc.giangVien != null && dk.lopHoc.giangVien.nguoiDung != null ? (dk.lopHoc.giangVien.nguoiDung.hoTen ?: dk.lopHoc.giangVien.nguoiDung.email) : 'Gia sư'}">Tên gia sư</span>
+                  <span class="text-[11px] text-on-surface-variant line-clamp-1"
+                        th:text="${dk.lopHoc.giangVien != null ? (dk.lopHoc.giangVien.tieuDeChuyenMon ?: 'Gia sư trực tuyến') : 'Giảng viên'}">Chuyên môn</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Thông tin chi tiết lớp -->
+            <div class="space-y-2 text-xs">
+              <div class="flex items-center justify-between text-on-surface-variant">
+                <span>Lịch học:</span>
+                <span class="font-bold text-on-surface" th:text="${dk.lopHoc.lichHocTrongTuan ?: 'Lịch học linh hoạt'}">Thứ 3, Thứ 5</span>
+              </div>
+              <div class="flex items-center justify-between text-on-surface-variant">
+                <span>Trạng thái lớp:</span>
+                <span class="font-bold text-status-success">Đang hoạt động</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-surface-container/40 flex items-center gap-3">
+            <a th:href="${dk.lopHoc.linkPhongHoc ?: 'https://meet.google.com/new'}" target="_blank" class="flex-1 py-2.5 rounded-xl bg-primary text-white text-xs font-bold flex items-center justify-center gap-2 hover:bg-primary-container shadow-sm transition-all">
+              <span class="material-symbols-outlined text-[18px]">videocam</span>
+              <span>Vào Lớp Trực Tuyến</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

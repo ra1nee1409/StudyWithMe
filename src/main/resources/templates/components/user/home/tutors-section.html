@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <!-- ==================== SECTION 3: TOP FEATURED TUTORS ==================== -->
+  <section th:fragment="tutors-section" class="py-space-xl bg-background" id="gia-su">
+    <div class="max-w-7xl mx-auto px-6 lg:px-margin-desktop">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+        <div>
+          <div
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent-coral-subtle text-tertiary font-label-md text-label-md mb-2">
+            <span class="material-symbols-outlined text-[16px]">verified</span>
+            <span>ĐỘI NGŨ TINH HOA 100% KIỂM DUYỆT BẰNG CẤP</span>
+          </div>
+          <h2 class="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
+            Gia Sư Tiêu Biểu Được Phụ Huynh Đánh Giá Cao Nhất
+          </h2>
+        </div>
+        <a class="inline-flex items-center gap-2 text-primary hover:text-primary-container font-label-lg text-label-lg font-bold group"
+          href="#tim-gia-su">
+          <span>Xem tất cả gia sư</span>
+          <span
+            class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">east</span>
+        </a>
+      </div>
+
+      <!-- Real Tutors from Database -->
+      <div th:if="${!#lists.isEmpty(featuredTutors)}">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div th:each="tutor : ${featuredTutors}"
+            class="bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all p-6 flex flex-col justify-between border border-surface-container">
+            <div>
+              <div class="flex items-start gap-4 mb-4">
+                <div class="relative shrink-0">
+                  <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center text-white text-xl font-bold ring-2 ring-primary-container/30"
+                       th:text="${tutor.nguoiDung != null and tutor.nguoiDung.hoTen != null ? #strings.substring(tutor.nguoiDung.hoTen.trim(), 0, 1).toUpperCase() : 'GS'}">
+                    GS
+                  </div>
+                  <span class="material-symbols-outlined text-primary text-[18px] absolute -bottom-1 -right-1 bg-surface-container-lowest rounded-full p-0.5 shadow-sm"
+                    style="font-variation-settings: 'FILL' 1;">verified</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-1">
+                    <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold truncate"
+                        th:text="${tutor.nguoiDung != null ? tutor.nguoiDung.hoTen : 'Gia sư StudyWithMe'}">Gia sư</h3>
+                    <span class="px-2 py-0.5 rounded-full bg-accent-cyan-subtle text-primary font-label-sm text-label-sm font-bold shrink-0">Đã Duyệt</span>
+                  </div>
+                  <p class="font-body-sm text-body-sm text-secondary font-medium truncate"
+                     th:text="${tutor.tieuDeChuyenMon ?: 'Gia sư Chuyên môn'}">Gia sư Chuyên môn</p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <div class="flex items-center text-status-warning">
+                      <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                      <span class="font-label-md text-label-md text-on-surface font-bold ml-1">5.0</span>
+                    </div>
+                    <span class="text-outline text-label-sm text-label-sm">(Hồ sơ đã xác minh)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="p-3 bg-surface-container-low rounded-lg mb-4 text-body-sm font-body-sm text-on-surface-variant">
+                <p class="line-clamp-2" th:text="${tutor.gioiThieuBanThan ?: 'Gia sư tận tâm với phương pháp dạy hiện đại, hỗ trợ học sinh lấy lại căn bản và bứt phá điểm số.'}"></p>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-3 pt-2">
+                <span class="text-on-surface-variant font-body-sm text-body-sm">Trạng thái:</span>
+                <span class="inline-flex items-center gap-1 text-status-success font-bold text-xs bg-accent-cyan-subtle px-2 py-0.5 rounded-full">
+                  <span class="w-1.5 h-1.5 rounded-full bg-status-success"></span> Đang nhận lớp
+                </span>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <a class="py-2.5 px-3 rounded-full bg-surface-container-low text-secondary font-label-md text-label-md hover:bg-accent-navy-subtle hover:text-primary transition-colors text-center"
+                  href="#tim-gia-su">Xem Hồ Sơ</a>
+                <a class="py-2.5 px-3 rounded-full bg-tertiary-container hover:bg-tertiary text-on-tertiary font-label-md text-label-md transition-colors text-center shadow-xs flex items-center justify-center"
+                  href="#dang-ky-hoc-thu">Học Thử 0đ</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State when no tutors approved in DB -->
+      <div th:if="${#lists.isEmpty(featuredTutors)}" class="text-center py-12 px-6 bg-surface-container-lowest rounded-2xl border border-surface-container">
+        <span class="material-symbols-outlined text-[48px] text-outline mb-2">school</span>
+        <h3 class="text-base font-bold text-on-surface">Đang Cập Nhật Danh Sách Gia Sư</h3>
+        <p class="text-xs text-on-surface-variant max-w-md mx-auto mt-1 mb-4">Các hồ sơ gia sư mới đang trong quá trình xét duyệt bằng cấp và chứng chỉ. Bạn có thể đăng ký tham gia đội ngũ giảng dạy ngay hôm nay.</p>
+        <a th:href="@{/register}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-white text-xs font-bold hover:bg-primary-container transition-all">
+          <span class="material-symbols-outlined text-[18px]">person_add</span>
+          <span>Đăng Ký Làm Gia Sư</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+</body>
+</html>

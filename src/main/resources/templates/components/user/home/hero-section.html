@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <!-- ==================== SECTION 1: HERO & SMART TUTOR FINDER ==================== -->
+  <section th:fragment="hero-section"
+    class="relative overflow-hidden bg-gradient-to-b from-surface-container-low/60 via-background to-surface-bright pb-space-xl"
+    id="tim-gia-su">
+    <div
+      class="absolute -top-32 left-1/2 -translate-x-1/2 w-[720px] h-[360px] bg-gradient-to-r from-primary-container/15 via-secondary-container/20 to-tertiary-container/10 blur-3xl pointer-events-none rounded-full">
+    </div>
+    <div
+      class="absolute top-48 -right-24 w-96 h-96 bg-accent-cyan-subtle/80 blur-2xl pointer-events-none rounded-full">
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6 lg:px-margin-desktop pt-8 sm:pt-12 relative z-10">
+      <!-- Trust Badges -->
+      <div class="flex flex-wrap items-center justify-center gap-3 mb-6">
+        <div
+          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-coral-subtle text-tertiary font-label-md text-label-md shadow-sm">
+          <span class="material-symbols-outlined text-[18px] text-tertiary-container"
+            style="font-variation-settings: 'FILL' 1;">stars</span>
+          <span>98.6% Học sinh tăng ít nhất 2 điểm sau 3 tháng</span>
+        </div>
+        <div
+          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-cyan-subtle text-secondary font-label-md text-label-md shadow-sm">
+          <span class="material-symbols-outlined text-[18px] text-primary"
+            style="font-variation-settings: 'FILL' 1;">redeem</span>
+          <span class="font-bold">Học thử 02 buổi miễn phí 100%</span>
+        </div>
+      </div>
+
+      <!-- Headline & Subtitle -->
+      <div class="text-center max-w-4xl mx-auto mb-10">
+        <h1 class="font-display text-display text-on-surface tracking-tight font-extrabold mb-4">
+          Kết Nối Gia Sư Giỏi <span class="text-primary-container">1-Kèm-1</span> – Đột Phá Điểm Số Cùng <span
+            class="text-tertiary-container">StudyWithMe</span>
+        </h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl mx-auto">
+          Hơn 15.000+ gia sư thủ khoa, giảng viên trường chuyên sư phạm, bách khoa, ngoại thương sẵn sàng đồng hành
+          cùng học sinh từ Lớp 1 đến Lớp 12 với giáo trình cá nhân hóa toàn diện.
+        </p>
+      </div>
+
+      <!-- Smart Tutor Finder Box -->
+      <div
+        class="bg-surface-container-lowest rounded-xl shadow-[0_12px_32px_-6px_rgba(0,165,223,0.14)] p-6 sm:p-8 max-w-5xl mx-auto border border-surface-container">
+        <div class="flex items-center gap-2 mb-6">
+          <span class="w-2.5 h-6 rounded-full bg-tertiary-container inline-block"></span>
+          <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Tìm Gia Sư Nhanh Theo Yêu Cầu Của
+            Bạn</h2>
+          <span
+            class="ml-auto hidden md:inline-flex items-center gap-1.5 font-label-sm text-label-sm text-status-success bg-accent-cyan-subtle px-2.5 py-1 rounded-full">
+            <span class="w-2 h-2 rounded-full bg-status-success animate-pulse"></span>
+            842 gia sư đang online sẵn sàng nhận lớp
+          </span>
+        </div>
+
+        <form class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end"
+          onsubmit="event.preventDefault(); window.location.href='#gia-su';">
+          <!-- Step 1: Grade Selection -->
+          <div class="lg:col-span-3 space-y-1.5">
+            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">1. Khối Lớp
+              Học</label>
+            <div class="relative">
+              <select
+                class="w-full h-12 pl-10 pr-8 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container appearance-none transition-all cursor-pointer">
+                <option value="cap-1">Tiểu học (Lớp 1 - 5)</option>
+                <option selected value="cap-2">THCS (Lớp 6 - 9)</option>
+                <option value="cap-3">THPT (Lớp 10 - 12)</option>
+                <option value="luyen-thi">Luyện thi ĐH / IELTS</option>
+              </select>
+              <span
+                class="material-symbols-outlined text-secondary absolute left-3 top-1/2 -translate-y-1/2 text-[20px] pointer-events-none">school</span>
+              <span
+                class="material-symbols-outlined text-outline absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] pointer-events-none">expand_more</span>
+            </div>
+          </div>
+
+          <!-- Step 2: Subject -->
+          <div class="lg:col-span-3 space-y-1.5">
+            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">2. Môn Cần Bổ
+              Trợ</label>
+            <div class="relative">
+              <select
+                class="w-full h-12 pl-10 pr-8 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container appearance-none transition-all cursor-pointer">
+                <option selected value="toan">Toán học</option>
+                <option value="anh">Tiếng Anh & IELTS</option>
+                <option value="van">Ngữ Văn</option>
+                <option value="ly">Vật Lý</option>
+                <option value="hoa">Hóa Học</option>
+                <option value="sinh">Sinh Học</option>
+                <option value="it">Lập trình Scratch/Python</option>
+              </select>
+              <span
+                class="material-symbols-outlined text-secondary absolute left-3 top-1/2 -translate-y-1/2 text-[20px] pointer-events-none">menu_book</span>
+              <span
+                class="material-symbols-outlined text-outline absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] pointer-events-none">expand_more</span>
+            </div>
+          </div>
+
+          <!-- Step 3: Format -->
+          <div class="lg:col-span-3 space-y-1.5">
+            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">3. Hình Thức
+              Học</label>
+            <div class="relative">
+              <select
+                class="w-full h-12 pl-10 pr-8 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container appearance-none transition-all cursor-pointer">
+                <option selected value="online">Online 1-kèm-1 (Bảng số)</option>
+                <option value="offline">Gia sư tại nhà riêng</option>
+                <option value="hybrid">Kết hợp linh hoạt</option>
+              </select>
+              <span
+                class="material-symbols-outlined text-secondary absolute left-3 top-1/2 -translate-y-1/2 text-[20px] pointer-events-none">devices</span>
+              <span
+                class="material-symbols-outlined text-outline absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] pointer-events-none">expand_more</span>
+            </div>
+          </div>
+
+          <!-- CTA Button -->
+          <div class="lg:col-span-3">
+            <button
+              class="w-full h-12 px-5 bg-tertiary-container hover:bg-tertiary text-on-tertiary font-label-lg text-label-lg rounded-full flex items-center justify-center gap-2 shadow-[0_4px_16px_-2px_rgba(255,109,32,0.5)] transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+              type="submit">
+              <span class="material-symbols-outlined text-[20px]">search_check</span>
+              <span>Tìm Gia Sư Ngay (30s)</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Quick filter chips -->
+        <div
+          class="mt-5 pt-4 flex flex-wrap items-center gap-2 text-body-sm font-body-sm text-on-surface-variant border-t border-surface-container">
+          <span class="font-bold text-on-surface text-label-md font-label-md">Gợi ý phổ biến:</span>
+          <button
+            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors"
+            type="button">Toán 9 Luyện thi vào 10</button>
+          <button
+            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors"
+            type="button">IELTS Cấp tốc 6.5+</button>
+          <button
+            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors"
+            type="button">Lấy gốc Hóa 10 & 11</button>
+          <button
+            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors"
+            type="button">Tiếng Anh Tiểu học Cambridge</button>
+        </div>
+      </div>
+
+      <!-- Hero Impact Numbers -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto mt-8">
+        <div
+          class="bg-surface-container-lowest/80 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
+          <div
+            class="w-12 h-12 rounded-xl bg-accent-cyan-subtle flex items-center justify-center shrink-0 text-primary">
+            <span class="material-symbols-outlined text-[26px]">groups</span>
+          </div>
+          <div>
+            <div class="font-headline-sm text-headline-sm text-primary font-bold">50,000+</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant">Học sinh theo học</div>
+          </div>
+        </div>
+
+        <div
+          class="bg-surface-container-lowest/80 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
+          <div
+            class="w-12 h-12 rounded-xl bg-accent-coral-subtle flex items-center justify-center shrink-0 text-tertiary-container">
+            <span class="material-symbols-outlined text-[26px]" style="font-variation-settings: 'FILL' 1;">star</span>
+          </div>
+          <div>
+            <div class="font-headline-sm text-headline-sm text-on-surface font-bold">4.9 / 5.0</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant">18.500+ Đánh giá 5 sao</div>
+          </div>
+        </div>
+
+        <div
+          class="bg-surface-container-lowest/80 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
+          <div
+            class="w-12 h-12 rounded-xl bg-accent-navy-subtle flex items-center justify-center shrink-0 text-secondary">
+            <span class="material-symbols-outlined text-[26px]">verified_user</span>
+          </div>
+          <div>
+            <div class="font-headline-sm text-headline-sm text-secondary font-bold">100%</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant">Gia sư kiểm định 5 bước</div>
+          </div>
+        </div>
+
+        <div
+          class="bg-surface-container-lowest/80 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
+          <div
+            class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 text-status-success">
+            <span class="material-symbols-outlined text-[26px]">trending_up</span>
+          </div>
+          <div>
+            <div class="font-headline-sm text-headline-sm text-status-success font-bold">+2.4 Điểm</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant">Tiến bộ trung bình/kỳ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

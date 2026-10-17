@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Thời khóa biểu học tập - StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== STUDENT SIDEBAR ==================== -->
+  <aside th:replace="~{components/student/sidebar :: student-sidebar('schedule')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar -->
+    <header th:replace="~{components/student/header :: student-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">Thời Khóa Biểu Học Tập Tuần</h1>
+          <p class="text-xs text-on-surface-variant">Xem các buổi học trực tuyến trong tuần và chuẩn bị bài vở trước khi vào lớp.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="px-3 py-2 rounded-xl bg-surface-container-low text-xs font-bold text-on-surface hover:bg-surface-container border border-surface-container flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+            <span>Tuần trước</span>
+          </button>
+          <span class="px-3 py-2 rounded-xl bg-accent-cyan-subtle text-primary font-bold text-xs">Tuần này (Hiện tại)</span>
+          <button class="px-3 py-2 rounded-xl bg-surface-container-low text-xs font-bold text-on-surface hover:bg-surface-container border border-surface-container flex items-center gap-1">
+            <span>Tuần sau</span>
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Empty State when no classes -->
+      <div th:if="${#lists.isEmpty(danhSachDangKy)}" class="p-12 text-center bg-surface-card rounded-2xl border border-dashed border-surface-container/60 shadow-sm">
+        <span class="material-symbols-outlined text-4xl text-outline mb-2">calendar_month</span>
+        <h3 class="text-base font-bold text-on-surface">Chưa có thời khóa biểu học tập</h3>
+        <p class="text-xs text-on-surface-variant max-w-md mx-auto mt-1 mb-4">Khi bạn đăng ký tham gia các lớp học trực tuyến, thời khóa biểu và ca học hàng tuần sẽ xuất hiện tại đây.</p>
+        <a th:href="@{/#tim-gia-su}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container shadow-sm transition-all">
+          <span class="material-symbols-outlined text-[18px]">search</span>
+          <span>Tìm & Đăng Ký Lớp Học</span>
+        </a>
+      </div>
+
+      <!-- Schedule Classes List when classes exist -->
+      <div th:unless="${#lists.isEmpty(danhSachDangKy)}" class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
+          <div>
+            <h2 class="text-base font-bold text-on-surface">Thời Khóa Biểu Các Ca Học Trực Tuyến</h2>
+            <p class="text-xs text-on-surface-variant">Lịch học hàng tuần của các lớp bạn đang theo học</p>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-accent-cyan-subtle text-primary font-bold text-xs" th:text="${#lists.size(danhSachDangKy)} + ' lớp đang học'">0 lớp</span>
+        </div>
+
+        <div class="space-y-3">
+          <div th:each="dk : ${danhSachDangKy}" class="p-4 rounded-xl bg-surface-container-low/60 border border-surface-container/50 hover:border-primary/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl bg-accent-cyan-subtle text-primary flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[24px]">schedule</span>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-on-surface" th:text="${dk.lopHoc.tieuDeLop}">Tên lớp</h3>
+                <p class="text-xs text-primary font-bold mt-0.5 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                  <span th:text="${dk.lopHoc.lichHocTrongTuan ?: 'Lịch học linh hoạt'}">Thứ 3 - Thứ 5</span>
+                </p>
+                <p class="text-[11px] text-on-surface-variant mt-1" th:text="'Gia sư: ' + ${dk.lopHoc.giangVien != null && dk.lopHoc.giangVien.nguoiDung != null ? dk.lopHoc.giangVien.nguoiDung.hoTen : 'Thầy/Cô'}"></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <a th:href="${dk.lopHoc.linkPhongHoc ?: 'https://meet.google.com/new'}" target="_blank" class="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container transition-all flex items-center gap-1.5 shadow-sm">
+                <span class="material-symbols-outlined text-[16px]">videocam</span>
+                <span>Vào Học Ngay</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

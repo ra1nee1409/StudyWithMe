@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <!-- ==================== STUDENT SIDEBAR COMPONENT ==================== -->
+  <aside th:fragment="student-sidebar(activeTab)" class="fixed left-0 top-0 h-screen w-72 bg-surface-card z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-r border-surface-container">
+    <div class="flex flex-col flex-1 min-h-0">
+      
+      <!-- Student Profile Box -->
+      <div class="p-5 bg-surface-container-low/60 border-b border-surface-container/40">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center shrink-0 shadow-sm text-white font-bold">
+            <span class="material-symbols-outlined text-[22px]">school</span>
+          </div>
+          <div class="flex flex-col min-w-0 flex-1">
+            <span class="font-bold text-sm text-on-surface truncate" th:text="${studentName ?: 'Học viên StudyWithMe'}">Học viên</span>
+            <span class="text-xs text-on-surface-variant truncate">Góc Học Tập & Lớp Trực Tuyến</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-status-success/10 text-status-success font-semibold">
+            <span class="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse"></span>Đang học tích cực
+          </span>
+          <span class="text-primary bg-accent-cyan-subtle px-2 py-0.5 rounded-full font-medium">Học viên Pro</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <!-- 1. Bàn học / Tổng quan -->
+        <a th:href="@{/student/dashboard}"
+           th:classappend="${activeTab == 'dashboard'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">space_dashboard</span>
+          <span>Bàn học của tôi</span>
+        </a>
+
+        <!-- 2. Lớp học trực tuyến của tôi -->
+        <a th:href="@{/student/lop-hoc}"
+           th:classappend="${activeTab == 'classes'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">video_camera_front</span>
+          <span>Lớp học trực tuyến</span>
+        </a>
+
+        <!-- 3. Thời khóa biểu học tập -->
+        <a th:href="@{/student/lich-hoc}"
+           th:classappend="${activeTab == 'schedule'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+          <span>Thời khóa biểu</span>
+        </a>
+
+        <!-- 4. Gia sư của tôi -->
+        <a th:href="@{/student/gia-su}"
+           th:classappend="${activeTab == 'tutors'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">supervised_user_circle</span>
+          <span>Gia sư của tôi</span>
+        </a>
+
+        <!-- 5. Học phí & Đơn hàng -->
+        <a th:href="@{/student/don-hang}"
+           th:classappend="${activeTab == 'orders'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+          <span>Lịch sử học phí</span>
+        </a>
+
+        <!-- 6. Hồ sơ cá nhân -->
+        <a th:href="@{/student/ho-so}"
+           th:classappend="${activeTab == 'profile'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">person</span>
+          <span>Hồ sơ cá nhân</span>
+        </a>
+
+        <!-- Khám phá thêm gia sư -->
+        <div class="pt-4 mt-4 border-t border-surface-container/40 space-y-1">
+          <a th:href="@{/#tim-gia-su}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-primary hover:bg-accent-cyan-subtle transition-all">
+            <span class="material-symbols-outlined text-[20px]">person_search</span>
+            <span>Tìm thêm gia sư</span>
+          </a>
+          <a th:href="@{/}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-secondary hover:bg-surface-container transition-all">
+            <span class="material-symbols-outlined text-[20px]">home</span>
+            <span>Về Trang chủ</span>
+          </a>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Logout -->
+    <div class="p-3 border-t border-surface-container/50">
+      <button onclick="handleStudentLogout()" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-error hover:bg-error-container hover:text-on-error-container transition-all cursor-pointer">
+        <span class="material-symbols-outlined text-[20px]">logout</span>
+        <span>Đăng xuất</span>
+      </button>
+    </div>
+  </aside>
+
+  <script th:inline="javascript">
+    function handleStudentLogout() {
+      localStorage.removeItem('studywithme_token');
+      localStorage.removeItem('studywithme_user');
+      document.cookie = "studywithme_token=; path=/; max-age=0";
+      window.location.href = '/login';
+    }
+  </script>
+</body>
+</html>

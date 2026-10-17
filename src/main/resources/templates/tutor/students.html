@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Học viên của tôi - StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== TUTOR SIDEBAR ==================== -->
+  <aside th:replace="~{components/tutor/sidebar :: tutor-sidebar('students')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar -->
+    <header th:replace="~{components/tutor/header :: tutor-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">Học Viên Của Tôi</h1>
+          <p class="text-xs text-on-surface-variant">Theo dõi tiến độ, chuyên cần và liên lạc trực tiếp với học sinh trong các lớp của bạn.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="px-3 py-1.5 rounded-xl bg-accent-coral-subtle text-tertiary-container font-bold text-xs"
+                th:text="'Tổng cộng: ' + ${#lists.size(danhSachHocVien)} + ' học viên'">
+            Tổng cộng: 0 học viên
+          </span>
+        </div>
+      </section>
+
+      <!-- Students Table / Empty State -->
+      <div th:if="${#lists.isEmpty(danhSachHocVien)}" class="p-12 text-center bg-surface-card rounded-2xl border border-dashed border-surface-container/60 shadow-sm">
+        <span class="material-symbols-outlined text-4xl text-outline mb-2">group_off</span>
+        <h3 class="text-base font-bold text-on-surface">Chưa có học viên nào trong lớp</h3>
+        <p class="text-xs text-on-surface-variant max-w-md mx-auto mt-1 mb-4">Khi học sinh ghi danh hoặc thanh toán lớp học của bạn, danh sách chuyên cần sẽ được cập nhật tại đây.</p>
+        <a th:href="@{/tutor/lop-hoc}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-sm transition-all">
+          <span class="material-symbols-outlined text-[18px]">school</span>
+          <span>Kiểm Tra Lớp Học</span>
+        </a>
+      </div>
+
+      <div th:unless="${#lists.isEmpty(danhSachHocVien)}" class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 overflow-hidden">
+        <div class="p-4 border-b border-surface-container/40 flex flex-wrap items-center justify-between gap-3">
+          <span class="text-xs font-bold text-on-surface" th:text="'Danh sách ' + ${#lists.size(danhSachHocVien)} + ' học viên đang theo học'">Danh sách</span>
+          <div class="relative w-64">
+            <input type="text" placeholder="Tìm tên hoặc email học viên..." class="w-full pl-9 pr-3 py-1.5 rounded-lg bg-surface-container-low text-xs border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+            <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-outline">search</span>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-surface-container-low/80 text-on-surface-variant uppercase text-[11px] font-bold border-b border-surface-container/40">
+              <tr>
+                <th class="py-3.5 px-6">Học Viên</th>
+                <th class="py-3.5 px-6">Lớp Theo Học</th>
+                <th class="py-3.5 px-6">Trạng Thái</th>
+                <th class="py-3.5 px-6">Ngày Ghi Danh</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-container/30">
+              <tr th:each="dk : ${danhSachHocVien}" class="hover:bg-surface-container-low/40 transition-colors">
+                <td class="py-3.5 px-6 flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-primary text-white font-bold flex items-center justify-center text-xs uppercase"
+                       th:text="${dk.hocVien != null && dk.hocVien.hoTen != null ? #strings.substring(dk.hocVien.hoTen.trim(), 0, 1) : 'H'}">
+                    HV
+                  </div>
+                  <div>
+                    <span class="font-bold text-on-surface block" th:text="${dk.hocVien != null ? (dk.hocVien.hoTen ?: dk.hocVien.email) : 'Học viên'}">Tên học viên</span>
+                    <span class="text-[11px] text-on-surface-variant" th:text="${dk.hocVien != null ? dk.hocVien.email : ''}">email@domain.com</span>
+                  </div>
+                </td>
+                <td class="py-3.5 px-6 font-medium text-on-surface" th:text="${dk.lopHoc != null ? dk.lopHoc.tieuDeLop : 'Lớp trực tuyến'}">Tên lớp</td>
+                <td class="py-3.5 px-6">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-status-success/10 text-status-success font-semibold text-[11px]"
+                        th:text="${dk.trangThaiThamGia != null ? dk.trangThaiThamGia.name() : 'DA_XAC_NHAN'}">Đã xác nhận</span>
+                </td>
+                <td class="py-3.5 px-6 text-on-surface-variant" th:text="${dk.ngayDangKy != null ? #temporals.format(dk.ngayDangKy, 'dd/MM/yyyy') : 'Gần đây'}">10/09/2026</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

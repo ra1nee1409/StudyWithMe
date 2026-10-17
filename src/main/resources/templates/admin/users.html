@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Quản lý Người dùng - Quản trị StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== SIDEBAR COMPONENT ==================== -->
+  <aside th:replace="~{components/admin/sidebar :: admin-sidebar('users')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar Component -->
+    <header th:replace="~{components/admin/header :: admin-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Flash Notification Message -->
+      <div th:if="${message}" class="p-4 rounded-xl bg-accent-cyan-subtle border border-primary-container text-primary flex items-center gap-3 shadow-sm">
+        <span class="material-symbols-outlined text-[22px] text-status-success">check_circle</span>
+        <span class="text-sm font-semibold" th:text="${message}"></span>
+      </div>
+
+      <!-- Header Banner -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-xl shadow-sm border border-surface-container/40">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-primary text-xs font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+              Phân quyền & Tài khoản
+            </span>
+            <span class="text-outline-variant">•</span>
+            <span class="text-xs text-on-surface-variant">Dữ liệu thời gian thực</span>
+          </div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">
+            Quản Lý Tài Khoản Người Dùng
+          </h1>
+          <p class="text-xs text-on-surface-variant">
+            Danh sách toàn bộ tài khoản học viên, gia sư và quản trị viên trong cơ sở dữ liệu hệ thống.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a th:href="@{/admin}" class="px-4 py-2 rounded-lg border border-surface-container text-xs font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            Về Tổng quan
+          </a>
+        </div>
+      </section>
+
+      <!-- KPI Thống kê Người dùng -->
+      <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <!-- Tổng tài khoản -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-xs text-on-surface-variant font-medium">Tổng số tài khoản</span>
+            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${tongNguoiDung}">0</span>
+            <span class="text-[11px] text-on-surface-variant mt-1">Đã đăng ký trong hệ thống</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-accent-cyan-subtle text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[26px]">groups</span>
+          </div>
+        </div>
+
+        <!-- Đang hoạt động -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-xs text-on-surface-variant font-medium">Đang hoạt động</span>
+            <span class="text-3xl font-extrabold text-status-success tracking-tight" th:text="${activeUsersCount}">0</span>
+            <span class="text-[11px] text-status-success font-semibold mt-1">Có thể đăng nhập bình thường</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-status-success/10 text-status-success flex items-center justify-center">
+            <span class="material-symbols-outlined text-[26px]">account_circle</span>
+          </div>
+        </div>
+
+        <!-- Tạm khóa -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-xs text-on-surface-variant font-medium">Đang tạm khóa</span>
+            <span class="text-3xl font-extrabold text-error tracking-tight" th:text="${lockedUsersCount}">0</span>
+            <span class="text-[11px] text-error font-semibold mt-1">Bị chặn đăng nhập</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-error-container text-error flex items-center justify-center">
+            <span class="material-symbols-outlined text-[26px]">lock</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Danh sách Người dùng -->
+      <section class="bg-surface-card rounded-xl shadow-sm border border-surface-container/30 p-6 flex flex-col gap-4">
+        
+        <!-- Thanh tìm kiếm & lọc nhanh -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="relative w-full sm:w-96">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-outline">search</span>
+            <input type="text" id="userSearchInput" onkeyup="filterUserTable()" placeholder="Tìm kiếm theo tên, email, vai trò..."
+                   class="w-full pl-9 pr-4 py-2 bg-surface-container-low border border-surface-container rounded-lg text-xs text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container transition-all">
+          </div>
+          
+          <div class="flex items-center gap-2 self-end sm:self-auto text-xs text-on-surface-variant">
+            <span>Hiển thị: </span>
+            <span class="font-bold text-on-surface" id="visible-user-count" th:text="${#lists.size(danhSachNguoiDung)}">0</span>
+            <span>người dùng</span>
+          </div>
+        </div>
+
+        <!-- Bảng danh sách chi tiết -->
+        <div class="overflow-x-auto rounded-lg border border-surface-container/40">
+          <table class="w-full text-left text-xs" id="userTable">
+            <thead class="bg-surface-container-low text-on-surface-variant uppercase tracking-wider font-semibold border-b border-surface-container">
+              <tr>
+                <th class="py-3 px-4">Mã ID</th>
+                <th class="py-3 px-4">Họ và Tên</th>
+                <th class="py-3 px-4">Email & SĐT</th>
+                <th class="py-3 px-4">Vai trò</th>
+                <th class="py-3 px-4">Trạng thái</th>
+                <th class="py-3 px-4">Ngày tạo</th>
+                <th class="py-3 px-4 text-right">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-container/30">
+              <tr th:each="user : ${danhSachNguoiDung}" class="user-row hover:bg-surface-container-low/40 transition-colors">
+                
+                <!-- ID -->
+                <td class="py-3.5 px-4 font-mono text-outline-variant font-bold" th:text="'#' + ${user.id}">#1</td>
+                
+                <!-- Họ tên + Avatar -->
+                <td class="py-3.5 px-4 font-bold text-on-surface">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-accent-cyan-subtle text-primary flex items-center justify-center font-bold text-xs"
+                         th:text="${user.hoTen != null && user.hoTen.length() > 0 ? user.hoTen.substring(0, 1) : 'U'}">U</div>
+                    <span class="user-name" th:text="${user.hoTen}">Nguyễn Văn A</span>
+                  </div>
+                </td>
+
+                <!-- Email & SĐT -->
+                <td class="py-3.5 px-4 text-on-surface-variant">
+                  <div class="user-email font-medium text-on-surface" th:text="${user.email}">user@test.com</div>
+                  <div class="text-[11px] text-outline" th:text="${user.soDienThoai ?: 'Chưa cập nhật SĐT'}">0987654321</div>
+                </td>
+
+                <!-- Vai trò -->
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-1 flex-wrap user-role">
+                    <span th:each="vt : ${user.danhSachVaiTro}"
+                          th:text="${vt.tenVaiTro == 'ROLE_QUAN_TRI' ? 'Quản trị viên' : (vt.tenVaiTro == 'ROLE_GIANG_VIEN' ? 'Gia sư' : 'Học viên')}"
+                          th:classappend="${vt.tenVaiTro == 'ROLE_QUAN_TRI'} ? 'bg-secondary-fixed/40 text-secondary border border-secondary/30' : (${vt.tenVaiTro == 'ROLE_GIANG_VIEN'} ? 'bg-accent-coral-subtle text-tertiary border border-tertiary/30' : 'bg-surface-container text-on-surface-variant')"
+                          class="px-2 py-0.5 rounded-full text-[11px] font-semibold">
+                    </span>
+                  </div>
+                </td>
+
+                <!-- Trạng thái -->
+                <td class="py-3.5 px-4 user-status">
+                  <span th:if="${user.trangThai.name() == 'HOAT_DONG'}" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-status-success/10 text-status-success font-semibold text-[11px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+                    Hoạt động
+                  </span>
+                  <span th:if="${user.trangThai.name() == 'TAM_KHOA'}" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-error font-semibold text-[11px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                    Tạm khóa
+                  </span>
+                </td>
+
+                <!-- Ngày tạo -->
+                <td class="py-3.5 px-4 text-on-surface-variant" th:text="${#temporals.format(user.ngayTao, 'dd/MM/yyyy HH:mm')}">17/10/2026</td>
+
+                <!-- Thao tác Khóa / Mở khóa -->
+                <td class="py-3.5 px-4 text-right">
+                  <!-- Không cho phép khóa chính quản trị viên mặc định -->
+                  <div th:if="${user.email == 'admin@studywithme.vn'}" class="text-[11px] text-outline font-medium italic">
+                    Tài khoản gốc
+                  </div>
+                  
+                  <form th:unless="${user.email == 'admin@studywithme.vn'}" th:action="@{/admin/doi-trang-thai-nguoi-dung/{id}(id=${user.id})}" method="post"
+                        onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái tài khoản này?');">
+                    
+                    <button th:if="${user.trangThai.name() == 'HOAT_DONG'}" type="submit"
+                            class="px-3 py-1.5 rounded-lg border border-error/30 text-error hover:bg-error-container text-xs font-semibold transition-all inline-flex items-center gap-1 cursor-pointer">
+                      <span class="material-symbols-outlined text-[15px]">lock</span>
+                      Khóa TK
+                    </button>
+
+                    <button th:if="${user.trangThai.name() == 'TAM_KHOA'}" type="submit"
+                            class="px-3 py-1.5 rounded-lg bg-status-success/10 text-status-success hover:bg-status-success hover:text-white text-xs font-semibold transition-all inline-flex items-center gap-1 cursor-pointer">
+                      <span class="material-symbols-outlined text-[15px]">lock_open</span>
+                      Mở khóa
+                    </button>
+                  </form>
+                </td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script th:inline="javascript">
+    function filterUserTable() {
+      const input = document.getElementById('userSearchInput');
+      const filter = input.value.toLowerCase().trim();
+      const rows = document.querySelectorAll('.user-row');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        const name = row.querySelector('.user-name')?.textContent?.toLowerCase() || '';
+        const email = row.querySelector('.user-email')?.textContent?.toLowerCase() || '';
+        const role = row.querySelector('.user-role')?.textContent?.toLowerCase() || '';
+        const status = row.querySelector('.user-status')?.textContent?.toLowerCase() || '';
+
+        if (name.includes(filter) || email.includes(filter) || role.includes(filter) || status.includes(filter)) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      const countEl = document.getElementById('visible-user-count');
+      if (countEl) countEl.textContent = visibleCount;
+    }
+  </script>
+</body>
+</html>

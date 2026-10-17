@@ -12,5 +12,7 @@ import java.util.List;
 @Repository
 public interface LopHocTrucTuyenRepository extends JpaRepository<LopHocTrucTuyen, Long> {
     List<LopHocTrucTuyen> findByGiangVienId(Long giangVienId);
+    List<LopHocTrucTuyen> findByGiangVienIdOrderByNgayTaoDesc(Long giangVienId);
+    long countByGiangVienId(Long giangVienId);
     Page<LopHocTrucTuyen> findByTrangThai(TrangThaiLopHoc trangThai, Pageable pageable);
 }

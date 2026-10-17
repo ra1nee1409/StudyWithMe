@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <!-- ==================== ADMIN SIDEBAR COMPONENT ==================== -->
+  <aside th:fragment="admin-sidebar(activeTab)" class="fixed left-0 top-0 h-screen w-72 bg-surface-card z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-r border-surface-container">
+    <div class="flex flex-col flex-1 min-h-0">
+      
+      <!-- Admin Profile Box -->
+      <div class="p-5 bg-surface-container-low/60 border-b border-surface-container/40">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0 shadow-sm text-on-primary font-bold">
+            <span class="material-symbols-outlined text-[22px]">admin_panel_settings</span>
+          </div>
+          <div class="flex flex-col min-w-0 flex-1">
+            <span class="font-bold text-sm text-on-surface truncate" th:text="${adminName ?: 'admin@studywithme.vn'}">admin@studywithme.vn</span>
+            <span class="text-xs text-on-surface-variant truncate">Hệ thống StudyWithMe</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-status-success/10 text-status-success font-semibold">
+            <span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>Trực tuyến
+          </span>
+          <span class="text-secondary bg-secondary-fixed/50 px-2 py-0.5 rounded-full font-medium">Toàn quyền Admin</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <!-- 1. Tổng quan -->
+        <a th:href="@{/admin}"
+           th:classappend="${activeTab == 'dashboard'} ? 'bg-primary-container text-on-primary font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">dashboard</span>
+          <span>Tổng quan</span>
+        </a>
+
+        <!-- 2. Duyệt Gia sư -->
+        <a th:href="@{/admin/duyet-gia-su}"
+           th:classappend="${activeTab == 'tutors'} ? 'bg-primary-container text-on-primary font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">school</span>
+          <span>Duyệt Gia sư</span>
+          <span th:if="${hoSoChoDuyet != null && hoSoChoDuyet > 0}" th:text="${hoSoChoDuyet}" class="ml-auto px-2 py-0.5 rounded-full bg-tertiary-container text-white text-xs font-bold"></span>
+        </a>
+
+        <!-- 3. Quản lý Người dùng -->
+        <a th:href="@{/admin/nguoi-dung}"
+           th:classappend="${activeTab == 'users'} ? 'bg-primary-container text-on-primary font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">manage_accounts</span>
+          <span>Quản lý Người dùng</span>
+        </a>
+
+        <!-- 4. Lớp học trực tuyến -->
+        <a th:href="@{/admin/lop-hoc}"
+           th:classappend="${activeTab == 'classes'} ? 'bg-primary-container text-on-primary font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">video_camera_front</span>
+          <span>Lớp học trực tuyến</span>
+        </a>
+
+        <!-- Xem Trang chủ -->
+        <a th:href="@{/}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-secondary hover:bg-accent-cyan-subtle transition-all mt-4 border-t border-surface-container/40 pt-4">
+          <span class="material-symbols-outlined text-[20px]">open_in_new</span>
+          <span>Xem Trang chủ</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Logout -->
+    <div class="p-3 border-t border-surface-container/50">
+      <button onclick="handleAdminLogout()" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-error hover:bg-error-container hover:text-on-error-container transition-all cursor-pointer">
+        <span class="material-symbols-outlined text-[20px]">logout</span>
+        <span>Đăng xuất</span>
+      </button>
+    </div>
+  </aside>
+
+  <script th:inline="javascript">
+    function handleAdminLogout() {
+      localStorage.removeItem('studywithme_token');
+      localStorage.removeItem('studywithme_user');
+      document.cookie = "studywithme_token=; path=/; max-age=0";
+      window.location.href = '/login';
+    }
+  </script>
+</body>
+</html>

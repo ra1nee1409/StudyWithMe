@@ -16,9 +16,16 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().write("{\"trangThai\":401,\"thongBao\":\"Yêu cầu không được ủy quyền hoặc Token không hợp lệ.\",\"chiTiet\":\"" 
-                + authException.getMessage() + "\"}");
+        String acceptHeader = request.getHeader("Accept");
+        String uri = request.getRequestURI();
+
+        if (uri.startsWith("/api/") || (acceptHeader != null && acceptHeader.contains(MediaType.APPLICATION_JSON_VALUE) && !acceptHeader.contains(MediaType.TEXT_HTML_VALUE))) {
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"thanhCong\":false,\"thongBao\":\"Yêu cầu không được ủy quyền hoặc Token không hợp lệ.\",\"chiTiet\":\"" 
+                    + authException.getMessage() + "\"}");
+        } else {
+            response.sendRedirect("/login");
+        }
     }
 }

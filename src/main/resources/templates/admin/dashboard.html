@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Tổng quan Hệ thống - Quản trị StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== SIDEBAR COMPONENT ==================== -->
+  <aside th:replace="~{components/admin/sidebar :: admin-sidebar('dashboard')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar Component -->
+    <header th:replace="~{components/admin/header :: admin-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Flash Notification Message -->
+      <div th:if="${message}" class="p-4 rounded-xl bg-accent-cyan-subtle border border-primary-container text-primary flex items-center gap-3 shadow-sm">
+        <span class="material-symbols-outlined text-[22px] text-status-success">check_circle</span>
+        <span class="text-sm font-semibold" th:text="${message}"></span>
+      </div>
+
+      <!-- 1. Header Banner: Khách quan, Tổng quan -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-xl shadow-sm border border-surface-container/40">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-primary text-xs font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+              Kết nối SQL Server ổn định
+            </span>
+            <span class="text-outline-variant">•</span>
+            <span class="text-xs text-on-surface-variant" id="live-clock">Đang tải thời gian...</span>
+          </div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">
+            Bảng Điều Khiển Tổng Quan
+          </h1>
+          <p class="text-xs text-on-surface-variant">
+            Số liệu thống kê khách quan về nền tảng StudyWithMe. Để quản lý chi tiết từng phần, vui lòng chọn menu tương ứng ở thanh điều hướng bên trái.
+          </p>
+        </div>
+      </section>
+
+      <!-- 2. Thống kê KPI cốt lõi -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <!-- Metric 1: Tổng người dùng -->
+        <a th:href="@{/admin/nguoi-dung}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-primary-container transition-all group">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-medium group-hover:text-primary transition-colors">Tổng tài khoản người dùng</span>
+            <div class="w-10 h-10 rounded-xl bg-accent-cyan-subtle text-primary flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px]">group</span>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${tongNguoiDung}">0</span>
+            <span class="text-xs text-on-surface-variant font-medium">tài khoản</span>
+          </div>
+        </a>
+
+        <!-- Metric 2: Gia sư đang hoạt động -->
+        <a th:href="@{/admin/duyet-gia-su}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-secondary transition-all group">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-medium group-hover:text-secondary transition-colors">Gia sư đang hoạt động</span>
+            <div class="w-10 h-10 rounded-xl bg-accent-navy-subtle text-secondary flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px]">school</span>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${tongGiaSu}">0</span>
+            <span class="text-xs text-on-surface-variant font-medium">hồ sơ đã duyệt</span>
+          </div>
+        </a>
+
+        <!-- Metric 3: Hồ sơ chờ duyệt -->
+        <a th:href="@{/admin/duyet-gia-su}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-tertiary-container transition-all group">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-medium group-hover:text-tertiary transition-colors">Hồ sơ gia sư chờ duyệt</span>
+            <div class="w-10 h-10 rounded-xl bg-accent-coral-subtle text-tertiary-container flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px]">pending_actions</span>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-tertiary tracking-tight" th:text="${hoSoChoDuyet}">0</span>
+            <span class="text-xs text-on-surface-variant font-medium">cần xử lý</span>
+          </div>
+        </a>
+
+        <!-- Metric 4: Lớp học trực tuyến -->
+        <a th:href="@{/admin/lop-hoc}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-status-success transition-all group">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-medium group-hover:text-status-success transition-colors">Lớp học trực tuyến</span>
+            <div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-status-success">
+              <span class="material-symbols-outlined text-[22px]">video_camera_front</span>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${tongLopHoc}">0</span>
+            <span class="text-xs text-on-surface-variant font-medium">lớp đã tạo</span>
+          </div>
+        </a>
+      </section>
+
+      <!-- 3. Tóm tắt Khách quan (Overview Grid 2 cột) -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Khối 1: Tóm tắt Hồ sơ Gia sư cần chú ý -->
+        <div class="bg-surface-card rounded-xl p-6 shadow-sm border border-surface-container/30 flex flex-col justify-between gap-4">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-tertiary text-[22px]">assignment</span>
+                <h2 class="text-base font-bold text-on-surface">Hồ sơ Gia sư chờ xử lý</h2>
+              </div>
+              <span th:if="${hoSoChoDuyet > 0}" th:text="${hoSoChoDuyet} + ' hồ sơ đang chờ'" class="px-2.5 py-0.5 rounded-full bg-accent-coral-subtle text-tertiary text-xs font-bold"></span>
+            </div>
+
+            <!-- Trường hợp không có hồ sơ tồn -->
+            <div th:if="${#lists.isEmpty(recentPendingTutors)}" class="p-8 text-center bg-surface-container-low/40 rounded-xl border border-dashed border-surface-container">
+              <span class="material-symbols-outlined text-3xl text-status-success mb-1">verified</span>
+              <p class="text-xs font-semibold text-on-surface">Tuyệt vời! Không có hồ sơ gia sư nào tồn đọng.</p>
+              <p class="text-[11px] text-on-surface-variant mt-0.5">Mọi hồ sơ đăng ký mới đã được xét duyệt hoàn tất.</p>
+            </div>
+
+            <!-- Trường hợp có hồ sơ chờ -->
+            <div th:if="${!#lists.isEmpty(recentPendingTutors)}" class="space-y-3">
+              <div th:each="tutor : ${recentPendingTutors}" class="p-3.5 rounded-lg bg-surface-container-low flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-9 h-9 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center font-bold text-xs shrink-0"
+                       th:text="${tutor.nguoiDung != null and tutor.nguoiDung.hoTen != null ? #strings.substring(tutor.nguoiDung.hoTen.trim(), 0, 1).toUpperCase() : 'G'}">
+                    G
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <p class="font-bold text-xs text-on-surface truncate" th:text="${tutor.nguoiDung != null ? tutor.nguoiDung.hoTen : 'Chưa cập nhật'}">Gia sư</p>
+                    <p class="text-[11px] text-on-surface-variant truncate" th:text="${tutor.nguoiDung != null ? tutor.nguoiDung.email : ''}"></p>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface text-[10px] font-medium shrink-0" th:text="${tutor.tieuDeChuyenMon ?: 'Gia sư mới'}"></span>
+              </div>
+            </div>
+          </div>
+
+          <a th:href="@{/admin/duyet-gia-su}" class="w-full py-2.5 rounded-lg bg-surface-container-low hover:bg-primary hover:text-white text-primary text-xs font-bold text-center transition-all flex items-center justify-center gap-1.5">
+            <span>Đi đến trang Duyệt Gia sư chi tiết</span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </a>
+        </div>
+
+        <!-- Khối 2: Tóm tắt Thành viên đăng ký mới nhất -->
+        <div class="bg-surface-card rounded-xl p-6 shadow-sm border border-surface-container/30 flex flex-col justify-between gap-4">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[22px]">person_add</span>
+                <h2 class="text-base font-bold text-on-surface">Thành viên mới đăng ký</h2>
+              </div>
+              <span class="text-xs text-on-surface-variant font-medium">5 tài khoản gần nhất</span>
+            </div>
+
+            <div class="space-y-2.5">
+              <div th:each="u : ${recentUsers}" class="p-2.5 rounded-lg bg-surface-container-low flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs shrink-0"
+                       th:text="${u.hoTen != null ? #strings.substring(u.hoTen.trim(), 0, 1).toUpperCase() : 'U'}">
+                    U
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <p class="font-bold text-xs text-on-surface truncate" th:text="${u.hoTen}">Họ tên</p>
+                    <p class="text-[11px] text-on-surface-variant truncate" th:text="${u.email}">email</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <span th:if="${u.trangThai.name() == 'HOAT_DONG'}" class="w-2 h-2 rounded-full bg-status-success" title="Hoạt động"></span>
+                  <span th:if="${u.trangThai.name() != 'HOAT_DONG'}" class="w-2 h-2 rounded-full bg-error" title="Tạm khóa"></span>
+                  <span class="text-[10px] text-outline" th:text="${#temporals.format(u.ngayTao, 'dd/MM/yyyy')}"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a th:href="@{/admin/nguoi-dung}" class="w-full py-2.5 rounded-lg bg-surface-container-low hover:bg-secondary hover:text-white text-secondary text-xs font-bold text-center transition-all flex items-center justify-center gap-1.5">
+            <span>Quản lý toàn bộ danh sách Người dùng</span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </a>
+        </div>
+
+      </section>
+
+      <!-- 4. Thẻ trạng thái hệ thống và hạ tầng -->
+      <section class="bg-surface-card rounded-xl p-6 shadow-sm border border-surface-container/30">
+        <h3 class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-[18px]">tune</span>
+          Hạ tầng kỹ thuật & Bảo mật
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <div class="p-4 rounded-xl bg-surface-container-low/60 flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-[28px]">database</span>
+            <div>
+              <p class="font-bold text-on-surface">SQL Server Database</p>
+              <p class="text-on-surface-variant text-[11px]">studywithme_db (HikariCP Pool)</p>
+            </div>
+          </div>
+          <div class="p-4 rounded-xl bg-surface-container-low/60 flex items-center gap-3">
+            <span class="material-symbols-outlined text-status-success text-[28px]">shield</span>
+            <div>
+              <p class="font-bold text-on-surface">Bảo mật JWT 2 lớp</p>
+              <p class="text-on-surface-variant text-[11px]">Cookie & Authorization Header</p>
+            </div>
+          </div>
+          <div class="p-4 rounded-xl bg-surface-container-low/60 flex items-center gap-3">
+            <span class="material-symbols-outlined text-tertiary-container text-[28px]">verified_user</span>
+            <div>
+              <p class="font-bold text-on-surface">Phân quyền chặt chẽ</p>
+              <p class="text-on-surface-variant text-[11px]">ROLE_QUAN_TRI kiểm soát /admin</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    function updateLiveClock() {
+      const clockEl = document.getElementById('live-clock');
+      const todayEl = document.getElementById('header-today-date');
+      const now = new Date();
+      const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+      const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+      
+      if (clockEl) clockEl.textContent = `${days[now.getDay()]}, ${dateStr} — ${timeStr}`;
+    }
+    updateLiveClock();
+    setInterval(updateLiveClock, 1000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Thông Báo Lỗi - StudyWithMe')}"></head>
+
+<body class="bg-background font-body-md text-body-md text-on-surface antialiased flex flex-col min-h-screen"
+      th:with="code=${status ?: (statusCode ?: 500)}">
+
+  <!-- HEADER COMPONENT -->
+  <header th:replace="~{components/user/header :: main-header('')}"></header>
+
+  <!-- MAIN ERROR CONTENT -->
+  <main class="w-full flex-1 pt-24 pb-16 flex items-center justify-center relative overflow-hidden">
+    <!-- Ambient ambient glows -->
+    <div class="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-r from-error/10 via-primary-container/10 to-tertiary-container/10 blur-3xl rounded-full -z-10"></div>
+    <div class="pointer-events-none absolute bottom-10 right-1/4 w-80 h-80 bg-accent-cyan-subtle/60 blur-3xl rounded-full -z-10"></div>
+
+    <div class="max-w-2xl mx-auto px-6 text-center">
+      
+      <!-- Icon & Status Code Badge -->
+      <div class="inline-flex flex-col items-center justify-center mb-6">
+        <div class="w-24 h-24 rounded-2xl flex items-center justify-center mb-4 shadow-md transition-transform hover:scale-105"
+             th:classappend="${code == 403} ? 'bg-error-container text-error' : (${code == 404} ? 'bg-accent-cyan-subtle text-primary' : 'bg-status-warning/15 text-status-warning')">
+          <span th:if="${code == 403}" class="material-symbols-outlined text-[52px]">lock_person</span>
+          <span th:if="${code == 404}" class="material-symbols-outlined text-[52px]">travel_explore</span>
+          <span th:if="${code != 403 && code != 404}" class="material-symbols-outlined text-[52px]">dns</span>
+        </div>
+        
+        <span class="inline-block px-3.5 py-1 rounded-full font-label-md text-label-md font-bold tracking-wider"
+              th:classappend="${code == 403} ? 'bg-error-container text-error' : (${code == 404} ? 'bg-accent-cyan-subtle text-primary' : 'bg-surface-container text-on-surface')"
+              th:text="'MÃ PHẢN HỒI: ' + ${code}">
+          MÃ LỖI: 403
+        </span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="font-display text-display text-on-surface font-extrabold tracking-tight mb-3">
+        <span th:if="${code == 403}">Truy Cập Bị Từ Chối (403)</span>
+        <span th:if="${code == 404}">Không Tìm Thấy Trang (404)</span>
+        <span th:if="${code == 401}">Yêu Cầu Đăng Nhập (401)</span>
+        <span th:if="${code != 403 && code != 404 && code != 401}" th:text="'Đã Xảy Ra Lỗi (' + ${code} + ')'">Đã Xảy Ra Lỗi</span>
+      </h1>
+
+      <!-- Detailed Description -->
+      <p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg mx-auto mb-8 leading-relaxed">
+        <span th:if="${code == 403}">Bạn không có quyền truy cập vào khu vực Quản trị hệ thống (Chức năng này chỉ dành riêng cho tài khoản có vai trò Quản Trị Viên).</span>
+        <span th:if="${code == 404}">Đường dẫn bạn yêu cầu không tồn tại, đã bị xóa hoặc đổi địa chỉ. Vui lòng kiểm tra lại URL.</span>
+        <span th:if="${code == 401}">Phiên làm việc của bạn đã hết hạn hoặc bạn chưa đăng nhập tài khoản hợp lệ.</span>
+        <span th:if="${code != 403 && code != 404 && code != 401}" th:text="${message ?: 'Máy chủ đang gặp sự cố khi xử lý yêu cầu. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ.'}">Đã xảy ra lỗi máy chủ.</span>
+      </p>
+
+      <!-- Path info card -->
+      <div th:if="${path}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-container-low text-xs text-on-surface-variant mb-8 max-w-md mx-auto truncate border border-surface-container">
+        <span class="material-symbols-outlined text-[16px] text-outline">link</span>
+        <span>Đường dẫn:</span>
+        <code class="font-mono text-primary font-semibold" th:text="${path}">/admin</code>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <a th:href="@{/}" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary hover:bg-on-secondary-container text-on-primary font-label-lg text-label-lg font-bold shadow-md transition-all">
+          <span class="material-symbols-outlined text-[20px]">home</span>
+          <span>Về Trang Chủ</span>
+        </a>
+
+        <a th:href="@{/login}" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface font-label-lg text-label-lg font-semibold transition-all">
+          <span class="material-symbols-outlined text-[20px]">login</span>
+          <span>Đăng Nhập Khác</span>
+        </a>
+
+        <a href="tel:19008888" class="inline-flex items-center gap-2 px-4 py-3 rounded-full text-secondary hover:bg-accent-navy-subtle font-label-md text-label-md transition-all">
+          <span class="material-symbols-outlined text-[18px] text-tertiary-container">support_agent</span>
+          <span>Hỗ Trợ: 1900 8888</span>
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER COMPONENT -->
+  <footer th:replace="~{components/user/footer :: simple-footer}"></footer>
+
+</body>
+</html>

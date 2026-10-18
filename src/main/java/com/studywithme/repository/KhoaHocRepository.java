@@ -27,5 +27,7 @@ public interface KhoaHocRepository extends JpaRepository<KhoaHoc, Long> {
                                  @Param("danhMucId") Long danhMucId, 
                                  Pageable pageable);
 
+    long countByTrangThai(TrangThaiKhoaHoc trangThai);
     List<KhoaHoc> findTop8ByTrangThaiOrderByTongSoHocVienDesc(TrangThaiKhoaHoc trangThai);
+    List<KhoaHoc> findTop5ByOrderByTongSoHocVienDesc();
 }

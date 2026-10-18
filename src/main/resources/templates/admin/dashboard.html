@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{components/common/head :: common-head('Tổng quan Hệ thống - Quản trị StudyWithMe')}"></head>
+<head>
+  <th:block th:replace="~{components/common/head :: common-head('Admin Dashboard - Tổng quan & Thống kê')}"></th:block>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
 
 <body class="bg-surface-canvas font-body-md text-on-surface antialiased">
 
@@ -21,217 +25,524 @@
         <span class="text-sm font-semibold" th:text="${message}"></span>
       </div>
 
-      <!-- 1. Header Banner: Khách quan, Tổng quan -->
-      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-xl shadow-sm border border-surface-container/40">
+      <!-- 1. Header Banner: Chào mừng & Trạng thái nền tảng -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
         <div class="flex flex-col gap-1">
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-primary text-xs font-semibold">
-              <span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
-              Kết nối SQL Server ổn định
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-status-success/10 text-status-success text-xs font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse"></span>
+              Hệ thống vận hành bình thường
             </span>
             <span class="text-outline-variant">•</span>
             <span class="text-xs text-on-surface-variant" id="live-clock">Đang tải thời gian...</span>
           </div>
-          <h1 class="text-2xl font-bold text-on-surface tracking-tight">
-            Bảng Điều Khiển Tổng Quan
+          <h1 class="text-2xl font-extrabold text-on-surface tracking-tight">
+            Bảng Điều Khiển Tổng Quan (Admin Dashboard)
           </h1>
           <p class="text-xs text-on-surface-variant">
-            Số liệu thống kê khách quan về nền tảng StudyWithMe. Để quản lý chi tiết từng phần, vui lòng chọn menu tương ứng ở thanh điều hướng bên trái.
+            Theo dõi thời gian thực các chỉ số tài chính, người dùng, tiến độ khóa học và hồ sơ kiểm duyệt toàn hệ thống.
           </p>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <button onclick="taiLaiTatCaDuLieu()" type="button" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-container-low hover:bg-surface-container text-xs font-bold text-on-surface transition-all cursor-pointer border border-surface-container/60 shadow-xs">
+            <span class="material-symbols-outlined text-[18px]">refresh</span>
+            <span>Làm mới số liệu</span>
+          </button>
+          <a th:href="@{/admin/banners}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all shadow-xs">
+            <span class="material-symbols-outlined text-[18px]">view_carousel</span>
+            <span>Quản lý Banner</span>
+          </a>
         </div>
       </section>
 
-      <!-- 2. Thống kê KPI cốt lõi -->
+      <!-- 2. BỐN THẺ KPI CỐT LÕI (TRÊN CÙNG) -->
       <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <!-- Metric 1: Tổng người dùng -->
-        <a th:href="@{/admin/nguoi-dung}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-primary-container transition-all group">
+
+        <!-- KPI 1: Tổng doanh thu (VNĐ) -->
+        <div class="bg-surface-card p-5 rounded-2xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 relative overflow-hidden group hover:border-primary-container transition-all">
           <div class="flex items-center justify-between">
-            <span class="text-xs text-on-surface-variant font-medium group-hover:text-primary transition-colors">Tổng tài khoản người dùng</span>
-            <div class="w-10 h-10 rounded-xl bg-accent-cyan-subtle text-primary flex items-center justify-center">
-              <span class="material-symbols-outlined text-[22px]">group</span>
+            <span class="text-xs text-on-surface-variant font-semibold">Tổng doanh thu nền tảng</span>
+            <div class="w-11 h-11 rounded-xl bg-accent-cyan-subtle text-primary flex items-center justify-center group-hover:scale-105 transition-transform">
+              <span class="material-symbols-outlined text-[24px]">payments</span>
             </div>
           </div>
-          <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${tongNguoiDung}">0</span>
-            <span class="text-xs text-on-surface-variant font-medium">tài khoản</span>
+          <div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-2xl xl:text-3xl font-black text-on-surface tracking-tight" id="kpi-doanh-thu"
+                    th:text="${#numbers.formatDecimal(tongDoanhThu ?: 0, 0, 'POINT', 0, 'COMMA')}">0</span>
+              <span class="text-xs font-bold text-primary">VNĐ</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-status-success text-[14px]">trending_up</span>
+              <span>Đơn hàng đã thanh toán thành công</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- KPI 2: Tổng người dùng -->
+        <a th:href="@{/admin/nguoi-dung}" class="bg-surface-card p-5 rounded-2xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 relative overflow-hidden group hover:border-secondary transition-all">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-semibold group-hover:text-secondary transition-colors">Tổng tài khoản người dùng</span>
+            <div class="w-11 h-11 rounded-xl bg-accent-navy-subtle text-secondary flex items-center justify-center group-hover:scale-105 transition-transform">
+              <span class="material-symbols-outlined text-[24px]">group</span>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-2xl xl:text-3xl font-black text-on-surface tracking-tight" id="kpi-nguoi-dung"
+                    th:text="${tongNguoiDung ?: 0}">0</span>
+              <span class="text-xs text-on-surface-variant font-medium">thành viên</span>
+            </div>
+            <p class="text-[11px] text-secondary mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">manage_accounts</span>
+              <span>Bao gồm Học viên, Giảng viên & Quản trị</span>
+            </p>
           </div>
         </a>
 
-        <!-- Metric 2: Gia sư đang hoạt động -->
-        <a th:href="@{/admin/duyet-gia-su}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-secondary transition-all group">
+        <!-- KPI 3: Tổng khóa học đang hoạt động -->
+        <div class="bg-surface-card p-5 rounded-2xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 relative overflow-hidden group hover:border-status-success transition-all">
           <div class="flex items-center justify-between">
-            <span class="text-xs text-on-surface-variant font-medium group-hover:text-secondary transition-colors">Gia sư đang hoạt động</span>
-            <div class="w-10 h-10 rounded-xl bg-accent-navy-subtle text-secondary flex items-center justify-center">
-              <span class="material-symbols-outlined text-[22px]">school</span>
+            <span class="text-xs text-on-surface-variant font-semibold">Khóa học đang hoạt động</span>
+            <div class="w-11 h-11 rounded-xl bg-surface-container text-status-success flex items-center justify-center group-hover:scale-105 transition-transform">
+              <span class="material-symbols-outlined text-[24px]">menu_book</span>
             </div>
           </div>
-          <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${tongGiaSu}">0</span>
-            <span class="text-xs text-on-surface-variant font-medium">hồ sơ đã duyệt</span>
+          <div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-2xl xl:text-3xl font-black text-on-surface tracking-tight" id="kpi-khoa-hoc"
+                    th:text="${tongKhoaHoc ?: 0}">0</span>
+              <span class="text-xs text-on-surface-variant font-medium">khóa học</span>
+            </div>
+            <p class="text-[11px] text-status-success mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">check_circle</span>
+              <span>Đang mở bán & ghi danh trên sàn</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- KPI 4: Lệnh rút tiền / Hồ sơ giảng viên chờ duyệt -->
+        <a th:href="@{/admin/duyet-gia-su}" class="bg-surface-card p-5 rounded-2xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 relative overflow-hidden group hover:border-tertiary-container transition-all">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-on-surface-variant font-semibold group-hover:text-tertiary transition-colors">Yêu cầu cần xử lý</span>
+            <div class="w-11 h-11 rounded-xl bg-accent-coral-subtle text-tertiary-container flex items-center justify-center group-hover:scale-105 transition-transform">
+              <span class="material-symbols-outlined text-[24px]">pending_actions</span>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-2xl xl:text-3xl font-black text-tertiary tracking-tight" id="kpi-cho-duyet"
+                    th:text="${tongChoDuyet ?: 0}">0</span>
+              <span class="text-xs text-on-surface-variant font-medium">yêu cầu chờ</span>
+            </div>
+            <p class="text-[11px] text-tertiary mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">hourglass_top</span>
+              <span><strong th:text="${hoSoChoDuyet ?: 0}">0</strong> hồ sơ GV • <strong th:text="${lenhRutTienChoDuyet ?: 0}">0</strong> lệnh rút</span>
+            </p>
           </div>
         </a>
 
-        <!-- Metric 3: Hồ sơ chờ duyệt -->
-        <a th:href="@{/admin/duyet-gia-su}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-tertiary-container transition-all group">
-          <div class="flex items-center justify-between">
-            <span class="text-xs text-on-surface-variant font-medium group-hover:text-tertiary transition-colors">Hồ sơ gia sư chờ duyệt</span>
-            <div class="w-10 h-10 rounded-xl bg-accent-coral-subtle text-tertiary-container flex items-center justify-center">
-              <span class="material-symbols-outlined text-[22px]">pending_actions</span>
-            </div>
-          </div>
-          <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-tertiary tracking-tight" th:text="${hoSoChoDuyet}">0</span>
-            <span class="text-xs text-on-surface-variant font-medium">cần xử lý</span>
-          </div>
-        </a>
-
-        <!-- Metric 4: Lớp học trực tuyến -->
-        <a th:href="@{/admin/lop-hoc}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-status-success transition-all group">
-          <div class="flex items-center justify-between">
-            <span class="text-xs text-on-surface-variant font-medium group-hover:text-status-success transition-colors">Lớp học trực tuyến</span>
-            <div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-status-success">
-              <span class="material-symbols-outlined text-[22px]">video_camera_front</span>
-            </div>
-          </div>
-          <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${tongLopHoc}">0</span>
-            <span class="text-xs text-on-surface-variant font-medium">lớp đã tạo</span>
-          </div>
-        </a>
       </section>
 
-      <!-- 3. Tóm tắt Khách quan (Overview Grid 2 cột) -->
+      <!-- 3. KHỐI BIỂU ĐỒ (LINE CHART & PIE CHART) -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Biểu đồ đường (Line chart): Doanh thu theo tháng trong năm (8 cột) -->
+        <div class="lg:col-span-8 bg-surface-card rounded-2xl p-6 shadow-sm border border-surface-container/30 flex flex-col justify-between gap-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-surface-container/40">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[22px]">show_chart</span>
+                <h2 class="text-base font-bold text-on-surface">Biểu Đồ Doanh Thu Theo Tháng</h2>
+              </div>
+              <p class="text-xs text-on-surface-variant mt-0.5">Xu hướng biến động doanh thu thanh toán qua các tháng trong năm</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <label for="select-nam-doanh-thu" class="text-xs font-semibold text-on-surface-variant">Chọn năm:</label>
+              <select id="select-nam-doanh-thu" onchange="taiDoanhThuTheoNam(this.value)"
+                      class="px-3 py-1.5 rounded-lg bg-surface-container-low text-xs font-bold text-on-surface border border-surface-container focus:outline-none focus:ring-2 focus:ring-primary-container cursor-pointer">
+                <option value="2026" selected>Năm 2026</option>
+                <option value="2025">Năm 2025</option>
+                <option value="2024">Năm 2024</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Canvas Line Chart -->
+          <div class="relative w-full h-[320px]">
+            <canvas id="lineChartDoanhThu"></canvas>
+            <div id="loading-line-chart" class="hidden absolute inset-0 bg-surface-card/80 backdrop-blur-xs flex items-center justify-center">
+              <div class="flex items-center gap-2 text-xs font-semibold text-primary">
+                <span class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+                <span>Đang tải số liệu biểu đồ...</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-2 border-t border-surface-container/30 text-xs text-on-surface-variant">
+            <span class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-primary inline-block"></span>
+              <span>Tổng doanh thu năm: <strong class="text-on-surface font-bold" id="tong-doanh-thu-nam">0 ₫</strong></span>
+            </span>
+            <span class="text-[11px] text-outline">Đơn vị: VNĐ (Đã bao gồm VAT)</span>
+          </div>
+        </div>
+
+        <!-- Biểu đồ tròn (Pie/Doughnut chart): Tỷ lệ học viên Cấp 1, Cấp 2, Cấp 3 và Ngoại ngữ (4 cột) -->
+        <div class="lg:col-span-4 bg-surface-card rounded-2xl p-6 shadow-sm border border-surface-container/30 flex flex-col justify-between gap-4">
+          <div class="pb-3 border-b border-surface-container/40">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-[22px]">pie_chart</span>
+              <h2 class="text-base font-bold text-on-surface">Tỷ Lệ Học Viên Theo Cấp Học</h2>
+            </div>
+            <p class="text-xs text-on-surface-variant mt-0.5">Phân bổ học viên theo nhóm khối học & ngoại ngữ</p>
+          </div>
+
+          <!-- Canvas Pie Chart -->
+          <div class="relative w-full h-[260px] flex items-center justify-center">
+            <canvas id="pieChartDanhMuc"></canvas>
+          </div>
+
+          <!-- Legend tùy biến chi tiết -->
+          <div id="pie-chart-legend" class="grid grid-cols-2 gap-2 pt-2 border-t border-surface-container/30 text-xs">
+            <!-- Render động qua JavaScript -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 4. HAI BẢNG NHỎ: TOP 5 KHÓA HỌC BÁN CHẠY & 5 HỒ SƠ GIẢNG VIÊN MỚI -->
       <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        <!-- Khối 1: Tóm tắt Hồ sơ Gia sư cần chú ý -->
-        <div class="bg-surface-card rounded-xl p-6 shadow-sm border border-surface-container/30 flex flex-col justify-between gap-4">
+        <!-- BẢNG 1: TOP 5 KHÓA HỌC BÁN CHẠY NHẤT -->
+        <div class="bg-surface-card rounded-2xl p-6 shadow-sm border border-surface-container/30 flex flex-col justify-between gap-4">
           <div>
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-surface-container/40">
               <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-tertiary text-[22px]">assignment</span>
-                <h2 class="text-base font-bold text-on-surface">Hồ sơ Gia sư chờ xử lý</h2>
+                <span class="material-symbols-outlined text-primary text-[22px]">military_tech</span>
+                <h2 class="text-base font-bold text-on-surface">Top 5 Khóa Học Bán Chạy Nhất</h2>
               </div>
-              <span th:if="${hoSoChoDuyet > 0}" th:text="${hoSoChoDuyet} + ' hồ sơ đang chờ'" class="px-2.5 py-0.5 rounded-full bg-accent-coral-subtle text-tertiary text-xs font-bold"></span>
+              <span class="px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-primary text-xs font-bold">Xếp theo học viên</span>
             </div>
 
-            <!-- Trường hợp không có hồ sơ tồn -->
-            <div th:if="${#lists.isEmpty(recentPendingTutors)}" class="p-8 text-center bg-surface-container-low/40 rounded-xl border border-dashed border-surface-container">
-              <span class="material-symbols-outlined text-3xl text-status-success mb-1">verified</span>
-              <p class="text-xs font-semibold text-on-surface">Tuyệt vời! Không có hồ sơ gia sư nào tồn đọng.</p>
-              <p class="text-[11px] text-on-surface-variant mt-0.5">Mọi hồ sơ đăng ký mới đã được xét duyệt hoàn tất.</p>
+            <!-- Trường hợp chưa có khóa học -->
+            <div th:if="${#lists.isEmpty(topKhoaHoc)}" class="p-8 text-center bg-surface-container-low/40 rounded-xl border border-dashed border-surface-container">
+              <span class="material-symbols-outlined text-3xl text-outline mb-1">auto_stories</span>
+              <p class="text-xs font-semibold text-on-surface">Chưa có dữ liệu khóa học bán chạy.</p>
+              <p class="text-[11px] text-on-surface-variant mt-0.5">Dữ liệu sẽ tự động cập nhật khi học viên ghi danh.</p>
             </div>
 
-            <!-- Trường hợp có hồ sơ chờ -->
-            <div th:if="${!#lists.isEmpty(recentPendingTutors)}" class="space-y-3">
-              <div th:each="tutor : ${recentPendingTutors}" class="p-3.5 rounded-lg bg-surface-container-low flex items-center justify-between gap-3">
+            <!-- Danh sách Top 5 Khóa học -->
+            <div th:if="${!#lists.isEmpty(topKhoaHoc)}" class="space-y-3">
+              <div th:each="kh, stat : ${topKhoaHoc}" class="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container/60 transition-colors flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3 min-w-0">
-                  <div class="w-9 h-9 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center font-bold text-xs shrink-0"
-                       th:text="${tutor.nguoiDung != null and tutor.nguoiDung.hoTen != null ? #strings.substring(tutor.nguoiDung.hoTen.trim(), 0, 1).toUpperCase() : 'G'}">
+                  <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0"
+                        th:classappend="${stat.index == 0 ? 'bg-status-warning text-white' : (stat.index == 1 ? 'bg-secondary text-white' : (stat.index == 2 ? 'bg-tertiary-container text-white' : 'bg-surface-container text-on-surface-variant'))}"
+                        th:text="${stat.count}">1</span>
+                  
+                  <div class="w-12 h-10 rounded-lg bg-surface-container overflow-hidden shrink-0">
+                    <img th:if="${kh.anhDaiDien != null}" th:src="${kh.anhDaiDien}" alt="Course" class="w-full h-full object-cover">
+                    <div th:if="${kh.anhDaiDien == null}" class="w-full h-full flex items-center justify-center bg-accent-cyan-subtle text-primary font-bold text-xs">KH</div>
+                  </div>
+
+                  <div class="min-w-0 flex-1">
+                    <h4 class="font-bold text-xs text-on-surface truncate" th:text="${kh.tieuDe}">Tên khóa học</h4>
+                    <p class="text-[11px] text-on-surface-variant truncate" th:text="'GV: ' + ${kh.tenGiangVien}">Giảng viên</p>
+                  </div>
+                </div>
+
+                <div class="text-right shrink-0">
+                  <div class="text-xs font-bold text-primary" th:text="${#numbers.formatDecimal(kh.giaHienTai ?: 0, 0, 'POINT', 0, 'COMMA')} + ' ₫'">0 ₫</div>
+                  <div class="text-[10px] text-on-surface-variant font-medium" th:text="${kh.soHocVien ?: 0} + ' học viên'">0 học viên</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-surface-container/30">
+            <div class="text-[11px] text-on-surface-variant text-center">
+              Dữ liệu được tổng hợp tự động từ các đơn hàng hoàn tất thanh toán
+            </div>
+          </div>
+        </div>
+
+        <!-- BẢNG 2: 5 HỒ SƠ GIẢNG VIÊN MỚI NỘP GẦN NHẤT -->
+        <div class="bg-surface-card rounded-2xl p-6 shadow-sm border border-surface-container/30 flex flex-col justify-between gap-4">
+          <div>
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-surface-container/40">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary text-[22px]">person_check</span>
+                <h2 class="text-base font-bold text-on-surface">5 Hồ Sơ Giảng Viên Mới Nộp</h2>
+              </div>
+              <a th:href="@{/admin/duyet-gia-su}" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                <span>Xem tất cả</span>
+                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+              </a>
+            </div>
+
+            <!-- Trường hợp chưa có hồ sơ -->
+            <div th:if="${#lists.isEmpty(giangVienMoi)}" class="p-8 text-center bg-surface-container-low/40 rounded-xl border border-dashed border-surface-container">
+              <span class="material-symbols-outlined text-3xl text-status-success mb-1">verified</span>
+              <p class="text-xs font-semibold text-on-surface">Không có hồ sơ gia sư mới nào cần xét duyệt.</p>
+              <p class="text-[11px] text-on-surface-variant mt-0.5">Tất cả ứng viên đã được xử lý hoàn tất.</p>
+            </div>
+
+            <!-- Danh sách 5 hồ sơ mới nộp -->
+            <div th:if="${!#lists.isEmpty(giangVienMoi)}" class="space-y-3">
+              <div th:each="gv : ${giangVienMoi}" class="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container/60 transition-colors flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-10 h-10 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center font-bold text-xs shrink-0"
+                       th:text="${gv.hoTen != null ? #strings.substring(gv.hoTen.trim(), 0, 1).toUpperCase() : 'G'}">
                     G
                   </div>
                   <div class="min-w-0 flex-1">
-                    <p class="font-bold text-xs text-on-surface truncate" th:text="${tutor.nguoiDung != null ? tutor.nguoiDung.hoTen : 'Chưa cập nhật'}">Gia sư</p>
-                    <p class="text-[11px] text-on-surface-variant truncate" th:text="${tutor.nguoiDung != null ? tutor.nguoiDung.email : ''}"></p>
+                    <p class="font-bold text-xs text-on-surface truncate" th:text="${gv.hoTen}">Họ tên giảng viên</p>
+                    <p class="text-[11px] text-on-surface-variant truncate" th:text="${gv.tieuDeChuyenMon ?: gv.email}">Chuyên môn</p>
                   </div>
                 </div>
-                <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface text-[10px] font-medium shrink-0" th:text="${tutor.tieuDeChuyenMon ?: 'Gia sư mới'}"></span>
-              </div>
-            </div>
-          </div>
 
-          <a th:href="@{/admin/duyet-gia-su}" class="w-full py-2.5 rounded-lg bg-surface-container-low hover:bg-primary hover:text-white text-primary text-xs font-bold text-center transition-all flex items-center justify-center gap-1.5">
-            <span>Đi đến trang Duyệt Gia sư chi tiết</span>
-            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-          </a>
-        </div>
-
-        <!-- Khối 2: Tóm tắt Thành viên đăng ký mới nhất -->
-        <div class="bg-surface-card rounded-xl p-6 shadow-sm border border-surface-container/30 flex flex-col justify-between gap-4">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary text-[22px]">person_add</span>
-                <h2 class="text-base font-bold text-on-surface">Thành viên mới đăng ký</h2>
-              </div>
-              <span class="text-xs text-on-surface-variant font-medium">5 tài khoản gần nhất</span>
-            </div>
-
-            <div class="space-y-2.5">
-              <div th:each="u : ${recentUsers}" class="p-2.5 rounded-lg bg-surface-container-low flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2.5 min-w-0">
-                  <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs shrink-0"
-                       th:text="${u.hoTen != null ? #strings.substring(u.hoTen.trim(), 0, 1).toUpperCase() : 'U'}">
-                    U
-                  </div>
-                  <div class="min-w-0 flex-1">
-                    <p class="font-bold text-xs text-on-surface truncate" th:text="${u.hoTen}">Họ tên</p>
-                    <p class="text-[11px] text-on-surface-variant truncate" th:text="${u.email}">email</p>
-                  </div>
-                </div>
                 <div class="flex items-center gap-2 shrink-0">
-                  <span th:if="${u.trangThai.name() == 'HOAT_DONG'}" class="w-2 h-2 rounded-full bg-status-success" title="Hoạt động"></span>
-                  <span th:if="${u.trangThai.name() != 'HOAT_DONG'}" class="w-2 h-2 rounded-full bg-error" title="Tạm khóa"></span>
-                  <span class="text-[10px] text-outline" th:text="${#temporals.format(u.ngayTao, 'dd/MM/yyyy')}"></span>
+                  <span th:if="${gv.trangThaiDuyet == 'CHO_DUYET'}" class="px-2.5 py-0.5 rounded-full bg-accent-coral-subtle text-tertiary text-[11px] font-bold">Chờ duyệt</span>
+                  <span th:if="${gv.trangThaiDuyet == 'DA_DUYET'}" class="px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-status-success text-[11px] font-bold">Đã duyệt</span>
+                  <span th:if="${gv.trangThaiDuyet == 'TU_CHOI'}" class="px-2.5 py-0.5 rounded-full bg-error-container text-error text-[11px] font-bold">Từ chối</span>
+
+                  <a th:href="@{/admin/duyet-gia-su}" title="Xét duyệt ngay" class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-on-surface hover:bg-primary hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-[16px]">visibility</span>
+                  </a>
                 </div>
               </div>
             </div>
           </div>
 
-          <a th:href="@{/admin/nguoi-dung}" class="w-full py-2.5 rounded-lg bg-surface-container-low hover:bg-secondary hover:text-white text-secondary text-xs font-bold text-center transition-all flex items-center justify-center gap-1.5">
-            <span>Quản lý toàn bộ danh sách Người dùng</span>
-            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-          </a>
-        </div>
-
-      </section>
-
-      <!-- 4. Thẻ trạng thái hệ thống và hạ tầng -->
-      <section class="bg-surface-card rounded-xl p-6 shadow-sm border border-surface-container/30">
-        <h3 class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-4 flex items-center gap-2">
-          <span class="material-symbols-outlined text-secondary text-[18px]">tune</span>
-          Hạ tầng kỹ thuật & Bảo mật
-        </h3>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-          <div class="p-4 rounded-xl bg-surface-container-low/60 flex items-center gap-3">
-            <span class="material-symbols-outlined text-primary text-[28px]">database</span>
-            <div>
-              <p class="font-bold text-on-surface">SQL Server Database</p>
-              <p class="text-on-surface-variant text-[11px]">studywithme_db (HikariCP Pool)</p>
-            </div>
-          </div>
-          <div class="p-4 rounded-xl bg-surface-container-low/60 flex items-center gap-3">
-            <span class="material-symbols-outlined text-status-success text-[28px]">shield</span>
-            <div>
-              <p class="font-bold text-on-surface">Bảo mật JWT 2 lớp</p>
-              <p class="text-on-surface-variant text-[11px]">Cookie & Authorization Header</p>
-            </div>
-          </div>
-          <div class="p-4 rounded-xl bg-surface-container-low/60 flex items-center gap-3">
-            <span class="material-symbols-outlined text-tertiary-container text-[28px]">verified_user</span>
-            <div>
-              <p class="font-bold text-on-surface">Phân quyền chặt chẽ</p>
-              <p class="text-on-surface-variant text-[11px]">ROLE_QUAN_TRI kiểm soát /admin</p>
-            </div>
+          <div class="pt-3 border-t border-surface-container/30">
+            <a th:href="@{/admin/duyet-gia-su}" class="w-full py-2.5 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold text-center transition-all flex items-center justify-center gap-1.5 shadow-xs">
+              <span>Đến trang phê duyệt hồ sơ giảng viên</span>
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </a>
           </div>
         </div>
+
       </section>
 
     </main>
   </div>
 
-  <script>
+  <!-- JAVASCRIPT XỬ LÝ BIỂU ĐỒ VÀ THỐNG KÊ (CHART.JS) -->
+  <script th:inline="javascript">
+    let lineChartInstance = null;
+    let pieChartInstance = null;
+
+    // 1. Đồng hồ thời gian thực
     function updateLiveClock() {
       const clockEl = document.getElementById('live-clock');
-      const todayEl = document.getElementById('header-today-date');
       const now = new Date();
       const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
       const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
       const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-      
       if (clockEl) clockEl.textContent = `${days[now.getDay()]}, ${dateStr} — ${timeStr}`;
     }
     updateLiveClock();
     setInterval(updateLiveClock, 1000);
+
+    // 2. Tải dữ liệu Doanh thu (Line chart)
+    async function taiDoanhThuTheoNam(nam) {
+      const loadingEl = document.getElementById('loading-line-chart');
+      if (loadingEl) loadingEl.classList.remove('hidden');
+
+      try {
+        const resp = await fetch(`/api/admin/thong-ke/doanh-thu?nam=${nam}`);
+        const result = await resp.json();
+
+        if (result.thanhCong && result.duLieu) {
+          const data = result.duLieu;
+          const labels = data.danhSachThang.map(item => item.nhanThang);
+          const values = data.danhSachThang.map(item => item.doanhThu);
+
+          document.getElementById('tong-doanh-thu-nam').textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.tongDoanhThuNam);
+
+          veLineChart(labels, values);
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải doanh thu:', err);
+      } finally {
+        if (loadingEl) loadingEl.classList.add('hidden');
+      }
+    }
+
+    function veLineChart(labels, values) {
+      const ctx = document.getElementById('lineChartDoanhThu').getContext('2d');
+
+      if (lineChartInstance) {
+        lineChartInstance.destroy();
+      }
+
+      // Tạo gradient nền màu Cyan/Primary
+      const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+      gradient.addColorStop(0, 'rgba(0, 165, 223, 0.28)');
+      gradient.addColorStop(1, 'rgba(0, 165, 223, 0.01)');
+
+      lineChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Doanh thu (VNĐ)',
+            data: values,
+            borderColor: '#00A5DF',
+            backgroundColor: gradient,
+            borderWidth: 3,
+            fill: true,
+            tension: 0.35,
+            pointBackgroundColor: '#FFFFFF',
+            pointBorderColor: '#00A5DF',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return ' ' + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(0, 0, 0, 0.04)' },
+              ticks: {
+                callback: function(value) {
+                  if (value >= 1000000) {
+                    return (value / 1000000).toFixed(0) + ' tr';
+                  } else if (value >= 1000) {
+                    return (value / 1000).toFixed(0) + ' k';
+                  }
+                  return value;
+                },
+                font: { size: 11 }
+              }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { font: { size: 11 } }
+            }
+          }
+        }
+      });
+    }
+
+    // 3. Tải dữ liệu Tỷ lệ Danh mục (Pie chart)
+    async function taiTyLeDanhMuc() {
+      try {
+        const resp = await fetch('/api/admin/thong-ke/ty-le-danh-muc');
+        const result = await resp.json();
+
+        if (result.thanhCong && result.duLieu) {
+          const data = result.duLieu.danhSachTyLe;
+          const labels = data.map(i => i.tenNhom);
+          const values = data.map(i => i.soLuongHocVien);
+          const colors = data.map(i => i.mauSac);
+
+          vePieChart(labels, values, colors);
+          taoLegendPieChart(data);
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải tỷ lệ danh mục:', err);
+      }
+    }
+
+    function vePieChart(labels, values, colors) {
+      const ctx = document.getElementById('pieChartDanhMuc').getContext('2d');
+
+      if (pieChartInstance) {
+        pieChartInstance.destroy();
+      }
+
+      pieChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: values,
+            backgroundColor: colors,
+            borderColor: '#FFFFFF',
+            borderWidth: 2,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed || 0;
+                  return ` ${label}: ${value} học viên`;
+                }
+              }
+            }
+          },
+          cutout: '68%'
+        }
+      });
+    }
+
+    function taoLegendPieChart(data) {
+      const legendContainer = document.getElementById('pie-chart-legend');
+      if (!legendContainer) return;
+
+      legendContainer.innerHTML = data.map(item => `
+        <div class="flex items-center gap-2 p-1.5 rounded-lg bg-surface-container-low/60">
+          <span class="w-3 h-3 rounded-full shrink-0" style="background-color: ${item.mauSac}"></span>
+          <div class="min-w-0 flex-1">
+            <p class="font-bold text-[11px] text-on-surface truncate">${item.tenNhom}</p>
+            <p class="text-[10px] text-on-surface-variant">${item.tyLePhanTram}% (${item.soLuongHocVien})</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 4. Nút tải lại tất cả dữ liệu
+    async function taiLaiTatCaDuLieu() {
+      const nam = document.getElementById('select-nam-doanh-thu').value;
+      await Promise.all([
+        taiDoanhThuTheoNam(nam),
+        taiTyLeDanhMuc(),
+        capNhatKPIs()
+      ]);
+    }
+
+    async function capNhatKPIs() {
+      try {
+        const resp = await fetch('/api/admin/thong-ke/tong-quan');
+        const result = await resp.json();
+        if (result.thanhCong && result.duLieu) {
+          const d = result.duLieu;
+          document.getElementById('kpi-doanh-thu').textContent = new Intl.NumberFormat('vi-VN').format(d.tongDoanhThu);
+          document.getElementById('kpi-nguoi-dung').textContent = d.tongNguoiDung;
+          document.getElementById('kpi-khoa-hoc').textContent = d.tongKhoaHocDangHoatDong;
+          document.getElementById('kpi-cho-duyet').textContent = d.tongYeuCauChoDuyet;
+        }
+      } catch (e) {
+        console.error('Lỗi cập nhật KPIs:', e);
+      }
+    }
+
+    // Tự động nạp khi vào trang
+    document.addEventListener('DOMContentLoaded', () => {
+      taiDoanhThuTheoNam('2026');
+      taiTyLeDanhMuc();
+    });
   </script>
 </body>
 </html>

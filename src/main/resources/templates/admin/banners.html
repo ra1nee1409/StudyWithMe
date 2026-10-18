@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{components/common/head :: common-head('Quản lý Banner Trang chủ - Admin StudyWithMe')}"></th:block>
+</head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== SIDEBAR COMPONENT ==================== -->
+  <aside th:replace="~{components/admin/sidebar :: admin-sidebar('banners')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar Component -->
+    <header th:replace="~{components/admin/header :: admin-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Toast Notification Container -->
+      <div id="toast-container" class="fixed top-20 right-8 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+      <!-- 1. Header Page Title & Action -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-primary text-xs font-semibold">
+              <span class="material-symbols-outlined text-[14px]">view_carousel</span>
+              Hệ Thống CMS Banner
+            </span>
+            <span class="text-outline-variant">•</span>
+            <span class="text-xs text-on-surface-variant">Trang chủ StudyWithMe</span>
+          </div>
+          <h1 class="text-2xl font-extrabold text-on-surface tracking-tight">
+            Quản Lý Banner Trang Chủ
+          </h1>
+          <p class="text-xs text-on-surface-variant">
+            Quản trị các hình ảnh quảng cáo, sự kiện khai giảng và chương trình khuyến mãi hiển thị trên Slider / Hero trang chủ.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3 shrink-0">
+          <button onclick="taiLaiDanhSachBanner()" type="button" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-xs font-bold text-on-surface transition-all cursor-pointer border border-surface-container/60 shadow-xs">
+            <span class="material-symbols-outlined text-[18px]">refresh</span>
+            <span>Tải lại</span>
+          </button>
+          <button onclick="moModalThemBanner()" type="button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all cursor-pointer shadow-sm">
+            <span class="material-symbols-outlined text-[18px]">add_photo_alternate</span>
+            <span>Thêm Banner Mới</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 2. Thống kê nhanh Banner -->
+      <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-surface-card p-4 rounded-xl border border-surface-container/30 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-on-surface-variant font-medium">Tổng số banner</p>
+            <p class="text-2xl font-black text-on-surface mt-0.5" id="stat-tong-banner">0</p>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-accent-cyan-subtle text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px]">imagesmode</span>
+          </div>
+        </div>
+        <div class="bg-surface-card p-4 rounded-xl border border-surface-container/30 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-on-surface-variant font-medium">Đang kích hoạt (Hiển thị)</p>
+            <p class="text-2xl font-black text-status-success mt-0.5" id="stat-active-banner">0</p>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-surface-container text-status-success flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px]">visibility</span>
+          </div>
+        </div>
+        <div class="bg-surface-card p-4 rounded-xl border border-surface-container/30 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-on-surface-variant font-medium">Đang ẩn (Tạm tắt)</p>
+            <p class="text-2xl font-black text-on-surface-variant mt-0.5" id="stat-inactive-banner">0</p>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-surface-container-low text-outline flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px]">visibility_off</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. BẢNG DANH SÁCH BANNER -->
+      <section class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/30 overflow-hidden flex flex-col">
+        <div class="p-5 border-b border-surface-container/40 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary text-[22px]">table_rows</span>
+            <h2 class="text-base font-bold text-on-surface">Danh Sách Banner Đang Lưu Trữ</h2>
+          </div>
+          <div class="text-xs text-on-surface-variant">
+            Gợi ý kích thước banner chuẩn: <strong>1200 x 450 px</strong> (tỷ lệ 8:3) hoặc <strong>1920 x 600 px</strong>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="bg-surface-container-low/70 text-on-surface-variant font-bold border-b border-surface-container">
+              <tr>
+                <th class="py-3.5 px-4 w-16 text-center">Thứ tự</th>
+                <th class="py-3.5 px-4 w-52">Ảnh Thumbnail</th>
+                <th class="py-3.5 px-4">Tiêu đề & Thông tin</th>
+                <th class="py-3.5 px-4">Đường dẫn khi click</th>
+                <th class="py-3.5 px-4 w-36 text-center">Trạng thái</th>
+                <th class="py-3.5 px-4 w-32 text-center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="banner-table-body" class="divide-y divide-surface-container/40">
+              <!-- Render động qua JavaScript -->
+              <tr>
+                <td colspan="6" class="py-12 text-center text-on-surface-variant">
+                  <div class="flex flex-col items-center justify-center gap-2">
+                    <span class="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+                    <span>Đang tải danh sách banner...</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==================== MODAL THÊM / SỬA BANNER ==================== -->
+  <div id="modal-banner" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+    <div class="bg-surface-card rounded-2xl max-w-lg w-full border border-surface-container shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-surface-container flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold">
+            <span class="material-symbols-outlined text-[20px]" id="modal-icon">add_photo_alternate</span>
+          </span>
+          <h3 class="text-base font-bold text-on-surface" id="modal-title">Thêm Banner Mới</h3>
+        </div>
+        <button onclick="dongModalBanner()" type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <form id="form-banner" onsubmit="xuLyLuuBanner(event)" class="p-6 space-y-4 text-xs">
+        <input type="hidden" id="banner-id" value="">
+
+        <!-- Tiêu đề -->
+        <div>
+          <label class="block font-bold text-on-surface mb-1">Tiêu đề Banner <span class="text-error">*</span></label>
+          <input type="text" id="banner-tieu-de" required placeholder="Ví dụ: Ưu Đãi Khai Giảng - Khóa Học Mùa Hè"
+                 class="w-full h-10 px-3.5 rounded-xl bg-surface-container-low text-on-surface text-xs border border-surface-container focus:outline-none focus:bg-surface-card focus:ring-2 focus:ring-primary-container transition-all">
+        </div>
+
+        <!-- Chọn phương thức nhập ảnh: Tải file hoặc Link URL -->
+        <div>
+          <label class="block font-bold text-on-surface mb-1.5">Hình ảnh Banner <span class="text-error">*</span></label>
+          <div class="flex items-center gap-2 mb-2">
+            <button type="button" id="tab-upload-btn" onclick="chonTabAnh('upload')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-white transition-all cursor-pointer">
+              Tải ảnh từ máy tính
+            </button>
+            <button type="button" id="tab-url-btn" onclick="chonTabAnh('url')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold bg-surface-container-low text-on-surface-variant hover:text-on-surface transition-all cursor-pointer">
+              Nhập liên kết (URL)
+            </button>
+          </div>
+
+          <!-- Khối Tải file -->
+          <div id="box-upload" class="space-y-2">
+            <div class="border-2 border-dashed border-surface-container hover:border-primary-container rounded-xl p-4 text-center cursor-pointer transition-colors bg-surface-container-low/40 relative">
+              <input type="file" id="banner-file" accept="image/*" onchange="previewFileAnh(this)"
+                     class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+              <span class="material-symbols-outlined text-3xl text-primary mb-1">cloud_upload</span>
+              <p class="font-bold text-on-surface">Kéo thả hoặc nhấp để chọn ảnh</p>
+              <p class="text-[10px] text-on-surface-variant mt-0.5">Định dạng hỗ trợ: JPG, PNG, WEBP (Tối đa 5MB)</p>
+            </div>
+          </div>
+
+          <!-- Khối Nhập URL -->
+          <div id="box-url" class="hidden space-y-2">
+            <input type="url" id="banner-link-anh" placeholder="https://example.com/banner.jpg" oninput="previewUrlAnh(this.value)"
+                   class="w-full h-10 px-3.5 rounded-xl bg-surface-container-low text-on-surface text-xs border border-surface-container focus:outline-none focus:bg-surface-card focus:ring-2 focus:ring-primary-container transition-all">
+          </div>
+
+          <!-- Khung Preview Ảnh -->
+          <div id="box-preview" class="hidden mt-2 p-2 bg-surface-container-low rounded-xl border border-surface-container">
+            <p class="text-[10px] font-bold text-on-surface-variant mb-1">Xem trước ảnh:</p>
+            <div class="w-full h-32 rounded-lg bg-black/10 overflow-hidden flex items-center justify-center">
+              <img id="img-preview" src="" alt="Preview" class="w-full h-full object-cover">
+            </div>
+          </div>
+        </div>
+
+        <!-- Link chuyển hướng -->
+        <div>
+          <label class="block font-bold text-on-surface mb-1">Link chuyển hướng khi click</label>
+          <input type="text" id="banner-link-chuyen-huong" placeholder="Ví dụ: /#tim-gia-su hoặc /khoa-hoc/toan-9"
+                 class="w-full h-10 px-3.5 rounded-xl bg-surface-container-low text-on-surface text-xs border border-surface-container focus:outline-none focus:bg-surface-card focus:ring-2 focus:ring-primary-container transition-all">
+          <p class="text-[10px] text-on-surface-variant mt-1">Để trống nếu không muốn banner chuyển hướng khi người dùng nhấp vào.</p>
+        </div>
+
+        <!-- Thứ tự & Kích hoạt -->
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <div>
+            <label class="block font-bold text-on-surface mb-1">Thứ tự hiển thị</label>
+            <input type="number" id="banner-thu-tu" value="0" min="0" max="999"
+                   class="w-full h-10 px-3.5 rounded-xl bg-surface-container-low text-on-surface text-xs border border-surface-container focus:outline-none focus:bg-surface-card focus:ring-2 focus:ring-primary-container transition-all">
+          </div>
+          <div class="flex flex-col justify-end">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-surface-container-low border border-surface-container cursor-pointer hover:bg-surface-container transition-colors">
+              <input type="checkbox" id="banner-kich-hoat" checked class="w-4 h-4 text-primary rounded accent-primary cursor-pointer">
+              <span class="font-bold text-xs text-on-surface select-none">Bật hiển thị ngay</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="pt-4 border-t border-surface-container flex items-center justify-end gap-2">
+          <button type="button" onclick="dongModalBanner()" class="px-4 py-2 rounded-xl bg-surface-container-low hover:bg-surface-container text-xs font-bold text-on-surface transition-colors cursor-pointer">
+            Hủy bỏ
+          </button>
+          <button type="submit" id="btn-submit-banner" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-container text-xs font-bold text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">save</span>
+            <span id="btn-submit-text">Lưu Banner</span>
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL XÁC NHẬN XÓA ==================== -->
+  <div id="modal-xoa" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+    <div class="bg-surface-card rounded-2xl max-w-sm w-full border border-surface-container shadow-2xl p-6 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-150">
+      <div class="w-12 h-12 rounded-2xl bg-error-container/40 text-error flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined text-[28px]">delete_forever</span>
+      </div>
+      <div class="text-center">
+        <h4 class="text-base font-bold text-on-surface">Xác nhận xóa Banner?</h4>
+        <p class="text-xs text-on-surface-variant mt-1" id="xoa-ten-banner">Hành động này không thể hoàn tác.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="dongModalXoa()" class="flex-1 py-2 rounded-xl bg-surface-container-low hover:bg-surface-container text-xs font-bold text-on-surface transition-colors cursor-pointer">
+          Hủy bỏ
+        </button>
+        <button type="button" id="btn-xac-nhan-xoa" class="flex-1 py-2 rounded-xl bg-error hover:bg-error-container text-xs font-bold text-white transition-colors cursor-pointer shadow-xs">
+          Xác nhận Xóa
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT XỬ LÝ CRUD BANNER ==================== -->
+  <script th:inline="javascript">
+    let danhSachBannerHienTai = [];
+    let tabAnhHienTai = 'upload';
+    let bannerIdDangXoa = null;
+
+    // Toast Alert
+    function showToast(message, isSuccess = true) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `p-3.5 px-4 rounded-xl shadow-lg border flex items-center gap-2.5 text-xs font-semibold pointer-events-auto transition-all transform translate-y-2 opacity-0 ${
+        isSuccess ? 'bg-status-success text-white border-status-success' : 'bg-error text-white border-error'
+      }`;
+      toast.innerHTML = `
+        <span class="material-symbols-outlined text-[18px]">${isSuccess ? 'check_circle' : 'error'}</span>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // 1. Tải danh sách Banner
+    async function taiLaiDanhSachBanner() {
+      const tbody = document.getElementById('banner-table-body');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="py-12 text-center text-on-surface-variant">
+            <div class="flex flex-col items-center justify-center gap-2">
+              <span class="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+              <span>Đang tải danh sách banner...</span>
+            </div>
+          </td>
+        </tr>
+      `;
+
+      try {
+        const resp = await fetch('/api/admin/banners');
+        const result = await resp.json();
+
+        if (result.thanhCong) {
+          danhSachBannerHienTai = result.duLieu || [];
+          renderBangBanner(danhSachBannerHienTai);
+          capNhatThongKeBanner(danhSachBannerHienTai);
+        } else {
+          tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-error">${result.thongBao}</td></tr>`;
+        }
+      } catch (err) {
+        console.error(err);
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-error">Lỗi khi kết nối đến máy chủ.</td></tr>`;
+      }
+    }
+
+    // 2. Render HTML bảng banner
+    function renderBangBanner(banners) {
+      const tbody = document.getElementById('banner-table-body');
+
+      if (!banners || banners.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-12 text-center text-on-surface-variant">
+              <div class="flex flex-col items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-4xl text-outline">view_carousel</span>
+                <p class="font-bold text-xs text-on-surface">Chưa có banner nào được tạo.</p>
+                <p class="text-[11px]">Nhấp vào nút "Thêm Banner Mới" ở góc trên để tạo banner đầu tiên.</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = banners.map((b, idx) => `
+        <tr class="hover:bg-surface-container-low/40 transition-colors">
+          <!-- Thứ tự -->
+          <td class="py-3 px-4 text-center font-bold text-on-surface">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-surface-container text-xs">
+              ${b.thuTuHienThi ?? 0}
+            </span>
+          </td>
+
+          <!-- Thumbnail -->
+          <td class="py-3 px-4">
+            <div class="w-44 h-20 rounded-xl bg-surface-container overflow-hidden border border-surface-container/60 shadow-xs group relative">
+              <img src="${b.linkAnhBanner}" alt="${b.tieuDe}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.src='/images/logo.png'">
+              <a href="${b.linkAnhBanner}" target="_blank" title="Xem ảnh gốc" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                <span class="material-symbols-outlined text-[20px]">zoom_in</span>
+              </a>
+            </div>
+          </td>
+
+          <!-- Tiêu đề -->
+          <td class="py-3 px-4">
+            <p class="font-bold text-xs text-on-surface max-w-sm line-clamp-2">${b.tieuDe}</p>
+            <p class="text-[10px] text-on-surface-variant mt-0.5">ID: #${b.id} • Cập nhật: ${formatDate(b.ngayCapNhat || b.ngayTao)}</p>
+          </td>
+
+          <!-- Link chuyển hướng -->
+          <td class="py-3 px-4">
+            <a href="${b.linkChuyenHuong || '#'}" target="_blank" class="text-primary hover:underline font-medium text-xs flex items-center gap-1 max-w-[200px] truncate" title="${b.linkChuyenHuong}">
+              <span class="material-symbols-outlined text-[14px]">link</span>
+              <span class="truncate">${b.linkChuyenHuong || 'Không có'}</span>
+            </a>
+          </td>
+
+          <!-- Toggle Kích hoạt (Active switch) -->
+          <td class="py-3 px-4 text-center">
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" ${b.kichHoat ? 'checked' : ''} onchange="toggleTrangThaiBanner(${b.id})" class="sr-only peer">
+              <div class="w-11 h-6 bg-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-status-success"></div>
+            </label>
+            <p class="text-[10px] mt-1 ${b.kichHoat ? 'text-status-success font-bold' : 'text-outline font-medium'}">
+              ${b.kichHoat ? 'Đang hiển thị' : 'Đang ẩn'}
+            </p>
+          </td>
+
+          <!-- Thao tác Sửa / Xóa -->
+          <td class="py-3 px-4 text-center">
+            <div class="flex items-center justify-center gap-1.5">
+              <button onclick="moModalSuaBanner(${b.id})" title="Chỉnh sửa banner" class="w-8 h-8 rounded-lg bg-surface-container hover:bg-primary hover:text-white text-on-surface flex items-center justify-center transition-colors cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">edit</span>
+              </button>
+              <button onclick="moModalXoaBanner(${b.id}, '${b.tieuDe.replace(/'/g, "\\'")}')" title="Xóa banner" class="w-8 h-8 rounded-lg bg-surface-container hover:bg-error hover:text-white text-error flex items-center justify-center transition-colors cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function capNhatThongKeBanner(banners) {
+      document.getElementById('stat-tong-banner').textContent = banners.length;
+      const activeCount = banners.filter(b => b.kichHoat).length;
+      document.getElementById('stat-active-banner').textContent = activeCount;
+      document.getElementById('stat-inactive-banner').textContent = banners.length - activeCount;
+    }
+
+    // 3. Chuyển Tab Ảnh trong Modal
+    function chonTabAnh(tab) {
+      tabAnhHienTai = tab;
+      const uploadBtn = document.getElementById('tab-upload-btn');
+      const urlBtn = document.getElementById('tab-url-btn');
+      const boxUpload = document.getElementById('box-upload');
+      const boxUrl = document.getElementById('box-url');
+
+      if (tab === 'upload') {
+        uploadBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-white transition-all cursor-pointer';
+        urlBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-surface-container-low text-on-surface-variant hover:text-on-surface transition-all cursor-pointer';
+        boxUpload.classList.remove('hidden');
+        boxUrl.classList.add('hidden');
+      } else {
+        urlBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-white transition-all cursor-pointer';
+        uploadBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-surface-container-low text-on-surface-variant hover:text-on-surface transition-all cursor-pointer';
+        boxUrl.classList.remove('hidden');
+        boxUpload.classList.add('hidden');
+      }
+    }
+
+    // 4. Xem trước ảnh (Preview)
+    function previewFileAnh(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const previewBox = document.getElementById('box-preview');
+          const previewImg = document.getElementById('img-preview');
+          previewImg.src = e.target.result;
+          previewBox.classList.remove('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function previewUrlAnh(url) {
+      const previewBox = document.getElementById('box-preview');
+      const previewImg = document.getElementById('img-preview');
+      if (url && url.trim().length > 10) {
+        previewImg.src = url.trim();
+        previewBox.classList.remove('hidden');
+      } else {
+        previewBox.classList.add('hidden');
+      }
+    }
+
+    // 5. Mở / Đóng Modal Thêm / Sửa
+    function moModalThemBanner() {
+      document.getElementById('modal-title').textContent = 'Thêm Banner Mới';
+      document.getElementById('modal-icon').textContent = 'add_photo_alternate';
+      document.getElementById('btn-submit-text').textContent = 'Lưu Banner Mới';
+      document.getElementById('banner-id').value = '';
+      document.getElementById('form-banner').reset();
+      document.getElementById('box-preview').classList.add('hidden');
+      chonTabAnh('upload');
+
+      const modal = document.getElementById('modal-banner');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function moModalSuaBanner(id) {
+      const banner = danhSachBannerHienTai.find(b => b.id === id);
+      if (!banner) return;
+
+      document.getElementById('modal-title').textContent = 'Chỉnh Sửa Banner #' + id;
+      document.getElementById('modal-icon').textContent = 'edit';
+      document.getElementById('btn-submit-text').textContent = 'Cập Nhật Thay Đổi';
+      document.getElementById('banner-id').value = banner.id;
+      document.getElementById('banner-tieu-de').value = banner.tieuDe || '';
+      document.getElementById('banner-link-chuyen-huong').value = banner.linkChuyenHuong || '';
+      document.getElementById('banner-thu-tu').value = banner.thuTuHienThi ?? 0;
+      document.getElementById('banner-kich-hoat').checked = Boolean(banner.kichHoat);
+
+      // Hiển thị URL ảnh cũ
+      document.getElementById('banner-link-anh').value = banner.linkAnhBanner || '';
+      previewUrlAnh(banner.linkAnhBanner);
+      chonTabAnh('url');
+
+      const modal = document.getElementById('modal-banner');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function dongModalBanner() {
+      const modal = document.getElementById('modal-banner');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // 6. Xử lý Lưu Banner (POST / PUT)
+    async function xuLyLuuBanner(e) {
+      e.preventDefault();
+
+      const id = document.getElementById('banner-id').value;
+      const tieuDe = document.getElementById('banner-tieu-de').value.trim();
+      const linkChuyenHuong = document.getElementById('banner-link-chuyen-huong').value.trim();
+      const thuTuHienThi = parseInt(document.getElementById('banner-thu-tu').value) || 0;
+      const kichHoat = document.getElementById('banner-kich-hoat').checked;
+      const fileInput = document.getElementById('banner-file');
+      const linkAnh = document.getElementById('banner-link-anh').value.trim();
+
+      const btnSubmit = document.getElementById('btn-submit-banner');
+      btnSubmit.disabled = true;
+
+      try {
+        let resp;
+        const hasFile = fileInput.files && fileInput.files.length > 0;
+
+        if (hasFile) {
+          // Gửi qua Multipart Form Data
+          const formData = new FormData();
+          formData.append('tieuDe', tieuDe);
+          formData.append('linkChuyenHuong', linkChuyenHuong);
+          formData.append('thuTuHienThi', thuTuHienThi);
+          formData.append('kichHoat', kichHoat);
+          formData.append('file', fileInput.files[0]);
+
+          const url = id ? `/api/admin/banners/${id}` : '/api/admin/banners';
+          const method = id ? 'PUT' : 'POST';
+
+          resp = await fetch(url, {
+            method: method,
+            body: formData
+          });
+        } else {
+          // Gửi qua JSON Body
+          const reqBody = {
+            tieuDe: tieuDe,
+            linkAnhBanner: linkAnh,
+            linkChuyenHuong: linkChuyenHuong,
+            thuTuHienThi: thuTuHienThi,
+            kichHoat: kichHoat
+          };
+
+          const url = id ? `/api/admin/banners/${id}` : '/api/admin/banners';
+          const method = id ? 'PUT' : 'POST';
+
+          resp = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reqBody)
+          });
+        }
+
+        const result = await resp.json();
+
+        if (result.thanhCong) {
+          showToast(id ? 'Cập nhật banner thành công!' : 'Thêm banner mới thành công!');
+          dongModalBanner();
+          taiLaiDanhSachBanner();
+        } else {
+          showToast(result.thongBao || 'Thao tác không thành công', false);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Có lỗi xảy ra khi lưu banner', false);
+      } finally {
+        btnSubmit.disabled = false;
+      }
+    }
+
+    // 7. Toggle Bật/Tắt Trạng thái (PATCH)
+    async function toggleTrangThaiBanner(id) {
+      try {
+        const resp = await fetch(`/api/admin/banners/${id}/trang-thai`, { method: 'PATCH' });
+        const result = await resp.json();
+
+        if (result.thanhCong) {
+          showToast(result.thongBao || 'Đã cập nhật trạng thái banner');
+          taiLaiDanhSachBanner();
+        } else {
+          showToast(result.thongBao || 'Lỗi cập nhật trạng thái', false);
+          taiLaiDanhSachBanner();
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Không thể kết nối đến máy chủ', false);
+        taiLaiDanhSachBanner();
+      }
+    }
+
+    // 8. Xóa Banner (DELETE)
+    function moModalXoaBanner(id, tieuDe) {
+      bannerIdDangXoa = id;
+      document.getElementById('xoa-ten-banner').innerHTML = `Bạn có chắc chắn muốn xóa banner: <strong>"${tieuDe}"</strong>?`;
+      document.getElementById('btn-xac-nhan-xoa').onclick = () => xuLyXoaBanner(id);
+
+      const modal = document.getElementById('modal-xoa');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function dongModalXoa() {
+      const modal = document.getElementById('modal-xoa');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      bannerIdDangXoa = null;
+    }
+
+    async function xuLyXoaBanner(id) {
+      dongModalXoa();
+      try {
+        const resp = await fetch(`/api/admin/banners/${id}`, { method: 'DELETE' });
+        const result = await resp.json();
+
+        if (result.thanhCong) {
+          showToast('Đã xóa banner thành công!');
+          taiLaiDanhSachBanner();
+        } else {
+          showToast(result.thongBao || 'Không thể xóa banner', false);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Có lỗi xảy ra khi xóa banner', false);
+      }
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+    }
+
+    // Khởi tạo trang
+    document.addEventListener('DOMContentLoaded', () => {
+      taiLaiDanhSachBanner();
+    });
+  </script>
+</body>
+</html>

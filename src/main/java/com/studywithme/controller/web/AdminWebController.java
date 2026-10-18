@@ -32,17 +32,23 @@ public class AdminWebController {
     private final DangKyLopHocRepository dangKyLopHocRepository;
     private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
     private final DanhGiaNhanXetRepository danhGiaNhanXetRepository;
+    private final com.studywithme.service.AdminThongKeService adminThongKeService;
+    private final com.studywithme.service.BannerService bannerService;
 
     public AdminWebController(NguoiDungRepository nguoiDungRepository,
                               HoSoGiangVienRepository hoSoGiangVienRepository,
                               DangKyLopHocRepository dangKyLopHocRepository,
                               LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
-                              DanhGiaNhanXetRepository danhGiaNhanXetRepository) {
+                              DanhGiaNhanXetRepository danhGiaNhanXetRepository,
+                              com.studywithme.service.AdminThongKeService adminThongKeService,
+                              com.studywithme.service.BannerService bannerService) {
         this.nguoiDungRepository = nguoiDungRepository;
         this.hoSoGiangVienRepository = hoSoGiangVienRepository;
         this.dangKyLopHocRepository = dangKyLopHocRepository;
         this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
         this.danhGiaNhanXetRepository = danhGiaNhanXetRepository;
+        this.adminThongKeService = adminThongKeService;
+        this.bannerService = bannerService;
     }
 
     @ModelAttribute
@@ -55,17 +61,30 @@ public class AdminWebController {
     }
 
     // ==========================================
-    // 1. MỤC TỔNG QUAN (KHÁCH QUAN, KHÔNG QUÁ CHI TIẾT)
+    // 1. MỤC TỔNG QUAN (ADMIN DASHBOARD)
     // ==========================================
     @GetMapping({"", "/", "/dashboard"})
     public String dashboard(Model model) {
-        List<HoSoGiangVien> pendingSummary = hoSoGiangVienRepository.findByTrangThaiDuyetOrderByNgayTaoDesc(TrangThaiGiangVien.CHO_DUYET);
-        if (pendingSummary.size() > 3) {
-            pendingSummary = pendingSummary.subList(0, 3);
-        }
-        model.addAttribute("recentPendingTutors", pendingSummary);
-        model.addAttribute("recentUsers", nguoiDungRepository.findTop5ByOrderByNgayTaoDesc());
+        com.studywithme.dto.response.ThongKeTongQuanResponse thongKe = adminThongKeService.layThongKeTongQuan();
+        model.addAttribute("thongKe", thongKe);
+        model.addAttribute("tongDoanhThu", thongKe.getTongDoanhThu());
+        model.addAttribute("tongNguoiDung", thongKe.getTongNguoiDung());
+        model.addAttribute("tongKhoaHoc", thongKe.getTongKhoaHocDangHoatDong());
+        model.addAttribute("lenhRutTienChoDuyet", thongKe.getLenhRutTienChoDuyet());
+        model.addAttribute("hoSoChoDuyet", thongKe.getHoSoGiangVienChoDuyet());
+        model.addAttribute("tongChoDuyet", thongKe.getTongYeuCauChoDuyet());
+        model.addAttribute("topKhoaHoc", thongKe.getTopKhoaHoc());
+        model.addAttribute("giangVienMoi", thongKe.getGiangVienMoi());
         return "admin/dashboard";
+    }
+
+    // ==========================================
+    // 5. MỤC QUẢN LÝ BANNER TRANG CHỦ (CMS BANNER)
+    // ==========================================
+    @GetMapping("/banners")
+    public String bannersPage(Model model) {
+        model.addAttribute("danhSachBanner", bannerService.layTatCaBanner());
+        return "admin/banners";
     }
 
     // ==========================================

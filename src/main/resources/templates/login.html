@@ -30,18 +30,6 @@
               <p class="font-body-md text-body-md text-on-surface-variant mt-1">Nhập thông tin tài khoản StudyWithMe của bạn</p>
             </div>
 
-            <!-- Role Selector -->
-            <div class="p-1 rounded-lg bg-surface-container-low flex items-center mb-space-lg">
-              <button class="flex-1 py-2 px-3 rounded-md font-label-md text-label-md transition-all flex items-center justify-center gap-1.5 bg-surface-container-lowest text-primary shadow-sm font-bold" id="tab-student" onclick="switchRole('student')" type="button">
-                <span class="material-symbols-outlined text-[18px]">school</span>
-                <span>Phụ huynh / Học viên</span>
-              </button>
-              <button class="flex-1 py-2 px-3 rounded-md font-label-md text-label-md transition-all flex items-center justify-center gap-1.5 text-on-surface-variant hover:text-primary font-medium" id="tab-tutor" onclick="switchRole('tutor')" type="button">
-                <span class="material-symbols-outlined text-[18px]">person_apron</span>
-                <span>Gia sư / Giáo viên</span>
-              </button>
-            </div>
-
             <!-- Alert message -->
             <div id="login-alert" class="hidden mb-4 p-3 rounded-lg text-body-sm font-body-sm flex items-center gap-2"></div>
 
@@ -52,7 +40,7 @@
                 </label>
                 <div class="relative flex items-center">
                   <span class="material-symbols-outlined text-outline absolute left-3.5 pointer-events-none text-[20px]">account_circle</span>
-                  <input class="w-full pl-11 pr-4 py-2.5 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary-container outline-none transition-all" id="login-account" name="account" placeholder="Ví dụ: admin@studywithme.vn" required type="email">
+                  <input class="w-full pl-11 pr-4 py-2.5 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary-container outline-none transition-all" id="login-account" name="account" placeholder="Nhập địa chỉ email của bạn" required type="email">
                 </div>
               </div>
 
@@ -120,24 +108,6 @@
       }
     }
 
-    function switchRole(role) {
-      const studentTab = document.getElementById('tab-student');
-      const tutorTab = document.getElementById('tab-tutor');
-      const accountInput = document.getElementById('login-account');
-
-      if (!studentTab || !tutorTab) return;
-
-      if (role === 'student') {
-        studentTab.className = "flex-1 py-2 px-3 rounded-md font-label-md text-label-md transition-all flex items-center justify-center gap-1.5 bg-surface-container-lowest text-primary shadow-sm font-bold";
-        tutorTab.className = "flex-1 py-2 px-3 rounded-md font-label-md text-label-md transition-all flex items-center justify-center gap-1.5 text-on-surface-variant hover:text-primary font-medium";
-        if (accountInput) accountInput.placeholder = "Ví dụ: phuhuynh@studywithme.vn";
-      } else {
-        tutorTab.className = "flex-1 py-2 px-3 rounded-md font-label-md text-label-md transition-all flex items-center justify-center gap-1.5 bg-surface-container-lowest text-primary shadow-sm font-bold";
-        studentTab.className = "flex-1 py-2 px-3 rounded-md font-label-md text-label-md transition-all flex items-center justify-center gap-1.5 text-on-surface-variant hover:text-primary font-medium";
-        if (accountInput) accountInput.placeholder = "Ví dụ: giasu@studywithme.vn";
-      }
-    }
-
     async function handleLoginSubmit(event) {
       event.preventDefault();
       const btn = document.getElementById('submit-login-btn');
@@ -178,7 +148,11 @@
 
           setTimeout(() => {
             if (roles.includes('ROLE_QUAN_TRI')) {
-              window.location.href = '/admin';
+              window.location.href = '/admin/dashboard';
+            } else if (roles.includes('ROLE_GIANG_VIEN')) {
+              window.location.href = '/tutor/dashboard';
+            } else if (roles.includes('ROLE_HOC_VIEN')) {
+              window.location.href = '/student/dashboard';
             } else {
               window.location.href = '/';
             }

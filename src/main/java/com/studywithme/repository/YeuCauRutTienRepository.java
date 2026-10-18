@@ -13,4 +13,5 @@ import java.util.List;
 public interface YeuCauRutTienRepository extends JpaRepository<YeuCauRutTien, Long> {
     List<YeuCauRutTien> findByGiangVienIdOrderByNgayTaoDesc(Long giangVienId);
     Page<YeuCauRutTien> findByTrangThai(TrangThaiRutTien trangThai, Pageable pageable);
+    long countByTrangThai(TrangThaiRutTien trangThai);
 }

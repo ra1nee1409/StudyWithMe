@@ -27,14 +27,22 @@
       <!-- Navigation Links -->
       <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         <!-- 1. Tổng quan -->
-        <a th:href="@{/admin}"
+        <a th:href="@{/admin/dashboard}"
            th:classappend="${activeTab == 'dashboard'} ? 'bg-primary-container text-on-primary font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
           <span class="material-symbols-outlined text-[20px]">dashboard</span>
           <span>Tổng quan</span>
         </a>
 
-        <!-- 2. Duyệt Gia sư -->
+        <!-- 2. Quản lý Banner (CMS Banner) -->
+        <a th:href="@{/admin/banners}"
+           th:classappend="${activeTab == 'banners'} ? 'bg-primary-container text-on-primary font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">view_carousel</span>
+          <span>Quản lý Banner</span>
+        </a>
+
+        <!-- 3. Duyệt Gia sư -->
         <a th:href="@{/admin/duyet-gia-su}"
            th:classappend="${activeTab == 'tutors'} ? 'bg-primary-container text-on-primary font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">

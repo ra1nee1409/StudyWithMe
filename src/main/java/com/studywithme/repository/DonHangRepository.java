@@ -16,6 +16,9 @@ public interface DonHangRepository extends JpaRepository<DonHang, Long> {
     List<DonHang> findByNguoiDungIdOrderByNgayTaoDonDesc(Long nguoiDungId);
     Page<DonHang> findByTrangThaiThanhToan(TrangThaiThanhToan trangThaiThanhToan, Pageable pageable);
 
+    @org.springframework.data.jpa.repository.Query("SELECT COALESCE(SUM(d.tongTienThanhToan), 0) FROM DonHang d WHERE d.trangThaiThanhToan = :trangThai")
+    java.math.BigDecimal sumTongDoanhThu(@org.springframework.data.repository.query.Param("trangThai") TrangThaiThanhToan trangThai);
+
     @org.springframework.data.jpa.repository.Query("SELECT SUM(d.tongTienThanhToan) FROM DonHang d WHERE d.trangThaiThanhToan = :trangThai AND d.ngayTaoDon >= :startDate AND d.ngayTaoDon <= :endDate")
     java.math.BigDecimal sumDoanhThuKhoangThoiGian(@org.springframework.data.repository.query.Param("trangThai") TrangThaiThanhToan trangThai,
                                                    @org.springframework.data.repository.query.Param("startDate") java.time.LocalDateTime startDate,

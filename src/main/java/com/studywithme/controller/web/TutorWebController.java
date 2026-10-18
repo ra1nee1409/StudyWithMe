@@ -77,7 +77,7 @@ public class TutorWebController {
             }
         }
 
-        NumberFormat vnFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
+        NumberFormat vnFormat = NumberFormat.getInstance(Locale.of("vi", "VN"));
         model.addAttribute("tutorName", tutorName);
         model.addAttribute("tongLopHoc", tongLopHoc);
         model.addAttribute("tongHocVien", tongHocVien);
@@ -147,7 +147,7 @@ public class TutorWebController {
                 .filter(tien -> tien != null && tien.compareTo(BigDecimal.ZERO) > 0)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        NumberFormat vnFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
+        NumberFormat vnFormat = NumberFormat.getInstance(Locale.of("vi", "VN"));
         model.addAttribute("danhSachGiaoDich", danhSachGiaoDich);
         model.addAttribute("tongThuNhapFormat", vnFormat.format(tongThuNhap));
         return "tutor/wallet";

@@ -1,9 +1,11 @@
 package com.studywithme.entity;
 
-import com.studywithme.entity.enums.TrangThaiThamGiaLop;
+import com.studywithme.entity.enums.hocvien.TrangThaiThamGiaLop;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -19,6 +21,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DangKyLopHoc {
 
     @Id
@@ -45,17 +49,4 @@ public class DangKyLopHoc {
     @CreationTimestamp
     @Column(name = "ngay_dang_ky", nullable = false, updatable = false)
     private LocalDateTime ngayDangKy;
-
-    public DangKyLopHoc() {
-    }
-
-    public DangKyLopHoc(Long id, LopHocTrucTuyen lopHoc, NguoiDung hocVien, DonHang donHang,
-                        TrangThaiThamGiaLop trangThaiThamGia, LocalDateTime ngayDangKy) {
-        this.id = id;
-        this.lopHoc = lopHoc;
-        this.hocVien = hocVien;
-        this.donHang = donHang;
-        this.trangThaiThamGia = trangThaiThamGia != null ? trangThaiThamGia : TrangThaiThamGiaLop.DA_XAC_NHAN;
-        this.ngayDangKy = ngayDangKy;
-    }
 }

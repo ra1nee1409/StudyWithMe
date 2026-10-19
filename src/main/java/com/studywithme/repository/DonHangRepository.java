@@ -1,7 +1,7 @@
 package com.studywithme.repository;
 
 import com.studywithme.entity.DonHang;
-import com.studywithme.entity.enums.TrangThaiThanhToan;
+import com.studywithme.entity.enums.shared.TrangThaiThanhToan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,10 +1,12 @@
 package com.studywithme.entity;
 
-import com.studywithme.entity.enums.PhuongThucThanhToan;
-import com.studywithme.entity.enums.TrangThaiThanhToan;
+import com.studywithme.entity.enums.shared.PhuongThucThanhToan;
+import com.studywithme.entity.enums.shared.TrangThaiThanhToan;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -18,6 +20,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DonHang {
 
     @Id
@@ -55,21 +59,4 @@ public class DonHang {
     @CreationTimestamp
     @Column(name = "ngay_tao_don", nullable = false, updatable = false)
     private LocalDateTime ngayTaoDon;
-
-    public DonHang() {
-    }
-
-    public DonHang(Long id, String maDonHang, NguoiDung nguoiDung, BigDecimal tongTienThanhToan,
-                   PhuongThucThanhToan phuongThucThanhToan, TrangThaiThanhToan trangThaiThanhToan,
-                   LocalDateTime ngayThanhToan, List<ChiTietDonHang> danhSachChiTiet, LocalDateTime ngayTaoDon) {
-        this.id = id;
-        this.maDonHang = maDonHang;
-        this.nguoiDung = nguoiDung;
-        this.tongTienThanhToan = tongTienThanhToan != null ? tongTienThanhToan : BigDecimal.ZERO;
-        this.phuongThucThanhToan = phuongThucThanhToan != null ? phuongThucThanhToan : PhuongThucThanhToan.VNPAY;
-        this.trangThaiThanhToan = trangThaiThanhToan != null ? trangThaiThanhToan : TrangThaiThanhToan.CHO_THANH_TOAN;
-        this.ngayThanhToan = ngayThanhToan;
-        this.danhSachChiTiet = danhSachChiTiet != null ? danhSachChiTiet : new ArrayList<>();
-        this.ngayTaoDon = ngayTaoDon;
-    }
 }

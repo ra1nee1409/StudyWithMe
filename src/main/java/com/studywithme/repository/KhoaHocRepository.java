@@ -1,7 +1,7 @@
 package com.studywithme.repository;
 
 import com.studywithme.entity.KhoaHoc;
-import com.studywithme.entity.enums.TrangThaiKhoaHoc;
+import com.studywithme.entity.enums.admin.TrangThaiKhoaHoc;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,4 +30,6 @@ public interface KhoaHocRepository extends JpaRepository<KhoaHoc, Long> {
     long countByTrangThai(TrangThaiKhoaHoc trangThai);
     List<KhoaHoc> findTop8ByTrangThaiOrderByTongSoHocVienDesc(TrangThaiKhoaHoc trangThai);
     List<KhoaHoc> findTop5ByOrderByTongSoHocVienDesc();
+    boolean existsByDanhMucId(Long danhMucId);
+    long countByDanhMucId(Long danhMucId);
 }

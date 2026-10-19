@@ -5,6 +5,7 @@ import com.studywithme.dto.response.DoanhThuThangResponse;
 import com.studywithme.dto.response.ThongKeTongQuanResponse;
 import com.studywithme.dto.response.TyLeDanhMucResponse;
 import com.studywithme.service.AdminThongKeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -12,13 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin/thong-ke")
 @PreAuthorize("hasAuthority('ROLE_QUAN_TRI')")
+@RequiredArgsConstructor
 public class AdminThongKeApiController {
 
     private final AdminThongKeService adminThongKeService;
-
-    public AdminThongKeApiController(AdminThongKeService adminThongKeService) {
-        this.adminThongKeService = adminThongKeService;
-    }
 
     /**
      * API 1: Lấy số liệu 4 thẻ KPI và bảng phụ trợ trên Dashboard

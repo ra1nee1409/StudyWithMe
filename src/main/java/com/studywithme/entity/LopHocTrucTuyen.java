@@ -1,9 +1,11 @@
 package com.studywithme.entity;
 
-import com.studywithme.entity.enums.TrangThaiLopHoc;
+import com.studywithme.entity.enums.giaovien.TrangThaiLopHoc;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -18,6 +20,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class LopHocTrucTuyen {
 
     @Id
@@ -70,27 +74,4 @@ public class LopHocTrucTuyen {
     @CreationTimestamp
     @Column(name = "ngay_tao", nullable = false, updatable = false)
     private LocalDateTime ngayTao;
-
-    public LopHocTrucTuyen() {
-    }
-
-    public LopHocTrucTuyen(Long id, HoSoGiangVien giangVien, DanhMuc danhMuc, String tieuDeLop, String moTaLop,
-                           Integer siSoToiDa, BigDecimal hocPhiMoiHocVien, LocalDate ngayBatDau,
-                           LocalDate ngayKetThuc, String lichHocTrongTuan, String linkPhongHoc,
-                           TrangThaiLopHoc trangThai, List<DangKyLopHoc> danhSachHocVien, LocalDateTime ngayTao) {
-        this.id = id;
-        this.giangVien = giangVien;
-        this.danhMuc = danhMuc;
-        this.tieuDeLop = tieuDeLop;
-        this.moTaLop = moTaLop;
-        this.siSoToiDa = siSoToiDa != null ? siSoToiDa : 1;
-        this.hocPhiMoiHocVien = hocPhiMoiHocVien != null ? hocPhiMoiHocVien : BigDecimal.ZERO;
-        this.ngayBatDau = ngayBatDau;
-        this.ngayKetThuc = ngayKetThuc;
-        this.lichHocTrongTuan = lichHocTrongTuan;
-        this.linkPhongHoc = linkPhongHoc;
-        this.trangThai = trangThai != null ? trangThai : TrangThaiLopHoc.DANG_MO_DANG_KY;
-        this.danhSachHocVien = danhSachHocVien != null ? danhSachHocVien : new ArrayList<>();
-        this.ngayTao = ngayTao;
-    }
 }

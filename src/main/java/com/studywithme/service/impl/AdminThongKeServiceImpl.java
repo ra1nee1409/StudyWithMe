@@ -4,13 +4,14 @@ import com.studywithme.dto.response.*;
 import com.studywithme.entity.DanhMuc;
 import com.studywithme.entity.HoSoGiangVien;
 import com.studywithme.entity.KhoaHoc;
-import com.studywithme.entity.enums.LoaiDanhMuc;
-import com.studywithme.entity.enums.TrangThaiGiangVien;
-import com.studywithme.entity.enums.TrangThaiKhoaHoc;
-import com.studywithme.entity.enums.TrangThaiRutTien;
-import com.studywithme.entity.enums.TrangThaiThanhToan;
+import com.studywithme.entity.enums.shared.LoaiDanhMuc;
+import com.studywithme.entity.enums.admin.TrangThaiGiangVien;
+import com.studywithme.entity.enums.admin.TrangThaiKhoaHoc;
+import com.studywithme.entity.enums.admin.TrangThaiRutTien;
+import com.studywithme.entity.enums.shared.TrangThaiThanhToan;
 import com.studywithme.repository.*;
 import com.studywithme.service.AdminThongKeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class AdminThongKeServiceImpl implements AdminThongKeService {
 
     private final DonHangRepository donHangRepository;
@@ -32,22 +34,6 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
     private final YeuCauRutTienRepository yeuCauRutTienRepository;
     private final GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository;
     private final DanhMucRepository danhMucRepository;
-
-    public AdminThongKeServiceImpl(DonHangRepository donHangRepository,
-                                  NguoiDungRepository nguoiDungRepository,
-                                  KhoaHocRepository khoaHocRepository,
-                                  HoSoGiangVienRepository hoSoGiangVienRepository,
-                                  YeuCauRutTienRepository yeuCauRutTienRepository,
-                                  GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository,
-                                  DanhMucRepository danhMucRepository) {
-        this.donHangRepository = donHangRepository;
-        this.nguoiDungRepository = nguoiDungRepository;
-        this.khoaHocRepository = khoaHocRepository;
-        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
-        this.yeuCauRutTienRepository = yeuCauRutTienRepository;
-        this.ghiDanhKhoaHocRepository = ghiDanhKhoaHocRepository;
-        this.danhMucRepository = danhMucRepository;
-    }
 
     @Override
     @Transactional(readOnly = true)

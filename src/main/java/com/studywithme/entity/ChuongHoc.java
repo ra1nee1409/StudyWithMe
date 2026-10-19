@@ -1,8 +1,10 @@
 package com.studywithme.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -13,6 +15,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChuongHoc {
 
     @Id
@@ -34,15 +38,4 @@ public class ChuongHoc {
     @OrderBy("thuTuSapXep ASC")
     @Builder.Default
     private List<BaiHoc> danhSachBaiHoc = new ArrayList<>();
-
-    public ChuongHoc() {
-    }
-
-    public ChuongHoc(Long id, KhoaHoc khoaHoc, String tieuDeChuong, Integer thuTuSapXep, List<BaiHoc> danhSachBaiHoc) {
-        this.id = id;
-        this.khoaHoc = khoaHoc;
-        this.tieuDeChuong = tieuDeChuong;
-        this.thuTuSapXep = thuTuSapXep != null ? thuTuSapXep : 1;
-        this.danhSachBaiHoc = danhSachBaiHoc != null ? danhSachBaiHoc : new ArrayList<>();
-    }
 }

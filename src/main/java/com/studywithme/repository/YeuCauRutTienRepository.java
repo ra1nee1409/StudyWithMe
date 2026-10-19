@@ -1,7 +1,7 @@
 package com.studywithme.repository;
 
 import com.studywithme.entity.YeuCauRutTien;
-import com.studywithme.entity.enums.TrangThaiRutTien;
+import com.studywithme.entity.enums.admin.TrangThaiRutTien;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

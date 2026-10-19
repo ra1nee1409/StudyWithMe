@@ -1,9 +1,11 @@
 package com.studywithme.entity;
 
-import com.studywithme.entity.enums.VaiTroName;
+import com.studywithme.entity.enums.shared.VaiTroName;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -11,6 +13,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class VaiTro {
 
     @Id
@@ -23,13 +27,4 @@ public class VaiTro {
 
     @Column(name = "mo_ta", length = 255)
     private String moTa;
-
-    public VaiTro() {
-    }
-
-    public VaiTro(Long id, VaiTroName tenVaiTro, String moTa) {
-        this.id = id;
-        this.tenVaiTro = tenVaiTro;
-        this.moTa = moTa;
-    }
 }

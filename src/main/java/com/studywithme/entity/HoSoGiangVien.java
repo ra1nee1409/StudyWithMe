@@ -1,9 +1,11 @@
 package com.studywithme.entity;
 
-import com.studywithme.entity.enums.TrangThaiGiangVien;
+import com.studywithme.entity.enums.admin.TrangThaiGiangVien;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -18,6 +20,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class HoSoGiangVien {
 
     @Id
@@ -73,29 +77,4 @@ public class HoSoGiangVien {
     @UpdateTimestamp
     @Column(name = "ngay_cap_nhat", nullable = false)
     private LocalDateTime ngayCapNhat;
-
-    public HoSoGiangVien() {
-    }
-
-    public HoSoGiangVien(Long id, NguoiDung nguoiDung, String tieuDeChuyenMon, String gioiThieuBanThan,
-                        String linkVideoDayThu, TrangThaiGiangVien trangThaiDuyet, String lyDoTuChoi,
-                        BigDecimal soDuVi, String tenNganHang, String soTaiKhoanNganHang,
-                        String tenChuTaiKhoan, List<ChungChiGiangVien> danhSachChungChi,
-                        List<LichSuViTien> lichSuGiaoDichVi, LocalDateTime ngayTao, LocalDateTime ngayCapNhat) {
-        this.id = id;
-        this.nguoiDung = nguoiDung;
-        this.tieuDeChuyenMon = tieuDeChuyenMon;
-        this.gioiThieuBanThan = gioiThieuBanThan;
-        this.linkVideoDayThu = linkVideoDayThu;
-        this.trangThaiDuyet = trangThaiDuyet != null ? trangThaiDuyet : TrangThaiGiangVien.CHO_DUYET;
-        this.lyDoTuChoi = lyDoTuChoi;
-        this.soDuVi = soDuVi != null ? soDuVi : BigDecimal.ZERO;
-        this.tenNganHang = tenNganHang;
-        this.soTaiKhoanNganHang = soTaiKhoanNganHang;
-        this.tenChuTaiKhoan = tenChuTaiKhoan;
-        this.danhSachChungChi = danhSachChungChi != null ? danhSachChungChi : new ArrayList<>();
-        this.lichSuGiaoDichVi = lichSuGiaoDichVi != null ? lichSuGiaoDichVi : new ArrayList<>();
-        this.ngayTao = ngayTao;
-        this.ngayCapNhat = ngayCapNhat;
-    }
 }

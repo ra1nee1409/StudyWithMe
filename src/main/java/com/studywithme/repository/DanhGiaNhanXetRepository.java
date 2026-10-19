@@ -1,7 +1,7 @@
 package com.studywithme.repository;
 
 import com.studywithme.entity.DanhGiaNhanXet;
-import com.studywithme.entity.enums.LoaiYeuThich;
+import com.studywithme.entity.enums.hocvien.LoaiYeuThich;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

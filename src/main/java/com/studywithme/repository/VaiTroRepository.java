@@ -1,7 +1,7 @@
 package com.studywithme.repository;
 
 import com.studywithme.entity.VaiTro;
-import com.studywithme.entity.enums.VaiTroName;
+import com.studywithme.entity.enums.shared.VaiTroName;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

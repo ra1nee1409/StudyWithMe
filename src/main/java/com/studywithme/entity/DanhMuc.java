@@ -1,9 +1,11 @@
 package com.studywithme.entity;
 
-import com.studywithme.entity.enums.LoaiDanhMuc;
+import com.studywithme.entity.enums.shared.LoaiDanhMuc;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -14,6 +16,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DanhMuc {
 
     @Id
@@ -49,21 +53,4 @@ public class DanhMuc {
     @Column(name = "kich_hoat", nullable = false)
     @Builder.Default
     private Boolean kichHoat = true;
-
-    public DanhMuc() {
-    }
-
-    public DanhMuc(Long id, String tenDanhMuc, String duongDanSlug, DanhMuc danhMucCha,
-                   List<DanhMuc> danhSachDanhMucCon, LoaiDanhMuc loaiDanhMuc, String linkIcon,
-                   Integer thuTuHienThi, Boolean kichHoat) {
-        this.id = id;
-        this.tenDanhMuc = tenDanhMuc;
-        this.duongDanSlug = duongDanSlug;
-        this.danhMucCha = danhMucCha;
-        this.danhSachDanhMucCon = danhSachDanhMucCon != null ? danhSachDanhMucCon : new ArrayList<>();
-        this.loaiDanhMuc = loaiDanhMuc != null ? loaiDanhMuc : LoaiDanhMuc.MON_HOC;
-        this.linkIcon = linkIcon;
-        this.thuTuHienThi = thuTuHienThi != null ? thuTuHienThi : 0;
-        this.kichHoat = kichHoat != null ? kichHoat : true;
-    }
 }

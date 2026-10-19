@@ -1,9 +1,11 @@
 package com.studywithme.entity;
 
-import com.studywithme.entity.enums.LoaiGiaoDichVi;
+import com.studywithme.entity.enums.admin.LoaiGiaoDichVi;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -15,6 +17,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class LichSuViTien {
 
     @Id
@@ -26,7 +30,7 @@ public class LichSuViTien {
     private HoSoGiangVien giangVien;
 
     @Column(name = "so_tien_bien_dong", nullable = false, precision = 15, scale = 2)
-    private BigDecimal soTienBienDong; // Dương (+) khi nhận tiền bán khóa/lớp, Âm (-) khi rút tiền/hoàn phí
+    private BigDecimal soTienBienDong;
 
     @Column(name = "so_du_truoc", nullable = false, precision = 15, scale = 2)
     private BigDecimal soDuTruoc;
@@ -39,7 +43,7 @@ public class LichSuViTien {
     private LoaiGiaoDichVi loaiGiaoDich;
 
     @Column(name = "ma_tham_chieu")
-    private Long maThamChieu; // Mã DonHang hoặc YeuCauRutTien
+    private Long maThamChieu;
 
     @Column(name = "mo_ta_giao_dich", length = 255)
     private String moTaGiaoDich;
@@ -47,21 +51,4 @@ public class LichSuViTien {
     @CreationTimestamp
     @Column(name = "ngay_tao", nullable = false, updatable = false)
     private LocalDateTime ngayTao;
-
-    public LichSuViTien() {
-    }
-
-    public LichSuViTien(Long id, HoSoGiangVien giangVien, BigDecimal soTienBienDong, BigDecimal soDuTruoc,
-                        BigDecimal soDuSau, LoaiGiaoDichVi loaiGiaoDich, Long maThamChieu,
-                        String moTaGiaoDich, LocalDateTime ngayTao) {
-        this.id = id;
-        this.giangVien = giangVien;
-        this.soTienBienDong = soTienBienDong;
-        this.soDuTruoc = soDuTruoc;
-        this.soDuSau = soDuSau;
-        this.loaiGiaoDich = loaiGiaoDich;
-        this.maThamChieu = maThamChieu;
-        this.moTaGiaoDich = moTaGiaoDich;
-        this.ngayTao = ngayTao;
-    }
 }

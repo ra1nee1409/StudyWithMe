@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{components/common/head :: common-head('Quản lý Cây Danh mục & Cấp học - Admin StudyWithMe')}"></th:block>
+</head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== SIDEBAR COMPONENT ==================== -->
+  <aside th:replace="~{components/admin/sidebar :: admin-sidebar('categories')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar Component -->
+    <header th:replace="~{components/admin/header :: admin-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Toast Notification Container -->
+      <div id="toast-container" class="fixed top-20 right-8 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+      <!-- 1. Header Page Title & Action -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-primary text-xs font-semibold">
+              <span class="material-symbols-outlined text-[14px]">account_tree</span>
+              Hệ Thống Phân Cấp Môn Học
+            </span>
+            <span class="text-outline-variant">•</span>
+            <span class="text-xs text-on-surface-variant">Admin CMS Trang A3</span>
+          </div>
+          <h1 class="text-2xl font-extrabold text-on-surface tracking-tight">
+            Quản Lý Cây Danh Mục & Cấp Học
+          </h1>
+          <p class="text-xs text-on-surface-variant">
+            Cơ cấu các cấp học (Tiểu học, THCS, THPT, Chứng chỉ Quốc tế) và môn học giúp phân loại khóa học video và lớp gia sư trực tuyến.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3 shrink-0">
+          <button onclick="taiLaiDuLieu()" type="button" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-xs font-bold text-on-surface transition-all cursor-pointer border border-surface-container/60 shadow-xs">
+            <span class="material-symbols-outlined text-[18px]">refresh</span>
+            <span>Tải lại</span>
+          </button>
+          <button onclick="toggleExpandAll()" id="btn-toggle-all" type="button" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-xs font-bold text-on-surface transition-all cursor-pointer border border-surface-container/60 shadow-xs">
+            <span class="material-symbols-outlined text-[18px]" id="icon-toggle-all">unfold_less</span>
+            <span id="text-toggle-all">Thu gọn tất cả</span>
+          </button>
+          <button onclick="moModalThemDanhMuc()" type="button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all cursor-pointer shadow-sm">
+            <span class="material-symbols-outlined text-[18px]">add_circle</span>
+            <span>Thêm Danh Mục Mới</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 2. Thống kê nhanh Danh mục -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-surface-card p-4 rounded-xl border border-surface-container/30 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-on-surface-variant font-medium">Nhóm cấp học (Danh mục gốc)</p>
+            <p class="text-2xl font-black text-on-surface mt-0.5" id="stat-tong-goc">0</p>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-accent-cyan-subtle text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px]">folder</span>
+          </div>
+        </div>
+        <div class="bg-surface-card p-4 rounded-xl border border-surface-container/30 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-on-surface-variant font-medium">Tổng môn học (Danh mục con)</p>
+            <p class="text-2xl font-black text-secondary mt-0.5" id="stat-tong-con">0</p>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-secondary-fixed/40 text-secondary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px]">menu_book</span>
+          </div>
+        </div>
+        <div class="bg-surface-card p-4 rounded-xl border border-surface-container/30 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-on-surface-variant font-medium">Đang kích hoạt</p>
+            <p class="text-2xl font-black text-status-success mt-0.5" id="stat-kich-hoat">0</p>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-surface-container text-status-success flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px]">visibility</span>
+          </div>
+        </div>
+        <div class="bg-surface-card p-4 rounded-xl border border-surface-container/30 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-on-surface-variant font-medium">Khóa học & Lớp học liên kết</p>
+            <p class="text-2xl font-black text-on-surface mt-0.5" id="stat-tong-lien-ket">0</p>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-surface-container-low text-tertiary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px]">school</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. BỘ LỌC & TÌM KIẾM NHANH -->
+      <section class="bg-surface-card p-4 rounded-xl border border-surface-container/30 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="relative w-full md:w-80">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+          <input type="text" id="filter-search" oninput="locDanhSach()" placeholder="Tìm theo tên môn, mã slug..." 
+                 class="w-full pl-9 pr-3 py-2 rounded-lg bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-hidden focus:border-primary focus:bg-surface-card transition-all">
+        </div>
+
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <select id="filter-loai" onchange="locDanhSach()" class="px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-hidden focus:border-primary">
+            <option value="ALL">Tất cả loại danh mục</option>
+            <option value="CAP_HOC_K12">Cấp học K-12</option>
+            <option value="CHUNG_CHI_NGOAI_NGU">Chứng chỉ Quốc tế</option>
+            <option value="MON_HOC">Môn học</option>
+          </select>
+
+          <select id="filter-trang-thai" onchange="locDanhSach()" class="px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-hidden focus:border-primary">
+            <option value="ALL">Tất cả trạng thái</option>
+            <option value="ACTIVE">Đang hiển thị</option>
+            <option value="INACTIVE">Đang ẩn</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- 4. KHUNG HIỂN THỊ CÂY DANH MỤC (TREE VIEW) -->
+      <section class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/30 overflow-hidden flex flex-col">
+        <div class="p-5 border-b border-surface-container/40 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary text-[22px]">account_tree</span>
+            <h2 class="text-base font-bold text-on-surface">Cấu Trúc Cây Phân Cấp Danh Mục</h2>
+          </div>
+          <div class="text-xs text-on-surface-variant">
+            Bấm vào nút <span class="font-bold text-primary">+ Môn con</span> để thêm trực tiếp môn học vào cấp lớp
+          </div>
+        </div>
+
+        <!-- Container chứa cây danh mục động -->
+        <div id="category-tree-container" class="p-4 flex flex-col gap-4">
+          <!-- Loading skeleton -->
+          <div class="flex items-center justify-center p-12 text-on-surface-variant text-xs gap-2">
+            <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+            <span>Đang tải cấu trúc danh mục...</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==================== MODAL THÊM / SỬA DANH MỤC ==================== -->
+  <div id="modal-danh-muc" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-surface-card w-full max-w-lg rounded-2xl shadow-2xl border border-surface-container overflow-hidden animate-in fade-in zoom-in duration-200">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-surface-container/50 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]" id="modal-icon-title">category</span>
+          </div>
+          <h3 class="font-bold text-base text-on-surface" id="modal-title">Thêm Danh Mục Mới</h3>
+        </div>
+        <button onclick="dongModalDanhMuc()" type="button" class="w-8 h-8 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface flex items-center justify-center transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Body Form -->
+      <form id="form-danh-muc" onsubmit="xuLyLuuDanhMuc(event)" class="p-6 flex flex-col gap-4">
+        <input type="hidden" id="dm-id" name="id">
+
+        <!-- 1. Danh mục cha -->
+        <div class="flex flex-col gap-1.5">
+          <label for="dm-cha-id" class="text-xs font-bold text-on-surface">Danh mục cha (Cấp học / Nhóm cha)</label>
+          <select id="dm-cha-id" name="danhMucChaId" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-hidden focus:border-primary">
+            <option value="">-- Là danh mục gốc (Cấp học / Nhóm độc lập) --</option>
+            <!-- Sẽ được fill bằng JavaScript -->
+          </select>
+          <span class="text-[11px] text-on-surface-variant">Nếu để trống, đây sẽ là nhóm danh mục cấp cao nhất (ví dụ: Tiểu học, THPT...).</span>
+        </div>
+
+        <!-- 2. Tên danh mục -->
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <label for="dm-ten" class="text-xs font-bold text-on-surface">Tên danh mục <span class="text-error">*</span></label>
+            <button type="button" onclick="tuDongTaoSlug()" class="text-[11px] text-primary hover:underline font-semibold flex items-center gap-1 cursor-pointer">
+              <span class="material-symbols-outlined text-[13px]">auto_fix_high</span>
+              Tạo slug tự động
+            </button>
+          </div>
+          <input type="text" id="dm-ten" name="tenDanhMuc" required placeholder="Ví dụ: Toán THPT & Ôn thi THPT QG"
+                 oninput="dongBoSlug(this.value)"
+                 class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-hidden focus:border-primary focus:bg-surface-card transition-all">
+        </div>
+
+        <!-- 3. Đường dẫn Slug -->
+        <div class="flex flex-col gap-1.5">
+          <label for="dm-slug" class="text-xs font-bold text-on-surface">Đường dẫn Slug (URL thân thiện)</label>
+          <div class="flex items-center gap-1.5 bg-surface-container-low border border-surface-container rounded-lg px-3 py-2">
+            <span class="text-[11px] text-on-surface-variant select-none">/khoa-hoc/</span>
+            <input type="text" id="dm-slug" name="duongDanSlug" placeholder="toan-thpt"
+                   class="w-full bg-transparent border-0 text-xs text-on-surface focus:outline-hidden font-mono">
+          </div>
+          <span class="text-[11px] text-on-surface-variant">Không dấu, cách nhau bằng gạch ngang. Để trống hệ thống sẽ tự sinh từ tên.</span>
+        </div>
+
+        <!-- 4. Loại danh mục -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label for="dm-loai" class="text-xs font-bold text-on-surface">Loại danh mục</label>
+            <select id="dm-loai" name="loaiDanhMuc" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-hidden focus:border-primary">
+              <option value="MON_HOC">Môn học (Toán, Lý, Hóa...)</option>
+              <option value="CAP_HOC_K12">Cấp học K-12 (Cấp 1, 2, 3)</option>
+              <option value="CHUNG_CHI_NGOAI_NGU">Chứng chỉ Quốc tế (IELTS, TOEIC)</option>
+            </select>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label for="dm-thu-tu" class="text-xs font-bold text-on-surface">Thứ tự hiển thị</label>
+            <input type="number" id="dm-thu-tu" name="thuTuHienThi" value="0" min="0" max="999"
+                   class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-hidden focus:border-primary">
+          </div>
+        </div>
+
+        <!-- 5. Icon Biểu tượng Material Symbol -->
+        <div class="flex flex-col gap-1.5">
+          <label for="dm-icon" class="text-xs font-bold text-on-surface">Biểu tượng (Material Symbol Icon)</label>
+          <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0 border border-surface-container">
+              <span class="material-symbols-outlined text-[20px]" id="dm-icon-preview">folder</span>
+            </div>
+            <input type="text" id="dm-icon" name="linkIcon" value="folder" placeholder="Ví dụ: calculate, school, science, translate..."
+                   oninput="document.getElementById('dm-icon-preview').innerText = this.value || 'folder'"
+                   class="flex-1 px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-hidden focus:border-primary">
+          </div>
+          <!-- Gợi ý icon phổ biến -->
+          <div class="flex flex-wrap gap-1.5 mt-1 items-center">
+            <span class="text-[11px] text-on-surface-variant mr-1">Gợi ý nhanh:</span>
+            <button type="button" onclick="chonIconNhanh('school')" class="px-2 py-0.5 rounded bg-surface-container hover:bg-primary hover:text-white text-[11px] text-on-surface-variant transition-all cursor-pointer">school</button>
+            <button type="button" onclick="chonIconNhanh('calculate')" class="px-2 py-0.5 rounded bg-surface-container hover:bg-primary hover:text-white text-[11px] text-on-surface-variant transition-all cursor-pointer">calculate</button>
+            <button type="button" onclick="chonIconNhanh('science')" class="px-2 py-0.5 rounded bg-surface-container hover:bg-primary hover:text-white text-[11px] text-on-surface-variant transition-all cursor-pointer">science</button>
+            <button type="button" onclick="chonIconNhanh('menu_book')" class="px-2 py-0.5 rounded bg-surface-container hover:bg-primary hover:text-white text-[11px] text-on-surface-variant transition-all cursor-pointer">menu_book</button>
+            <button type="button" onclick="chonIconNhanh('functions')" class="px-2 py-0.5 rounded bg-surface-container hover:bg-primary hover:text-white text-[11px] text-on-surface-variant transition-all cursor-pointer">functions</button>
+            <button type="button" onclick="chonIconNhanh('translate')" class="px-2 py-0.5 rounded bg-surface-container hover:bg-primary hover:text-white text-[11px] text-on-surface-variant transition-all cursor-pointer">translate</button>
+            <button type="button" onclick="chonIconNhanh('workspace_premium')" class="px-2 py-0.5 rounded bg-surface-container hover:bg-primary hover:text-white text-[11px] text-on-surface-variant transition-all cursor-pointer">workspace_premium</button>
+            <button type="button" onclick="chonIconNhanh('bolt')" class="px-2 py-0.5 rounded bg-surface-container hover:bg-primary hover:text-white text-[11px] text-on-surface-variant transition-all cursor-pointer">bolt</button>
+            <button type="button" onclick="chonIconNhanh('experiment')" class="px-2 py-0.5 rounded bg-surface-container hover:bg-primary hover:text-white text-[11px] text-on-surface-variant transition-all cursor-pointer">experiment</button>
+          </div>
+        </div>
+
+        <!-- 6. Trạng thái kích hoạt -->
+        <div class="flex items-center gap-2 pt-1">
+          <input type="checkbox" id="dm-kich-hoat" name="kichHoat" checked class="w-4 h-4 rounded text-primary focus:ring-primary">
+          <label for="dm-kich-hoat" class="text-xs text-on-surface font-medium cursor-pointer">Kích hoạt hiển thị trên menu & bộ lọc tìm kiếm</label>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-surface-container/50">
+          <button type="button" onclick="dongModalDanhMuc()" class="px-4 py-2 rounded-xl bg-surface-container-low hover:bg-surface-container text-xs font-bold text-on-surface-variant transition-all cursor-pointer">
+            Hủy bỏ
+          </button>
+          <button type="submit" id="btn-submit-dm" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all shadow-sm cursor-pointer flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px]">save</span>
+            <span>Lưu Danh Mục</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL XÁC NHẬN XÓA ==================== -->
+  <div id="modal-xoa" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-surface-card w-full max-w-md rounded-2xl shadow-2xl border border-surface-container p-6 animate-in fade-in zoom-in duration-200 flex flex-col gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-error-container text-error flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[24px]">warning</span>
+        </div>
+        <div>
+          <h4 class="font-bold text-base text-on-surface">Xác Nhận Xóa Danh Mục?</h4>
+          <p class="text-xs text-on-surface-variant">Thao tác này sẽ xóa vĩnh viễn danh mục khỏi hệ thống.</p>
+        </div>
+      </div>
+
+      <div class="p-3 bg-surface-container-low rounded-xl border border-surface-container/60 text-xs">
+        <p class="text-on-surface font-semibold" id="xoa-ten-danh-muc">--</p>
+        <p class="text-on-surface-variant mt-1 text-[11px]">
+          ⚠️ Lưu ý: Nếu danh mục đang chứa môn học con, hoặc đã có khóa học / lớp học liên kết, hệ thống sẽ từ chối xóa để đảm bảo toàn vẹn dữ liệu.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button type="button" onclick="dongModalXoa()" class="px-4 py-2 rounded-xl bg-surface-container-low hover:bg-surface-container text-xs font-bold text-on-surface-variant transition-all cursor-pointer">
+          Hủy bỏ
+        </button>
+        <button type="button" id="btn-xac-nhan-xoa" onclick="thucHienXoaDanhMuc()" class="px-4 py-2 rounded-xl bg-error hover:bg-error-container hover:text-on-error-container text-white text-xs font-bold transition-all shadow-sm cursor-pointer flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px]">delete</span>
+          <span>Xóa Danh Mục</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script th:inline="javascript">
+    let cayDanhMucCache = [];
+    let danhSachPhangCache = [];
+    let danhMucIdDangXoa = null;
+    let isAllExpanded = true;
+
+    // Toast Notification Helper
+    function showToast(message, isSuccess = true) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border text-xs font-semibold transform transition-all duration-300 translate-y-2 opacity-0 ${
+        isSuccess
+          ? 'bg-surface-card border-status-success/30 text-on-surface'
+          : 'bg-surface-card border-error/30 text-error'
+      }`;
+
+      const iconName = isSuccess ? 'check_circle' : 'error';
+      const iconColor = isSuccess ? 'text-status-success' : 'text-error';
+
+      toast.innerHTML = `
+        <span class="material-symbols-outlined text-[20px] ${iconColor}">${iconName}</span>
+        <span>${message}</span>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Tải lại dữ liệu trang
+    async function taiLaiDuLieu() {
+      await Promise.all([taiCayDanhMuc(), taiDanhSachPhang(), taiThongKe()]);
+    }
+
+    // Tải thống kê
+    async function taiThongKe() {
+      try {
+        const resp = await fetch('/api/admin/danh-muc/thong-ke');
+        const data = await resp.json();
+        if (data.thanhCong && data.duLieu) {
+          const s = data.duLieu;
+          document.getElementById('stat-tong-goc').innerText = s.tongDanhMucGoc || 0;
+          document.getElementById('stat-tong-con').innerText = s.tongDanhMucCon || 0;
+          document.getElementById('stat-kich-hoat').innerText = s.tongKichHoat || 0;
+          document.getElementById('stat-tong-lien-ket').innerText = (s.tongKhoaHoc || 0) + (s.tongLopHoc || 0);
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải thống kê:', err);
+      }
+    }
+
+    // Tải danh sách phẳng (cho dropdown cha)
+    async function taiDanhSachPhang() {
+      try {
+        const resp = await fetch('/api/admin/danh-muc/phang');
+        const data = await resp.json();
+        if (data.thanhCong && data.duLieu) {
+          danhSachPhangCache = data.duLieu;
+          capNhatDropdownDanhMucCha();
+        }
+      } catch (err) {
+        console.error('Lỗi tải danh sách phẳng:', err);
+      }
+    }
+
+    function capNhatDropdownDanhMucCha(selectedId = null, excludeId = null) {
+      const select = document.getElementById('dm-cha-id');
+      select.innerHTML = '<option value="">-- Là danh mục gốc (Cấp học / Nhóm cha độc lập) --</option>';
+
+      danhSachPhangCache.forEach(dm => {
+        if (excludeId && dm.id === excludeId) return; // Không chọn chính nó làm cha
+        const opt = document.createElement('option');
+        opt.value = dm.id;
+        const prefix = dm.danhMucChaId ? '  └─ ' : '📁 ';
+        opt.textContent = `${prefix}${dm.tenDanhMuc} (${dm.loaiDanhMucTen || 'Môn học'})`;
+        if (selectedId && dm.id === selectedId) {
+          opt.selected = true;
+        }
+        select.appendChild(opt);
+      });
+    }
+
+    // Tải cây danh mục
+    async function taiCayDanhMuc() {
+      const container = document.getElementById('category-tree-container');
+      container.innerHTML = `
+        <div class="flex items-center justify-center p-12 text-on-surface-variant text-xs gap-2">
+          <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+          <span>Đang tải cấu trúc danh mục...</span>
+        </div>
+      `;
+
+      try {
+        const resp = await fetch('/api/admin/danh-muc');
+        const data = await resp.json();
+
+        if (data.thanhCong && data.duLieu) {
+          cayDanhMucCache = data.duLieu;
+          renderCayDanhMuc(cayDanhMucCache);
+        } else {
+          container.innerHTML = `
+            <div class="p-8 text-center text-xs text-error">
+              Không thể tải cây danh mục: ${data.thongBao || 'Lỗi hệ thống'}
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = `
+          <div class="p-8 text-center text-xs text-error">
+            Lỗi kết nối khi tải dữ liệu cây danh mục.
+          </div>
+        `;
+      }
+    }
+
+    // Render HTML Tree View
+    function renderCayDanhMuc(treeList) {
+      const container = document.getElementById('category-tree-container');
+      if (!treeList || treeList.length === 0) {
+        container.innerHTML = `
+          <div class="p-12 text-center text-xs text-on-surface-variant flex flex-col items-center gap-3">
+            <span class="material-symbols-outlined text-[48px] text-outline">folder_off</span>
+            <p class="font-semibold">Chưa có danh mục nào trong hệ thống.</p>
+            <button onclick="moModalThemDanhMuc()" class="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold cursor-pointer">
+              Thêm Danh Mục Đầu Tiên
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      treeList.forEach((root, idx) => {
+        const hasChildren = root.danhSachDanhMucCon && root.danhSachDanhMucCon.length > 0;
+        const subCount = hasChildren ? root.danhSachDanhMucCon.length : 0;
+        const totalCourses = root.soKhoaHoc + (root.danhSachDanhMucCon ? root.danhSachDanhMucCon.reduce((acc, c) => acc + (c.soKhoaHoc || 0), 0) : 0);
+        const totalClasses = root.soLopHoc + (root.danhSachDanhMucCon ? root.danhSachDanhMucCon.reduce((acc, c) => acc + (c.soLopHoc || 0), 0) : 0);
+
+        let badgeBg = 'bg-accent-cyan-subtle text-primary';
+        if (root.loaiDanhMuc === 'CHUNG_CHI_NGOAI_NGU') {
+          badgeBg = 'bg-tertiary-fixed text-tertiary';
+        } else if (root.loaiDanhMuc === 'MON_HOC') {
+          badgeBg = 'bg-secondary-fixed/50 text-secondary';
+        }
+
+        html += `
+          <div class="root-category-card rounded-xl border border-surface-container/60 bg-surface-card overflow-hidden shadow-xs transition-all"
+               data-id="${root.id}" data-name="${root.tenDanhMuc.toLowerCase()}" data-slug="${(root.duongDanSlug || '').toLowerCase()}" data-loai="${root.loaiDanhMuc}" data-status="${root.kichHoat ? 'ACTIVE' : 'INACTIVE'}">
+            
+            <!-- Root Category Header Bar -->
+            <div class="p-4 bg-surface-container-low/50 hover:bg-surface-container-low transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-surface-container/40">
+              <div class="flex items-center gap-3 min-w-0">
+                <button type="button" onclick="toggleGroupCollapse(${root.id})" class="p-1 rounded-md hover:bg-surface-container text-on-surface-variant cursor-pointer transition-all">
+                  <span class="material-symbols-outlined text-[20px] transition-transform duration-200" id="chevron-group-${root.id}">expand_more</span>
+                </button>
+
+                <div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary shrink-0 shadow-xs border border-surface-container">
+                  <span class="material-symbols-outlined text-[22px]">${root.linkIcon || 'folder'}</span>
+                </div>
+
+                <div class="flex flex-col min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-extrabold text-sm text-on-surface truncate">${root.tenDanhMuc}</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeBg}">
+                      ${root.loaiDanhMucTen || 'Cấp học'}
+                    </span>
+                    ${!root.kichHoat ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-container text-outline">Đang ẩn</span>' : ''}
+                  </div>
+                  <div class="flex items-center gap-2 text-[11px] text-on-surface-variant mt-0.5">
+                    <span class="font-mono text-outline">/khoa-hoc/${root.duongDanSlug || ''}</span>
+                    <span>•</span>
+                    <span>Thứ tự: <strong>${root.thuTuHienThi ?? 0}</strong></span>
+                    <span>•</span>
+                    <span class="text-secondary font-semibold">${subCount} môn học trực thuộc</span>
+                    <span>•</span>
+                    <span>${totalCourses} khóa học / ${totalClasses} lớp học</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Root Actions -->
+              <div class="flex items-center gap-2 shrink-0 ml-auto md:ml-0">
+                <!-- Toggle Active -->
+                <button type="button" onclick="toggleTrangThai(${root.id})" title="${root.kichHoat ? 'Bấm để ẩn danh mục' : 'Bấm để kích hoạt'}"
+                        class="p-2 rounded-lg border border-surface-container hover:bg-surface-container text-xs font-semibold cursor-pointer transition-all ${root.kichHoat ? 'text-status-success' : 'text-outline'}">
+                  <span class="material-symbols-outlined text-[18px]">${root.kichHoat ? 'visibility' : 'visibility_off'}</span>
+                </button>
+
+                <!-- Add Sub-category -->
+                <button type="button" onclick="moModalThemDanhMuc(${root.id})" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-container text-on-primary text-xs font-bold hover:bg-primary transition-all cursor-pointer shadow-xs">
+                  <span class="material-symbols-outlined text-[16px]">add</span>
+                  <span>Môn con</span>
+                </button>
+
+                <!-- Edit -->
+                <button type="button" onclick="moModalSuaDanhMuc(${root.id})" class="p-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface text-xs cursor-pointer transition-all" title="Chỉnh sửa">
+                  <span class="material-symbols-outlined text-[18px]">edit</span>
+                </button>
+
+                <!-- Delete -->
+                <button type="button" onclick="xacNhanXoaDanhMuc(${root.id}, '${root.tenDanhMuc}')" class="p-2 rounded-lg bg-error-container/40 hover:bg-error-container text-error text-xs cursor-pointer transition-all" title="Xóa">
+                  <span class="material-symbols-outlined text-[18px]">delete</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Sub-categories List (Tree children) -->
+            <div id="group-content-${root.id}" class="divide-y divide-surface-container/30 bg-surface-card">
+              ${hasChildren ? root.danhSachDanhMucCon.map(child => `
+                <div class="sub-category-row p-3 pl-8 sm:pl-12 hover:bg-surface-container-low/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                     data-name="${child.tenDanhMuc.toLowerCase()}" data-slug="${(child.duongDanSlug || '').toLowerCase()}" data-loai="${child.loaiDanhMuc}" data-status="${child.kichHoat ? 'ACTIVE' : 'INACTIVE'}">
+                  
+                  <div class="flex items-center gap-3 min-w-0">
+                    <!-- Tree Branch Indicator -->
+                    <span class="text-outline-variant font-mono select-none text-xs">└─</span>
+
+                    <div class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary shrink-0 border border-surface-container/60">
+                      <span class="material-symbols-outlined text-[18px]">${child.linkIcon || 'menu_book'}</span>
+                    </div>
+
+                    <div class="flex flex-col min-w-0">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-bold text-xs text-on-surface truncate">${child.tenDanhMuc}</span>
+                        <span class="font-mono text-[10px] text-outline">/${child.duongDanSlug || ''}</span>
+                        ${!child.kichHoat ? '<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-surface-container text-outline">Đang ẩn</span>' : ''}
+                      </div>
+                      <div class="flex items-center gap-2 text-[10px] text-on-surface-variant mt-0.5">
+                        <span>Thứ tự: <strong>${child.thuTuHienThi ?? 0}</strong></span>
+                        <span>•</span>
+                        <span>${child.soKhoaHoc || 0} khóa học</span>
+                        <span>•</span>
+                        <span>${child.soLopHoc || 0} lớp gia sư</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Sub Actions -->
+                  <div class="flex items-center gap-1.5 shrink-0 ml-auto sm:ml-0">
+                    <button type="button" onclick="toggleTrangThai(${child.id})" title="${child.kichHoat ? 'Bấm để ẩn' : 'Bấm để kích hoạt'}"
+                            class="p-1.5 rounded-lg border border-surface-container/60 hover:bg-surface-container text-xs cursor-pointer transition-all ${child.kichHoat ? 'text-status-success' : 'text-outline'}">
+                      <span class="material-symbols-outlined text-[16px]">${child.kichHoat ? 'visibility' : 'visibility_off'}</span>
+                    </button>
+                    <button type="button" onclick="moModalSuaDanhMuc(${child.id})" class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant text-xs cursor-pointer transition-all" title="Sửa">
+                      <span class="material-symbols-outlined text-[16px]">edit</span>
+                    </button>
+                    <button type="button" onclick="xacNhanXoaDanhMuc(${child.id}, '${child.tenDanhMuc}')" class="p-1.5 rounded-lg hover:bg-error-container text-error text-xs cursor-pointer transition-all" title="Xóa">
+                      <span class="material-symbols-outlined text-[16px]">delete</span>
+                    </button>
+                  </div>
+                </div>
+              `).join('') : `
+                <div class="p-3 pl-12 text-[11px] text-on-surface-variant italic flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[16px] text-outline">info</span>
+                  <span>Chưa có môn học trực thuộc nhóm này. Hãy bấm "Môn con" để thêm.</span>
+                </div>
+              `}
+            </div>
+
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // Toggle collapse a root group
+    function toggleGroupCollapse(groupId) {
+      const content = document.getElementById(`group-content-${groupId}`);
+      const chevron = document.getElementById(`chevron-group-${groupId}`);
+      if (!content) return;
+
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+      } else {
+        content.classList.add('hidden');
+        chevron.style.transform = 'rotate(-90deg)';
+      }
+    }
+
+    // Toggle expand/collapse all
+    function toggleExpandAll() {
+      isAllExpanded = !isAllExpanded;
+      const btnText = document.getElementById('text-toggle-all');
+      const btnIcon = document.getElementById('icon-toggle-all');
+
+      if (isAllExpanded) {
+        btnText.innerText = 'Thu gọn tất cả';
+        btnIcon.innerText = 'unfold_less';
+      } else {
+        btnText.innerText = 'Mở rộng tất cả';
+        btnIcon.innerText = 'unfold_more';
+      }
+
+      cayDanhMucCache.forEach(root => {
+        const content = document.getElementById(`group-content-${root.id}`);
+        const chevron = document.getElementById(`chevron-group-${root.id}`);
+        if (content && chevron) {
+          if (isAllExpanded) {
+            content.classList.remove('hidden');
+            chevron.style.transform = 'rotate(0deg)';
+          } else {
+            content.classList.add('hidden');
+            chevron.style.transform = 'rotate(-90deg)';
+          }
+        }
+      });
+    }
+
+    // Modal Mở Thêm Danh Mục
+    function moModalThemDanhMuc(parentId = null) {
+      document.getElementById('form-danh-muc').reset();
+      document.getElementById('dm-id').value = '';
+      document.getElementById('modal-title').innerText = 'Thêm Danh Mục Mới';
+      document.getElementById('modal-icon-title').innerText = 'add_circle';
+      document.getElementById('dm-icon-preview').innerText = 'folder';
+      document.getElementById('dm-kich-hoat').checked = true;
+
+      capNhatDropdownDanhMucCha(parentId);
+
+      // Nếu có parentId, gợi ý loại MON_HOC
+      if (parentId) {
+        document.getElementById('dm-loai').value = 'MON_HOC';
+      } else {
+        document.getElementById('dm-loai').value = 'CAP_HOC_K12';
+      }
+
+      const modal = document.getElementById('modal-danh-muc');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.getElementById('dm-ten').focus();
+    }
+
+    // Modal Mở Sửa Danh Mục
+    async function moModalSuaDanhMuc(id) {
+      try {
+        const resp = await fetch(`/api/admin/danh-muc/${id}`);
+        const data = await resp.json();
+
+        if (data.thanhCong && data.duLieu) {
+          const dm = data.duLieu;
+          document.getElementById('dm-id').value = dm.id;
+          document.getElementById('dm-ten').value = dm.tenDanhMuc;
+          document.getElementById('dm-slug').value = dm.duongDanSlug || '';
+          document.getElementById('dm-loai').value = dm.loaiDanhMuc || 'MON_HOC';
+          document.getElementById('dm-icon').value = dm.linkIcon || 'folder';
+          document.getElementById('dm-icon-preview').innerText = dm.linkIcon || 'folder';
+          document.getElementById('dm-thu-tu').value = dm.thuTuHienThi ?? 0;
+          document.getElementById('dm-kich-hoat').checked = dm.kichHoat !== false;
+
+          document.getElementById('modal-title').innerText = `Chỉnh Sửa Danh Mục: ${dm.tenDanhMuc}`;
+          document.getElementById('modal-icon-title').innerText = 'edit_note';
+
+          capNhatDropdownDanhMucCha(dm.danhMucChaId, dm.id);
+
+          const modal = document.getElementById('modal-danh-muc');
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        } else {
+          showToast(data.thongBao || 'Không tìm thấy thông tin danh mục', false);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Có lỗi xảy ra khi tải dữ liệu danh mục', false);
+      }
+    }
+
+    // Đóng Modal Danh Mục
+    function dongModalDanhMuc() {
+      const modal = document.getElementById('modal-danh-muc');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // Xử lý Lưu Danh Mục (POST / PUT)
+    async function xuLyLuuDanhMuc(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-dm');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[16px]">progress_activity</span> Đang lưu...';
+
+      const id = document.getElementById('dm-id').value;
+      const tenDanhMuc = document.getElementById('dm-ten').value.trim();
+      const duongDanSlug = document.getElementById('dm-slug').value.trim();
+      const danhMucChaIdVal = document.getElementById('dm-cha-id').value;
+      const loaiDanhMuc = document.getElementById('dm-loai').value;
+      const linkIcon = document.getElementById('dm-icon').value.trim();
+      const thuTuHienThi = parseInt(document.getElementById('dm-thu-tu').value, 10) || 0;
+      const kichHoat = document.getElementById('dm-kich-hoat').checked;
+
+      const payload = {
+        tenDanhMuc: tenDanhMuc,
+        duongDanSlug: duongDanSlug || null,
+        danhMucChaId: danhMucChaIdVal ? parseInt(danhMucChaIdVal, 10) : null,
+        loaiDanhMuc: loaiDanhMuc,
+        linkIcon: linkIcon || 'folder',
+        thuTuHienThi: thuTuHienThi,
+        kichHoat: kichHoat
+      };
+
+      try {
+        const isUpdate = Boolean(id);
+        const url = isUpdate ? `/api/admin/danh-muc/${id}` : '/api/admin/danh-muc';
+        const method = isUpdate ? 'PUT' : 'POST';
+
+        const resp = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await resp.json();
+
+        if (result.thanhCong) {
+          showToast(isUpdate ? 'Cập nhật danh mục thành công!' : 'Tạo danh mục mới thành công!');
+          dongModalDanhMuc();
+          await taiLaiDuLieu();
+        } else {
+          showToast(result.thongBao || 'Lỗi khi lưu danh mục', false);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Có lỗi xảy ra khi gửi yêu cầu lên máy chủ', false);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    // Toggle Trạng thái kích hoạt (PATCH)
+    async function toggleTrangThai(id) {
+      try {
+        const resp = await fetch(`/api/admin/danh-muc/${id}/trang-thai`, { method: 'PATCH' });
+        const result = await resp.json();
+        if (result.thanhCong) {
+          showToast(result.thongBao || 'Đã đổi trạng thái danh mục');
+          await taiLaiDuLieu();
+        } else {
+          showToast(result.thongBao || 'Không thể đổi trạng thái', false);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Có lỗi xảy ra khi đổi trạng thái', false);
+      }
+    }
+
+    // Modal Xác nhận Xóa
+    function xacNhanXoaDanhMuc(id, tenDanhMuc) {
+      danhMucIdDangXoa = id;
+      document.getElementById('xoa-ten-danh-muc').innerText = `Danh mục: "${tenDanhMuc}" (ID: ${id})`;
+      const modal = document.getElementById('modal-xoa');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function dongModalXoa() {
+      const modal = document.getElementById('modal-xoa');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      danhMucIdDangXoa = null;
+    }
+
+    async function thucHienXoaDanhMuc() {
+      if (!danhMucIdDangXoa) return;
+      const id = danhMucIdDangXoa;
+      dongModalXoa();
+
+      try {
+        const resp = await fetch(`/api/admin/danh-muc/${id}`, { method: 'DELETE' });
+        const result = await resp.json();
+
+        if (result.thanhCong) {
+          showToast('Đã xóa danh mục thành công!');
+          await taiLaiDuLieu();
+        } else {
+          showToast(result.thongBao || 'Không thể xóa danh mục', false);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Có lỗi xảy ra khi xóa danh mục', false);
+      }
+    }
+
+    // Helper: Đồng bộ slug
+    function dongBoSlug(val) {
+      const slugInput = document.getElementById('dm-slug');
+      if (!slugInput.value || slugInput.dataset.autoGenerated === 'true') {
+        slugInput.value = generateSlug(val);
+        slugInput.dataset.autoGenerated = 'true';
+      }
+    }
+
+    function tuDongTaoSlug() {
+      const ten = document.getElementById('dm-ten').value;
+      const slugInput = document.getElementById('dm-slug');
+      slugInput.value = generateSlug(ten);
+      slugInput.dataset.autoGenerated = 'true';
+    }
+
+    function chonIconNhanh(iconName) {
+      document.getElementById('dm-icon').value = iconName;
+      document.getElementById('dm-icon-preview').innerText = iconName;
+    }
+
+    function generateSlug(text) {
+      if (!text) return '';
+      return text.toString().toLowerCase().trim()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[đĐ]/g, 'd')
+        .replace(/[^a-z0-9 -]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    }
+
+    // Bộ lọc client-side
+    function locDanhSach() {
+      const kw = (document.getElementById('filter-search').value || '').toLowerCase().trim();
+      const loai = document.getElementById('filter-loai').value;
+      const status = document.getElementById('filter-trang-thai').value;
+
+      const rootCards = document.querySelectorAll('.root-category-card');
+      rootCards.forEach(card => {
+        const rootName = card.dataset.name || '';
+        const rootSlug = card.dataset.slug || '';
+        const rootLoai = card.dataset.loai || '';
+        const rootStatus = card.dataset.status || '';
+
+        const subRows = card.querySelectorAll('.sub-category-row');
+        let anySubMatch = false;
+
+        subRows.forEach(row => {
+          const subName = row.dataset.name || '';
+          const subSlug = row.dataset.slug || '';
+          const subLoai = row.dataset.loai || '';
+          const subStatus = row.dataset.status || '';
+
+          const matchKw = !kw || subName.includes(kw) || subSlug.includes(kw);
+          const matchLoai = loai === 'ALL' || subLoai === loai;
+          const matchStatus = status === 'ALL' || subStatus === status;
+
+          if (matchKw && matchLoai && matchStatus) {
+            row.style.display = '';
+            anySubMatch = true;
+          } else {
+            row.style.display = 'none';
+          }
+        });
+
+        const rootMatchKw = !kw || rootName.includes(kw) || rootSlug.includes(kw);
+        const rootMatchLoai = loai === 'ALL' || rootLoai === loai;
+        const rootMatchStatus = status === 'ALL' || rootStatus === status;
+
+        if ((rootMatchKw && rootMatchLoai && rootMatchStatus) || anySubMatch) {
+          card.style.display = '';
+          // Nếu có con match thì tự động mở
+          if (anySubMatch) {
+            const content = card.querySelector('[id^="group-content-"]');
+            if (content) content.classList.remove('hidden');
+          }
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Khởi tạo trang
+    document.addEventListener('DOMContentLoaded', () => {
+      taiLaiDuLieu();
+    });
+  </script>
+</body>
+</html>

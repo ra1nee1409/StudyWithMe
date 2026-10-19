@@ -1,9 +1,11 @@
 package com.studywithme.entity;
 
-import com.studywithme.entity.enums.TrangThaiNguoiDung;
+import com.studywithme.entity.enums.shared.TrangThaiNguoiDung;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -17,6 +19,8 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class NguoiDung {
 
     @Id
@@ -59,22 +63,4 @@ public class NguoiDung {
     @UpdateTimestamp
     @Column(name = "ngay_cap_nhat", nullable = false)
     private LocalDateTime ngayCapNhat;
-
-    public NguoiDung() {
-    }
-
-    public NguoiDung(Long id, String email, String matKhau, String hoTen, String soDienThoai,
-                     String anhDaiDien, TrangThaiNguoiDung trangThai, Set<VaiTro> danhSachVaiTro,
-                     LocalDateTime ngayTao, LocalDateTime ngayCapNhat) {
-        this.id = id;
-        this.email = email;
-        this.matKhau = matKhau;
-        this.hoTen = hoTen;
-        this.soDienThoai = soDienThoai;
-        this.anhDaiDien = anhDaiDien;
-        this.trangThai = trangThai != null ? trangThai : TrangThaiNguoiDung.HOAT_DONG;
-        this.danhSachVaiTro = danhSachVaiTro != null ? danhSachVaiTro : new HashSet<>();
-        this.ngayTao = ngayTao;
-        this.ngayCapNhat = ngayCapNhat;
-    }
 }

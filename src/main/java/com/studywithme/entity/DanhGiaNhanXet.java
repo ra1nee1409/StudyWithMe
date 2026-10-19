@@ -1,9 +1,11 @@
 package com.studywithme.entity;
 
-import com.studywithme.entity.enums.LoaiYeuThich;
+import com.studywithme.entity.enums.hocvien.LoaiYeuThich;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -14,6 +16,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DanhGiaNhanXet {
 
     @Id
@@ -26,13 +30,13 @@ public class DanhGiaNhanXet {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "loai_danh_gia", nullable = false, length = 30)
-    private LoaiYeuThich loaiDanhGia; // KHOA_HOC hoặc GIANG_VIEN
+    private LoaiYeuThich loaiDanhGia;
 
     @Column(name = "muc_tieu_id", nullable = false)
     private Long mucTieuId;
 
     @Column(name = "so_sao_danh_gia", nullable = false, columnDefinition = "TINYINT")
-    private Integer soSaoDanhGia; // 1 -> 5 sao
+    private Integer soSaoDanhGia;
 
     @Column(name = "noi_dung_nhan_xet", columnDefinition = "TEXT")
     private String noiDungNhanXet;
@@ -44,19 +48,4 @@ public class DanhGiaNhanXet {
     @CreationTimestamp
     @Column(name = "ngay_danh_gia", nullable = false, updatable = false)
     private LocalDateTime ngayDanhGia;
-
-    public DanhGiaNhanXet() {
-    }
-
-    public DanhGiaNhanXet(Long id, NguoiDung nguoiDung, LoaiYeuThich loaiDanhGia, Long mucTieuId,
-                          Integer soSaoDanhGia, String noiDungNhanXet, Boolean duocHienThi, LocalDateTime ngayDanhGia) {
-        this.id = id;
-        this.nguoiDung = nguoiDung;
-        this.loaiDanhGia = loaiDanhGia;
-        this.mucTieuId = mucTieuId;
-        this.soSaoDanhGia = soSaoDanhGia;
-        this.noiDungNhanXet = noiDungNhanXet;
-        this.duocHienThi = duocHienThi != null ? duocHienThi : true;
-        this.ngayDanhGia = ngayDanhGia;
-    }
 }

@@ -1,10 +1,12 @@
 package com.studywithme.entity;
 
-import com.studywithme.entity.enums.LoaiChungChi;
-import com.studywithme.entity.enums.TrangThaiXacThuc;
+import com.studywithme.entity.enums.giaovien.LoaiChungChi;
+import com.studywithme.entity.enums.admin.TrangThaiXacThuc;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -17,6 +19,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChungChiGiangVien {
 
     @Id
@@ -61,25 +65,4 @@ public class ChungChiGiangVien {
     @UpdateTimestamp
     @Column(name = "ngay_cap_nhat", nullable = false)
     private LocalDateTime ngayCapNhat;
-
-    public ChungChiGiangVien() {
-    }
-
-    public ChungChiGiangVien(Long id, HoSoGiangVien giangVien, LoaiChungChi loaiChungChi, String tenChungChi,
-                            String diemSoHoacXepLoai, String noiCap, LocalDate ngayCap, String linkAnhChungChi,
-                            TrangThaiXacThuc trangThaiXacThuc, String lyDoTuChoi,
-                            LocalDateTime ngayTao, LocalDateTime ngayCapNhat) {
-        this.id = id;
-        this.giangVien = giangVien;
-        this.loaiChungChi = loaiChungChi;
-        this.tenChungChi = tenChungChi;
-        this.diemSoHoacXepLoai = diemSoHoacXepLoai;
-        this.noiCap = noiCap;
-        this.ngayCap = ngayCap;
-        this.linkAnhChungChi = linkAnhChungChi;
-        this.trangThaiXacThuc = trangThaiXacThuc != null ? trangThaiXacThuc : TrangThaiXacThuc.CHO_XAC_THUC;
-        this.lyDoTuChoi = lyDoTuChoi;
-        this.ngayTao = ngayTao;
-        this.ngayCapNhat = ngayCapNhat;
-    }
 }

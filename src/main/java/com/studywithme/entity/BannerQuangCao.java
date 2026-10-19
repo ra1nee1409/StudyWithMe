@@ -1,8 +1,10 @@
 package com.studywithme.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -14,6 +16,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class BannerQuangCao {
 
     @Id
@@ -44,19 +48,4 @@ public class BannerQuangCao {
     @UpdateTimestamp
     @Column(name = "ngay_cap_nhat", nullable = false)
     private LocalDateTime ngayCapNhat;
-
-    public BannerQuangCao() {
-    }
-
-    public BannerQuangCao(Long id, String tieuDe, String linkAnhBanner, String linkChuyenHuong,
-                          Integer thuTuHienThi, Boolean kichHoat, LocalDateTime ngayTao, LocalDateTime ngayCapNhat) {
-        this.id = id;
-        this.tieuDe = tieuDe;
-        this.linkAnhBanner = linkAnhBanner;
-        this.linkChuyenHuong = linkChuyenHuong;
-        this.thuTuHienThi = thuTuHienThi != null ? thuTuHienThi : 0;
-        this.kichHoat = kichHoat != null ? kichHoat : true;
-        this.ngayTao = ngayTao;
-        this.ngayCapNhat = ngayCapNhat;
-    }
 }

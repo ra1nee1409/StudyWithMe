@@ -1,8 +1,10 @@
 package com.studywithme.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -18,6 +20,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class GhiDanhKhoaHoc {
 
     @Id
@@ -43,17 +47,4 @@ public class GhiDanhKhoaHoc {
     @Column(name = "phan_tram_tien_do", nullable = false)
     @Builder.Default
     private Integer phanTramTienDo = 0;
-
-    public GhiDanhKhoaHoc() {
-    }
-
-    public GhiDanhKhoaHoc(Long id, NguoiDung nguoiDung, KhoaHoc khoaHoc, DonHang donHang,
-                          LocalDateTime ngayGhiDanh, Integer phanTramTienDo) {
-        this.id = id;
-        this.nguoiDung = nguoiDung;
-        this.khoaHoc = khoaHoc;
-        this.donHang = donHang;
-        this.ngayGhiDanh = ngayGhiDanh;
-        this.phanTramTienDo = phanTramTienDo != null ? phanTramTienDo : 0;
-    }
 }

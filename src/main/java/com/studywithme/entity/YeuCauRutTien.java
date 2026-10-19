@@ -1,9 +1,11 @@
 package com.studywithme.entity;
 
-import com.studywithme.entity.enums.TrangThaiRutTien;
+import com.studywithme.entity.enums.admin.TrangThaiRutTien;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -15,6 +17,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class YeuCauRutTien {
 
     @Id
@@ -51,22 +55,4 @@ public class YeuCauRutTien {
 
     @Column(name = "ngay_xu_ly")
     private LocalDateTime ngayXuLy;
-
-    public YeuCauRutTien() {
-    }
-
-    public YeuCauRutTien(Long id, HoSoGiangVien giangVien, BigDecimal soTienRut, String tenNganHang,
-                         String soTaiKhoan, String tenChuTaiKhoan, TrangThaiRutTien trangThai,
-                         String ghiChuAdmin, LocalDateTime ngayTao, LocalDateTime ngayXuLy) {
-        this.id = id;
-        this.giangVien = giangVien;
-        this.soTienRut = soTienRut;
-        this.tenNganHang = tenNganHang;
-        this.soTaiKhoan = soTaiKhoan;
-        this.tenChuTaiKhoan = tenChuTaiKhoan;
-        this.trangThai = trangThai != null ? trangThai : TrangThaiRutTien.CHO_XU_LY;
-        this.ghiChuAdmin = ghiChuAdmin;
-        this.ngayTao = ngayTao;
-        this.ngayXuLy = ngayXuLy;
-    }
 }

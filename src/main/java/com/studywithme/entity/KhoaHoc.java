@@ -1,10 +1,12 @@
 package com.studywithme.entity;
 
-import com.studywithme.entity.enums.TrangThaiKhoaHoc;
-import com.studywithme.entity.enums.TrinhDoKhoaHoc;
+import com.studywithme.entity.enums.admin.TrangThaiKhoaHoc;
+import com.studywithme.entity.enums.giaovien.TrinhDoKhoaHoc;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -19,6 +21,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class KhoaHoc {
 
     @Id
@@ -92,33 +96,4 @@ public class KhoaHoc {
     @UpdateTimestamp
     @Column(name = "ngay_cap_nhat", nullable = false)
     private LocalDateTime ngayCapNhat;
-
-    public KhoaHoc() {
-    }
-
-    public KhoaHoc(Long id, HoSoGiangVien giangVien, DanhMuc danhMuc, String tieuDe, String duongDanSlug,
-                   String moTaChiTiet, String anhDaiDienKhoaHoc, BigDecimal giaGoc, BigDecimal giaKhuyenMai,
-                   TrinhDoKhoaHoc trinhDo, String thePhanLoai, TrangThaiKhoaHoc trangThai, String lyDoTuChoi,
-                   BigDecimal diemDanhGiaTrungBinh, Integer tongSoDanhGia, Integer tongSoHocVien,
-                   List<ChuongHoc> danhSachChuongHoc, LocalDateTime ngayTao, LocalDateTime ngayCapNhat) {
-        this.id = id;
-        this.giangVien = giangVien;
-        this.danhMuc = danhMuc;
-        this.tieuDe = tieuDe;
-        this.duongDanSlug = duongDanSlug;
-        this.moTaChiTiet = moTaChiTiet;
-        this.anhDaiDienKhoaHoc = anhDaiDienKhoaHoc;
-        this.giaGoc = giaGoc != null ? giaGoc : BigDecimal.ZERO;
-        this.giaKhuyenMai = giaKhuyenMai;
-        this.trinhDo = trinhDo != null ? trinhDo : TrinhDoKhoaHoc.MOI_TRINH_DO;
-        this.thePhanLoai = thePhanLoai;
-        this.trangThai = trangThai != null ? trangThai : TrangThaiKhoaHoc.BAN_NHAP;
-        this.lyDoTuChoi = lyDoTuChoi;
-        this.diemDanhGiaTrungBinh = diemDanhGiaTrungBinh != null ? diemDanhGiaTrungBinh : BigDecimal.ZERO;
-        this.tongSoDanhGia = tongSoDanhGia != null ? tongSoDanhGia : 0;
-        this.tongSoHocVien = tongSoHocVien != null ? tongSoHocVien : 0;
-        this.danhSachChuongHoc = danhSachChuongHoc != null ? danhSachChuongHoc : new ArrayList<>();
-        this.ngayTao = ngayTao;
-        this.ngayCapNhat = ngayCapNhat;
-    }
 }

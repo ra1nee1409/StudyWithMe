@@ -5,6 +5,7 @@ import com.studywithme.entity.BannerQuangCao;
 import com.studywithme.exception.ResourceNotFoundException;
 import com.studywithme.repository.BannerQuangCaoRepository;
 import com.studywithme.service.BannerService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,14 +23,11 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BannerServiceImpl implements BannerService {
 
     private static final Logger logger = LoggerFactory.getLogger(BannerServiceImpl.class);
     private final BannerQuangCaoRepository bannerQuangCaoRepository;
-
-    public BannerServiceImpl(BannerQuangCaoRepository bannerQuangCaoRepository) {
-        this.bannerQuangCaoRepository = bannerQuangCaoRepository;
-    }
 
     @Override
     @Transactional(readOnly = true)

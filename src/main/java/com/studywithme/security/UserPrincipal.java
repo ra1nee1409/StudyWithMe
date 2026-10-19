@@ -2,7 +2,7 @@ package com.studywithme.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.studywithme.entity.NguoiDung;
-import com.studywithme.entity.enums.TrangThaiNguoiDung;
+import com.studywithme.entity.enums.shared.TrangThaiNguoiDung;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

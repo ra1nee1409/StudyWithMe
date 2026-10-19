@@ -8,6 +8,7 @@ import com.studywithme.repository.DangKyLopHocRepository;
 import com.studywithme.repository.HoSoGiangVienRepository;
 import com.studywithme.repository.LopHocTrucTuyenRepository;
 import com.studywithme.repository.NguoiDungRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +27,7 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/tutor")
 @PreAuthorize("hasAnyAuthority('ROLE_GIANG_VIEN', 'ROLE_QUAN_TRI')")
+@RequiredArgsConstructor
 public class TutorWebController {
 
     private final NguoiDungRepository nguoiDungRepository;
@@ -33,18 +35,6 @@ public class TutorWebController {
     private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
     private final DangKyLopHocRepository dangKyLopHocRepository;
     private final com.studywithme.repository.LichSuViTienRepository lichSuViTienRepository;
-
-    public TutorWebController(NguoiDungRepository nguoiDungRepository,
-                              HoSoGiangVienRepository hoSoGiangVienRepository,
-                              LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
-                              DangKyLopHocRepository dangKyLopHocRepository,
-                              com.studywithme.repository.LichSuViTienRepository lichSuViTienRepository) {
-        this.nguoiDungRepository = nguoiDungRepository;
-        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
-        this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
-        this.dangKyLopHocRepository = dangKyLopHocRepository;
-        this.lichSuViTienRepository = lichSuViTienRepository;
-    }
 
     private Optional<HoSoGiangVien> getHoSoByPrincipal(Principal principal) {
         if (principal == null) return Optional.empty();

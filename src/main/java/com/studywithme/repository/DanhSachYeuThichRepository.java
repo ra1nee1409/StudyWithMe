@@ -1,7 +1,7 @@
 package com.studywithme.repository;
 
 import com.studywithme.entity.DanhSachYeuThich;
-import com.studywithme.entity.enums.LoaiYeuThich;
+import com.studywithme.entity.enums.hocvien.LoaiYeuThich;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

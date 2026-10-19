@@ -2,8 +2,8 @@ package com.studywithme.controller.web;
 
 import com.studywithme.entity.HoSoGiangVien;
 import com.studywithme.entity.NguoiDung;
-import com.studywithme.entity.enums.TrangThaiGiangVien;
-import com.studywithme.entity.enums.TrangThaiNguoiDung;
+import com.studywithme.entity.enums.admin.TrangThaiGiangVien;
+import com.studywithme.entity.enums.shared.TrangThaiNguoiDung;
 import com.studywithme.repository.DangKyLopHocRepository;
 import com.studywithme.repository.DanhGiaNhanXetRepository;
 import com.studywithme.repository.HoSoGiangVienRepository;
@@ -22,9 +22,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/admin")
 @PreAuthorize("hasAuthority('ROLE_QUAN_TRI')")
+@RequiredArgsConstructor
 public class AdminWebController {
 
     private final NguoiDungRepository nguoiDungRepository;
@@ -34,22 +37,7 @@ public class AdminWebController {
     private final DanhGiaNhanXetRepository danhGiaNhanXetRepository;
     private final com.studywithme.service.AdminThongKeService adminThongKeService;
     private final com.studywithme.service.BannerService bannerService;
-
-    public AdminWebController(NguoiDungRepository nguoiDungRepository,
-                              HoSoGiangVienRepository hoSoGiangVienRepository,
-                              DangKyLopHocRepository dangKyLopHocRepository,
-                              LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
-                              DanhGiaNhanXetRepository danhGiaNhanXetRepository,
-                              com.studywithme.service.AdminThongKeService adminThongKeService,
-                              com.studywithme.service.BannerService bannerService) {
-        this.nguoiDungRepository = nguoiDungRepository;
-        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
-        this.dangKyLopHocRepository = dangKyLopHocRepository;
-        this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
-        this.danhGiaNhanXetRepository = danhGiaNhanXetRepository;
-        this.adminThongKeService = adminThongKeService;
-        this.bannerService = bannerService;
-    }
+    private final com.studywithme.service.DanhMucService danhMucService;
 
     @ModelAttribute
     public void loadAdminCommonData(Model model, Principal principal) {
@@ -85,6 +73,16 @@ public class AdminWebController {
     public String bannersPage(Model model) {
         model.addAttribute("danhSachBanner", bannerService.layTatCaBanner());
         return "admin/banners";
+    }
+
+    // ==========================================
+    // 6. MỤC QUẢN LÝ CÂY DANH MỤC & CẤP HỌC (TRANG A3)
+    // ==========================================
+    @GetMapping("/danh-muc")
+    public String danhMucPage(Model model) {
+        model.addAttribute("cayDanhMuc", danhMucService.layCayDanhMuc());
+        model.addAttribute("thongKeDanhMuc", danhMucService.layThongKeDanhMuc());
+        return "admin/categories";
     }
 
     // ==========================================

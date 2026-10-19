@@ -4,6 +4,7 @@ import com.studywithme.dto.request.BannerRequest;
 import com.studywithme.dto.response.ApiResponse;
 import com.studywithme.entity.BannerQuangCao;
 import com.studywithme.service.BannerService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +17,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/banners")
 @PreAuthorize("hasAuthority('ROLE_QUAN_TRI')")
+@RequiredArgsConstructor
 public class AdminBannerApiController {
 
     private final BannerService bannerService;
-
-    public AdminBannerApiController(BannerService bannerService) {
-        this.bannerService = bannerService;
-    }
 
     /**
      * API: Danh sách toàn bộ banner (kể cả đang ẩn)

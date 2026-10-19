@@ -1,8 +1,10 @@
 package com.studywithme.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -10,6 +12,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class BaiHoc {
 
     @Id
@@ -37,18 +41,4 @@ public class BaiHoc {
     @Column(name = "thu_tu_sap_xep", nullable = false)
     @Builder.Default
     private Integer thuTuSapXep = 1;
-
-    public BaiHoc() {
-    }
-
-    public BaiHoc(Long id, ChuongHoc chuongHoc, String tieuDeBaiHoc, String linkVideo,
-                  Integer thoiLuongGiay, Boolean choPhepHocThu, Integer thuTuSapXep) {
-        this.id = id;
-        this.chuongHoc = chuongHoc;
-        this.tieuDeBaiHoc = tieuDeBaiHoc;
-        this.linkVideo = linkVideo;
-        this.thoiLuongGiay = thoiLuongGiay != null ? thoiLuongGiay : 0;
-        this.choPhepHocThu = choPhepHocThu != null ? choPhepHocThu : false;
-        this.thuTuSapXep = thuTuSapXep != null ? thuTuSapXep : 1;
-    }
 }

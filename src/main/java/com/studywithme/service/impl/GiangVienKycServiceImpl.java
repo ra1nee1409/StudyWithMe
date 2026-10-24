@@ -24,13 +24,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class GiangVienKycServiceImpl implements GiangVienKycService {
 
     private final HoSoGiangVienRepository hoSoGiangVienRepository;
     private final ChungChiGiangVienRepository chungChiGiangVienRepository;
     private final NguoiDungRepository nguoiDungRepository;
     private final VaiTroRepository vaiTroRepository;
+
+    public GiangVienKycServiceImpl(HoSoGiangVienRepository hoSoGiangVienRepository,
+                                  ChungChiGiangVienRepository chungChiGiangVienRepository,
+                                  NguoiDungRepository nguoiDungRepository,
+                                  VaiTroRepository vaiTroRepository) {
+        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
+        this.chungChiGiangVienRepository = chungChiGiangVienRepository;
+        this.nguoiDungRepository = nguoiDungRepository;
+        this.vaiTroRepository = vaiTroRepository;
+    }
 
     @Override
     @Transactional(readOnly = true)

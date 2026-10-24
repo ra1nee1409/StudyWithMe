@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class DanhMucServiceImpl implements DanhMucService {
 
     private static final Logger logger = LoggerFactory.getLogger(DanhMucServiceImpl.class);
@@ -30,6 +29,14 @@ public class DanhMucServiceImpl implements DanhMucService {
     private final DanhMucRepository danhMucRepository;
     private final KhoaHocRepository khoaHocRepository;
     private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
+
+    public DanhMucServiceImpl(DanhMucRepository danhMucRepository,
+                              KhoaHocRepository khoaHocRepository,
+                              LopHocTrucTuyenRepository lopHocTrucTuyenRepository) {
+        this.danhMucRepository = danhMucRepository;
+        this.khoaHocRepository = khoaHocRepository;
+        this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
+    }
 
     @Override
     @Transactional(readOnly = true)

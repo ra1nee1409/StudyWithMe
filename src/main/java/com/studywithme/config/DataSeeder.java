@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-@RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(DataSeeder.class);
@@ -38,6 +37,30 @@ public class DataSeeder implements CommandLineRunner {
     private final ChuongHocRepository chuongHocRepository;
     private final BaiHocRepository baiHocRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public DataSeeder(VaiTroRepository vaiTroRepository,
+                      NguoiDungRepository nguoiDungRepository,
+                      HoSoGiangVienRepository hoSoGiangVienRepository,
+                      ChungChiGiangVienRepository chungChiGiangVienRepository,
+                      BannerQuangCaoRepository bannerQuangCaoRepository,
+                      DonHangRepository donHangRepository,
+                      DanhMucRepository danhMucRepository,
+                      KhoaHocRepository khoaHocRepository,
+                      ChuongHocRepository chuongHocRepository,
+                      BaiHocRepository baiHocRepository,
+                      PasswordEncoder passwordEncoder) {
+        this.vaiTroRepository = vaiTroRepository;
+        this.nguoiDungRepository = nguoiDungRepository;
+        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
+        this.chungChiGiangVienRepository = chungChiGiangVienRepository;
+        this.bannerQuangCaoRepository = bannerQuangCaoRepository;
+        this.donHangRepository = donHangRepository;
+        this.danhMucRepository = danhMucRepository;
+        this.khoaHocRepository = khoaHocRepository;
+        this.chuongHocRepository = chuongHocRepository;
+        this.baiHocRepository = baiHocRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public void run(String... args) {

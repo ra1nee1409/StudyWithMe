@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class AdminThongKeServiceImpl implements AdminThongKeService {
 
     private final DonHangRepository donHangRepository;
@@ -34,6 +33,22 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
     private final YeuCauRutTienRepository yeuCauRutTienRepository;
     private final GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository;
     private final DanhMucRepository danhMucRepository;
+
+    public AdminThongKeServiceImpl(DonHangRepository donHangRepository,
+                                  NguoiDungRepository nguoiDungRepository,
+                                  KhoaHocRepository khoaHocRepository,
+                                  HoSoGiangVienRepository hoSoGiangVienRepository,
+                                  YeuCauRutTienRepository yeuCauRutTienRepository,
+                                  GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository,
+                                  DanhMucRepository danhMucRepository) {
+        this.donHangRepository = donHangRepository;
+        this.nguoiDungRepository = nguoiDungRepository;
+        this.khoaHocRepository = khoaHocRepository;
+        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
+        this.yeuCauRutTienRepository = yeuCauRutTienRepository;
+        this.ghiDanhKhoaHocRepository = ghiDanhKhoaHocRepository;
+        this.danhMucRepository = danhMucRepository;
+    }
 
     @Override
     @Transactional(readOnly = true)

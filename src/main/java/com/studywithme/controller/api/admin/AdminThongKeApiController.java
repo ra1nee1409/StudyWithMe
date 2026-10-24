@@ -13,10 +13,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin/thong-ke")
 @PreAuthorize("hasAuthority('ROLE_QUAN_TRI')")
-@RequiredArgsConstructor
 public class AdminThongKeApiController {
 
     private final AdminThongKeService adminThongKeService;
+
+    public AdminThongKeApiController(AdminThongKeService adminThongKeService) {
+        this.adminThongKeService = adminThongKeService;
+    }
 
     /**
      * API 1: Lấy số liệu 4 thẻ KPI và bảng phụ trợ trên Dashboard

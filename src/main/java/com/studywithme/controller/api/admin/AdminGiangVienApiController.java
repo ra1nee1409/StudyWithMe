@@ -16,11 +16,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/giang-vien")
-@RequiredArgsConstructor
 @PreAuthorize("hasAuthority('ROLE_QUAN_TRI')")
 public class AdminGiangVienApiController {
 
     private final GiangVienKycService giangVienKycService;
+
+    public AdminGiangVienApiController(GiangVienKycService giangVienKycService) {
+        this.giangVienKycService = giangVienKycService;
+    }
 
     /**
      * 1. Lấy danh sách hồ sơ gia sư theo trạng thái lọc (CHO_DUYET, DA_DUYET, TU_CHOI hoặc null để lấy tất cả)

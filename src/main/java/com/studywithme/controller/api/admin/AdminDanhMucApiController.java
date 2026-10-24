@@ -17,10 +17,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/danh-muc")
 @PreAuthorize("hasAuthority('ROLE_QUAN_TRI')")
-@RequiredArgsConstructor
 public class AdminDanhMucApiController {
 
     private final DanhMucService danhMucService;
+
+    public AdminDanhMucApiController(DanhMucService danhMucService) {
+        this.danhMucService = danhMucService;
+    }
 
     /**
      * API: Lấy toàn bộ cây danh mục cha-con

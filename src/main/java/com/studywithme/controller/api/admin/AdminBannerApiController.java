@@ -17,10 +17,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/banners")
 @PreAuthorize("hasAuthority('ROLE_QUAN_TRI')")
-@RequiredArgsConstructor
 public class AdminBannerApiController {
 
     private final BannerService bannerService;
+
+    public AdminBannerApiController(BannerService bannerService) {
+        this.bannerService = bannerService;
+    }
 
     /**
      * API: Danh sách toàn bộ banner (kể cả đang ẩn)

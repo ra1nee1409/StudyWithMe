@@ -22,12 +22,19 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/student")
 @PreAuthorize("isAuthenticated()")
-@RequiredArgsConstructor
 public class StudentWebController {
 
     private final NguoiDungRepository nguoiDungRepository;
     private final DangKyLopHocRepository dangKyLopHocRepository;
     private final DonHangRepository donHangRepository;
+
+    public StudentWebController(NguoiDungRepository nguoiDungRepository,
+                               DangKyLopHocRepository dangKyLopHocRepository,
+                               DonHangRepository donHangRepository) {
+        this.nguoiDungRepository = nguoiDungRepository;
+        this.dangKyLopHocRepository = dangKyLopHocRepository;
+        this.donHangRepository = donHangRepository;
+    }
 
     private Optional<NguoiDung> getUserByPrincipal(Principal principal) {
         if (principal == null) return Optional.empty();

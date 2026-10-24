@@ -32,7 +32,6 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin")
 @PreAuthorize("hasAuthority('ROLE_QUAN_TRI')")
-@RequiredArgsConstructor
 public class AdminWebController {
 
     private final NguoiDungRepository nguoiDungRepository;
@@ -44,6 +43,26 @@ public class AdminWebController {
     private final BannerService bannerService;
     private final DanhMucService danhMucService;
     private final GiangVienKycService giangVienKycService;
+
+    public AdminWebController(NguoiDungRepository nguoiDungRepository,
+                              HoSoGiangVienRepository hoSoGiangVienRepository,
+                              DangKyLopHocRepository dangKyLopHocRepository,
+                              LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
+                              DanhGiaNhanXetRepository danhGiaNhanXetRepository,
+                              AdminThongKeService adminThongKeService,
+                              BannerService bannerService,
+                              DanhMucService danhMucService,
+                              GiangVienKycService giangVienKycService) {
+        this.nguoiDungRepository = nguoiDungRepository;
+        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
+        this.dangKyLopHocRepository = dangKyLopHocRepository;
+        this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
+        this.danhGiaNhanXetRepository = danhGiaNhanXetRepository;
+        this.adminThongKeService = adminThongKeService;
+        this.bannerService = bannerService;
+        this.danhMucService = danhMucService;
+        this.giangVienKycService = giangVienKycService;
+    }
 
     @ModelAttribute
     public void loadAdminCommonData(Model model, Principal principal) {

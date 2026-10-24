@@ -29,7 +29,6 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/tutor")
 @PreAuthorize("hasAnyAuthority('ROLE_GIANG_VIEN', 'ROLE_QUAN_TRI')")
-@RequiredArgsConstructor
 public class TutorWebController {
 
     private final NguoiDungRepository nguoiDungRepository;
@@ -37,6 +36,18 @@ public class TutorWebController {
     private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
     private final DangKyLopHocRepository dangKyLopHocRepository;
     private final LichSuViTienRepository lichSuViTienRepository;
+
+    public TutorWebController(NguoiDungRepository nguoiDungRepository,
+                              HoSoGiangVienRepository hoSoGiangVienRepository,
+                              LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
+                              DangKyLopHocRepository dangKyLopHocRepository,
+                              LichSuViTienRepository lichSuViTienRepository) {
+        this.nguoiDungRepository = nguoiDungRepository;
+        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
+        this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
+        this.dangKyLopHocRepository = dangKyLopHocRepository;
+        this.lichSuViTienRepository = lichSuViTienRepository;
+    }
 
     private Optional<HoSoGiangVien> getHoSoByPrincipal(Principal principal) {
         if (principal == null) return Optional.empty();

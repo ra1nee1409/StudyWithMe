@@ -12,7 +12,6 @@ import com.studywithme.repository.HoSoGiangVienRepository;
 import com.studywithme.repository.LichSuViTienRepository;
 import com.studywithme.repository.LopHocTrucTuyenRepository;
 import com.studywithme.repository.NguoiDungRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

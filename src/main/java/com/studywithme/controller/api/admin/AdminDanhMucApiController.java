@@ -5,7 +5,6 @@ import com.studywithme.dto.response.ApiResponse;
 import com.studywithme.dto.response.DanhMucResponse;
 import com.studywithme.service.DanhMucService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

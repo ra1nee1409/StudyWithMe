@@ -16,7 +16,6 @@ import com.studywithme.repository.HoSoGiangVienRepository;
 import com.studywithme.repository.NguoiDungRepository;
 import com.studywithme.repository.VaiTroRepository;
 import com.studywithme.service.GiangVienKycService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

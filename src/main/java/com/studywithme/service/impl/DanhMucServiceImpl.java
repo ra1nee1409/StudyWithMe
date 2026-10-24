@@ -9,7 +9,6 @@ import com.studywithme.repository.DanhMucRepository;
 import com.studywithme.repository.KhoaHocRepository;
 import com.studywithme.repository.LopHocTrucTuyenRepository;
 import com.studywithme.service.DanhMucService;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

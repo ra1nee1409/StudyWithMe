@@ -4,7 +4,6 @@ import com.studywithme.dto.request.BannerRequest;
 import com.studywithme.dto.response.ApiResponse;
 import com.studywithme.entity.BannerQuangCao;
 import com.studywithme.service.BannerService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

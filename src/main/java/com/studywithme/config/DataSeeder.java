@@ -9,7 +9,6 @@ import com.studywithme.entity.enums.giaovien.TrinhDoKhoaHoc;
 import com.studywithme.entity.enums.shared.TrangThaiNguoiDung;
 import com.studywithme.entity.enums.shared.VaiTroName;
 import com.studywithme.repository.*;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;

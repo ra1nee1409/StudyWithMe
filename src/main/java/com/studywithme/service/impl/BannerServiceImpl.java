@@ -5,7 +5,6 @@ import com.studywithme.entity.BannerQuangCao;
 import com.studywithme.exception.ResourceNotFoundException;
 import com.studywithme.repository.BannerQuangCaoRepository;
 import com.studywithme.service.BannerService;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

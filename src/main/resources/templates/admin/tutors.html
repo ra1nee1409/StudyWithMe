@@ -159,11 +159,11 @@
                   <div class="flex items-center gap-4 text-xs text-on-surface-variant flex-wrap">
                     <span class="flex items-center gap-1 font-medium">
                       <span class="material-symbols-outlined text-[15px] text-primary">mail</span>
-                      <span th:text="${tutor.email != null ? tutor.email : 'N/A'}">email@example.com</span>
+                      <span th:text="${tutor.email != null ? tutor.email : 'N/A'}">-</span>
                     </span>
                     <span th:if="${tutor.soDienThoai != null}" class="flex items-center gap-1 font-medium">
                       <span class="material-symbols-outlined text-[15px] text-primary">call</span>
-                      <span th:text="${tutor.soDienThoai}">0987654321</span>
+                      <span th:text="${tutor.soDienThoai}">-</span>
                     </span>
                   </div>
 

@@ -62,7 +62,7 @@
             </div>
           </div>
           <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${soLopDangHoc ?: '2'}">2</span>
+            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${soLopDangHoc ?: 0}">0</span>
             <span class="text-xs text-on-surface-variant font-medium">lớp trực tuyến</span>
           </div>
         </a>
@@ -76,7 +76,7 @@
             </div>
           </div>
           <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${soLopDangHoc}">0</span>
+            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${soLopDangHoc ?: 0}">0</span>
             <span class="text-xs text-on-surface-variant font-medium">lớp hợp lệ</span>
           </div>
         </div>
@@ -90,7 +90,7 @@
             </div>
           </div>
           <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-status-success tracking-tight">100%</span>
+            <span class="text-3xl font-extrabold text-status-success tracking-tight" th:text="${soLopDangHoc != null && soLopDangHoc > 0 ? '100%' : '0%'}">0%</span>
             <span class="text-xs text-on-surface-variant font-medium">tiêu chuẩn tham gia</span>
           </div>
         </div>

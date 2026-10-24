@@ -49,9 +49,6 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
 
         // 3. KPI Khóa học
         long tongKhoaHocDangHoatDong = khoaHocRepository.countByTrangThai(TrangThaiKhoaHoc.DA_XUAT_BAN);
-        if (tongKhoaHocDangHoatDong == 0) {
-            tongKhoaHocDangHoatDong = khoaHocRepository.count();
-        }
 
         // 4. KPI Chờ duyệt
         long hoSoChoDuyet = hoSoGiangVienRepository.countByTrangThaiDuyet(TrangThaiGiangVien.CHO_DUYET);
@@ -189,19 +186,17 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
         }
 
         long tongLuot = countCap1 + countCap2 + countCap3 + countNgoaiNgu;
-        if (tongLuot == 0) {
-            // Mẫu số liệu cân đối mặc định khi hệ thống mới tinh
-            countCap1 = 18;
-            countCap2 = 35;
-            countCap3 = 27;
-            countNgoaiNgu = 20;
-            tongLuot = 100;
-        }
+        double tyLeCap1 = 0.0;
+        double tyLeCap2 = 0.0;
+        double tyLeCap3 = 0.0;
+        double tyLeNgoaiNgu = 0.0;
 
-        double tyLeCap1 = round((double) countCap1 * 100 / tongLuot);
-        double tyLeCap2 = round((double) countCap2 * 100 / tongLuot);
-        double tyLeCap3 = round((double) countCap3 * 100 / tongLuot);
-        double tyLeNgoaiNgu = round(100.0 - (tyLeCap1 + tyLeCap2 + tyLeCap3));
+        if (tongLuot > 0) {
+            tyLeCap1 = round((double) countCap1 * 100 / tongLuot);
+            tyLeCap2 = round((double) countCap2 * 100 / tongLuot);
+            tyLeCap3 = round((double) countCap3 * 100 / tongLuot);
+            tyLeNgoaiNgu = round(100.0 - (tyLeCap1 + tyLeCap2 + tyLeCap3));
+        }
 
         List<TyLeDanhMucResponse.NhomDanhMucItem> danhSachTyLe = new ArrayList<>();
         danhSachTyLe.add(TyLeDanhMucResponse.NhomDanhMucItem.builder()

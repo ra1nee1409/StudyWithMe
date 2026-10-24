@@ -1,10 +1,12 @@
 package com.studywithme.controller.web;
 
+import com.studywithme.entity.ChungChiGiangVien;
 import com.studywithme.entity.DangKyLopHoc;
 import com.studywithme.entity.HoSoGiangVien;
 import com.studywithme.entity.LichSuViTien;
 import com.studywithme.entity.LopHocTrucTuyen;
 import com.studywithme.entity.NguoiDung;
+import com.studywithme.repository.ChungChiGiangVienRepository;
 import com.studywithme.repository.DangKyLopHocRepository;
 import com.studywithme.repository.HoSoGiangVienRepository;
 import com.studywithme.repository.LichSuViTienRepository;
@@ -36,17 +38,20 @@ public class TutorWebController {
     private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
     private final DangKyLopHocRepository dangKyLopHocRepository;
     private final LichSuViTienRepository lichSuViTienRepository;
+    private final ChungChiGiangVienRepository chungChiGiangVienRepository;
 
     public TutorWebController(NguoiDungRepository nguoiDungRepository,
                               HoSoGiangVienRepository hoSoGiangVienRepository,
                               LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
                               DangKyLopHocRepository dangKyLopHocRepository,
-                              LichSuViTienRepository lichSuViTienRepository) {
+                              LichSuViTienRepository lichSuViTienRepository,
+                              ChungChiGiangVienRepository chungChiGiangVienRepository) {
         this.nguoiDungRepository = nguoiDungRepository;
         this.hoSoGiangVienRepository = hoSoGiangVienRepository;
         this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
         this.dangKyLopHocRepository = dangKyLopHocRepository;
         this.lichSuViTienRepository = lichSuViTienRepository;
+        this.chungChiGiangVienRepository = chungChiGiangVienRepository;
     }
 
     private Optional<HoSoGiangVien> getHoSoByPrincipal(Principal principal) {
@@ -158,6 +163,12 @@ public class TutorWebController {
 
     @GetMapping("/ho-so")
     public String profile(Model model, Principal principal) {
+        Optional<HoSoGiangVien> hoSoOpt = getHoSoByPrincipal(principal);
+        List<ChungChiGiangVien> danhSachChungChi = new ArrayList<>();
+        if (hoSoOpt.isPresent()) {
+            danhSachChungChi = chungChiGiangVienRepository.findByGiangVienId(hoSoOpt.get().getId());
+        }
+        model.addAttribute("danhSachChungChi", danhSachChungChi);
         return "tutor/profile";
     }
 }

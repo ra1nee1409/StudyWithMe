@@ -143,4 +143,13 @@ public class NguoiDung {
     public void setNgayCapNhat(LocalDateTime ngayCapNhat) {
         this.ngayCapNhat = ngayCapNhat;
     }
+
+    public void addVaiTro(VaiTro vaiTro) {
+        if (this.danhSachVaiTro == null) {
+            this.danhSachVaiTro = new java.util.HashSet<>();
+        } else if (!(this.danhSachVaiTro instanceof java.util.HashSet)) {
+            this.danhSachVaiTro = new java.util.HashSet<>(this.danhSachVaiTro);
+        }
+        this.danhSachVaiTro.add(vaiTro);
+    }
 }

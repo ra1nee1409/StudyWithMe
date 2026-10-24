@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface NguoiDungRepository extends JpaRepository<NguoiDung, Long> {
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"danhSachVaiTro"})
     Optional<NguoiDung> findByEmail(String email);
     boolean existsByEmail(String email);
     Page<NguoiDung> findByHoTenContainingIgnoreCaseOrEmailContainingIgnoreCase(String hoTen, String email, Pageable pageable);

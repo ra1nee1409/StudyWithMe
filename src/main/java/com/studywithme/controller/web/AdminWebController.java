@@ -13,6 +13,7 @@ import com.studywithme.repository.NguoiDungRepository;
 import com.studywithme.service.AdminThongKeService;
 import com.studywithme.service.BannerService;
 import com.studywithme.service.DanhMucService;
+import com.studywithme.service.GiangVienKycService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
@@ -41,6 +43,7 @@ public class AdminWebController {
     private final AdminThongKeService adminThongKeService;
     private final BannerService bannerService;
     private final DanhMucService danhMucService;
+    private final GiangVienKycService giangVienKycService;
 
     @ModelAttribute
     public void loadAdminCommonData(Model model, Principal principal) {
@@ -89,33 +92,30 @@ public class AdminWebController {
     }
 
     // ==========================================
-    // 2. MỤC DUYỆT GIA SƯ (CHUYÊN BIỆT)
+    // 2. MỤC DUYỆT GIA SƯ (TRANG A4 - TEACHER KYC)
     // ==========================================
-    @GetMapping("/duyet-gia-su")
+    @GetMapping({"/duyet-gia-su", "/tutors"})
     public String duyetGiaSuPage(Model model) {
-        model.addAttribute("danhSachChoDuyet", hoSoGiangVienRepository.findByTrangThaiDuyetOrderByNgayTaoDesc(TrangThaiGiangVien.CHO_DUYET));
-        model.addAttribute("danhSachDaDuyet", hoSoGiangVienRepository.findByTrangThaiDuyetOrderByNgayTaoDesc(TrangThaiGiangVien.DA_DUYET));
-        model.addAttribute("danhSachTuChoi", hoSoGiangVienRepository.findByTrangThaiDuyetOrderByNgayTaoDesc(TrangThaiGiangVien.TU_CHOI));
+        model.addAttribute("danhSachChoDuyet", giangVienKycService.layDanhSachHoSo(TrangThaiGiangVien.CHO_DUYET));
+        model.addAttribute("danhSachDaDuyet", giangVienKycService.layDanhSachHoSo(TrangThaiGiangVien.DA_DUYET));
+        model.addAttribute("danhSachTuChoi", giangVienKycService.layDanhSachHoSo(TrangThaiGiangVien.TU_CHOI));
+        model.addAttribute("thongKeKyc", giangVienKycService.layThongKeKyc());
         return "admin/tutors";
     }
 
-    @PostMapping("/duyet-gia-su/{id}")
+    @PostMapping({"/duyet-gia-su/{id}", "/tutors/{id}/approve"})
     public String duyetGiaSuAction(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        hoSoGiangVienRepository.findById(id).ifPresent(hoSo -> {
-            hoSo.setTrangThaiDuyet(TrangThaiGiangVien.DA_DUYET);
-            hoSoGiangVienRepository.save(hoSo);
-        });
-        redirectAttributes.addFlashAttribute("message", "Đã phê duyệt hồ sơ gia sư thành công!");
+        giangVienKycService.pheDuyetHoSo(id);
+        redirectAttributes.addFlashAttribute("message", "Đã phê duyệt hồ sơ gia sư và nâng quyền ROLE_GIANG_VIEN thành công!");
         return "redirect:/admin/duyet-gia-su";
     }
 
-    @PostMapping("/tu-choi-gia-su/{id}")
-    public String tuChoiGiaSuAction(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        hoSoGiangVienRepository.findById(id).ifPresent(hoSo -> {
-            hoSo.setTrangThaiDuyet(TrangThaiGiangVien.TU_CHOI);
-            hoSoGiangVienRepository.save(hoSo);
-        });
-        redirectAttributes.addFlashAttribute("message", "Đã từ chối hồ sơ gia sư!");
+    @PostMapping({"/tu-choi-gia-su/{id}", "/tutors/{id}/reject"})
+    public String tuChoiGiaSuAction(@PathVariable Long id,
+                                   @RequestParam(name = "lyDoTuChoi", required = false) String lyDoTuChoi,
+                                   RedirectAttributes redirectAttributes) {
+        giangVienKycService.tuChoiHoSo(id, lyDoTuChoi);
+        redirectAttributes.addFlashAttribute("message", "Đã từ chối hồ sơ gia sư và lưu lý do thành công!");
         return "redirect:/admin/duyet-gia-su";
     }
 

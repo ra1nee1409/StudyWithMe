@@ -25,5 +25,11 @@ public interface HoSoGiangVienRepository extends JpaRepository<HoSoGiangVien, Lo
 
     @EntityGraph(attributePaths = {"nguoiDung"})
     List<HoSoGiangVien> findTop5ByOrderByNgayTaoDesc();
+
+    @EntityGraph(attributePaths = {"nguoiDung"})
+    List<HoSoGiangVien> findAllByOrderByNgayTaoDesc();
+
+    @EntityGraph(attributePaths = {"nguoiDung", "danhSachChungChi"})
+    Optional<HoSoGiangVien> findById(Long id);
 }
 

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{components/common/head :: common-head('Duyệt Hồ Sơ Gia Sư - Quản trị StudyWithMe')}"></head>
+<head th:replace="~{components/common/head :: common-head('Duyệt Hồ Sơ Gia Sư KYC - Quản trị StudyWithMe')}"></head>
 
 <body class="bg-surface-canvas font-body-md text-on-surface antialiased">
 
@@ -16,8 +16,8 @@
     <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
 
       <!-- Flash Notification Message -->
-      <div th:if="${message}" class="p-4 rounded-xl bg-accent-cyan-subtle border border-primary-container text-primary flex items-center gap-3 shadow-sm">
-        <span class="material-symbols-outlined text-[22px] text-status-success">check_circle</span>
+      <div th:if="${message}" class="p-4 rounded-xl bg-status-success/10 border border-status-success/30 text-status-success flex items-center gap-3 shadow-sm animate-fade-in">
+        <span class="material-symbols-outlined text-[22px]">check_circle</span>
         <span class="text-sm font-semibold" th:text="${message}"></span>
       </div>
 
@@ -27,35 +27,38 @@
           <div class="flex items-center gap-2">
             <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-coral-subtle text-tertiary text-xs font-semibold">
               <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
-              Phê duyệt & Kiểm định
+              Trang A4 • Phê duyệt & Kiểm định KYC
             </span>
             <span class="text-outline-variant">•</span>
-            <span class="text-xs text-on-surface-variant">Quy trình tuyển chọn giảng viên</span>
+            <span class="text-xs text-on-surface-variant">Quy trình tuyển chọn & cấp quyền giảng viên</span>
           </div>
           <h1 class="text-2xl font-bold text-on-surface tracking-tight">
             Quản Lý & Duyệt Hồ Sơ Gia Sư
           </h1>
           <p class="text-xs text-on-surface-variant">
-            Thẩm định hồ sơ năng lực, chứng chỉ và video dạy thử của các gia sư đăng ký trên StudyWithMe.
+            Thẩm định hồ sơ năng lực, bằng cấp sư phạm, chứng chỉ ngoại ngữ và video dạy thử trước khi cấp quyền mở lớp trên StudyWithMe.
           </p>
         </div>
 
         <div class="flex items-center gap-2">
-          <a th:href="@{/admin}" class="px-4 py-2 rounded-lg border border-surface-container text-xs font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all flex items-center gap-1.5">
+          <a th:href="@{/admin/dashboard}" class="px-4 py-2 rounded-lg border border-surface-container text-xs font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[16px]">arrow_back</span>
-            Về Tổng quan
+            Về Dashboard
           </a>
         </div>
       </section>
 
-      <!-- KPI Thống kê Gia sư -->
-      <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <!-- KPI Thống kê Gia sư KYC -->
+      <section class="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <!-- Chờ duyệt -->
         <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
           <div class="flex flex-col">
             <span class="text-xs text-on-surface-variant font-medium">Hồ sơ chờ phê duyệt</span>
-            <span class="text-3xl font-extrabold text-tertiary tracking-tight" th:text="${#lists.size(danhSachChoDuyet)}">0</span>
-            <span class="text-[11px] text-tertiary-container font-semibold mt-1">Cần xem xét ngay</span>
+            <span class="text-3xl font-extrabold text-tertiary tracking-tight" th:text="${thongKeKyc != null ? thongKeKyc.choDuyet : #lists.size(danhSachChoDuyet)}">0</span>
+            <span class="text-[11px] text-tertiary font-semibold mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">warning</span>
+              Cần xem xét ngay
+            </span>
           </div>
           <div class="w-12 h-12 rounded-xl bg-accent-coral-subtle text-tertiary flex items-center justify-center">
             <span class="material-symbols-outlined text-[26px]">hourglass_top</span>
@@ -66,8 +69,8 @@
         <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
           <div class="flex flex-col">
             <span class="text-xs text-on-surface-variant font-medium">Gia sư chính thức</span>
-            <span class="text-3xl font-extrabold text-status-success tracking-tight" th:text="${#lists.size(danhSachDaDuyet)}">0</span>
-            <span class="text-[11px] text-on-surface-variant mt-1">Đang hoạt động giảng dạy</span>
+            <span class="text-3xl font-extrabold text-status-success tracking-tight" th:text="${thongKeKyc != null ? thongKeKyc.daDuyet : #lists.size(danhSachDaDuyet)}">0</span>
+            <span class="text-[11px] text-on-surface-variant mt-1">Đã cấp ROLE_GIANG_VIEN</span>
           </div>
           <div class="w-12 h-12 rounded-xl bg-status-success/10 text-status-success flex items-center justify-center">
             <span class="material-symbols-outlined text-[26px]">verified</span>
@@ -78,11 +81,23 @@
         <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
           <div class="flex flex-col">
             <span class="text-xs text-on-surface-variant font-medium">Hồ sơ không đạt</span>
-            <span class="text-3xl font-extrabold text-error tracking-tight" th:text="${#lists.size(danhSachTuChoi)}">0</span>
+            <span class="text-3xl font-extrabold text-error tracking-tight" th:text="${thongKeKyc != null ? thongKeKyc.tuChoi : #lists.size(danhSachTuChoi)}">0</span>
             <span class="text-[11px] text-on-surface-variant mt-1">Đã gửi thông báo từ chối</span>
           </div>
           <div class="w-12 h-12 rounded-xl bg-error-container text-error flex items-center justify-center">
             <span class="material-symbols-outlined text-[26px]">cancel</span>
+          </div>
+        </div>
+
+        <!-- Tổng số hồ sơ -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-xs text-on-surface-variant font-medium">Tổng hồ sơ nộp</span>
+            <span class="text-3xl font-extrabold text-primary tracking-tight" th:text="${thongKeKyc != null ? thongKeKyc.tongCong : (#lists.size(danhSachChoDuyet) + #lists.size(danhSachDaDuyet) + #lists.size(danhSachTuChoi))}">0</span>
+            <span class="text-[11px] text-on-surface-variant mt-1">Gia sư & Người ứng tuyển</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-accent-cyan-subtle text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[26px]">badge</span>
           </div>
         </div>
       </section>
@@ -97,7 +112,7 @@
           </button>
           <button id="tab-btn-approved" onclick="switchTutorTab('approved')" type="button" class="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-on-surface-variant hover:text-on-surface flex items-center gap-2 cursor-pointer transition-all">
             <span class="material-symbols-outlined text-[18px]">check_circle</span>
-            <span>Đã phê duyệt</span>
+            <span>Đã phê duyệt (Chính thức)</span>
             <span th:text="${#lists.size(danhSachDaDuyet)}" class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-xs font-bold">0</span>
           </button>
           <button id="tab-btn-rejected" onclick="switchTutorTab('rejected')" type="button" class="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-on-surface-variant hover:text-on-surface flex items-center gap-2 cursor-pointer transition-all">
@@ -112,21 +127,28 @@
           <div th:if="${#lists.isEmpty(danhSachChoDuyet)}" class="p-12 text-center bg-surface-container-low/30 rounded-xl border border-dashed border-surface-container">
             <span class="material-symbols-outlined text-4xl text-status-success mb-2">task_alt</span>
             <p class="text-sm font-bold text-on-surface">Không có hồ sơ nào đang chờ duyệt</p>
-            <p class="text-xs text-on-surface-variant mt-1">Tất cả đơn đăng ký gia sư đã được xử lý xong!</p>
+            <p class="text-xs text-on-surface-variant mt-1">Tất cả đơn đăng ký gia sư mới đã được xem xét và xử lý xong!</p>
           </div>
 
-          <div th:unless="${#lists.isEmpty(danhSachChoDuyet)}" class="grid grid-cols-1 gap-4">
-            <div th:each="tutor : ${danhSachChoDuyet}" class="p-5 rounded-xl border border-surface-container/50 bg-surface-container-low/20 flex flex-col lg:flex-row items-start justify-between gap-6 hover:border-tertiary transition-all">
+          <div th:unless="${#lists.isEmpty(danhSachChoDuyet)}" class="grid grid-cols-1 gap-5">
+            <div th:each="tutor : ${danhSachChoDuyet}" class="p-6 rounded-xl border border-surface-container/60 bg-surface-container-low/20 flex flex-col lg:flex-row items-start justify-between gap-6 hover:border-tertiary hover:shadow-sm transition-all">
               
               <!-- Thông tin cơ bản & chuyên môn -->
               <div class="flex items-start gap-4 flex-1">
-                <div class="w-12 h-12 rounded-xl bg-accent-coral-subtle text-tertiary flex items-center justify-center font-bold text-base shrink-0 shadow-sm"
-                     th:text="${tutor.nguoiDung != null && tutor.nguoiDung.hoTen != null && tutor.nguoiDung.hoTen.length() > 0 ? tutor.nguoiDung.hoTen.substring(0, 1) : 'G'}">G</div>
+                <!-- Avatar -->
+                <div class="relative shrink-0">
+                  <div th:if="${tutor.anhDaiDien != null}" class="w-16 h-16 rounded-xl overflow-hidden ring-2 ring-tertiary/20">
+                    <img th:src="${tutor.anhDaiDien}" th:alt="${tutor.hoTen}" class="w-full h-full object-cover"/>
+                  </div>
+                  <div th:unless="${tutor.anhDaiDien != null}" class="w-16 h-16 rounded-xl bg-accent-coral-subtle text-tertiary flex items-center justify-center font-bold text-xl ring-2 ring-tertiary/20 shadow-sm"
+                       th:text="${tutor.hoTen != null && tutor.hoTen.length() > 0 ? tutor.hoTen.substring(0, 1) : 'G'}">G</div>
+                  <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-tertiary border-2 border-white flex items-center justify-center" title="Chờ xét duyệt"></span>
+                </div>
                 
-                <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+                <div class="flex flex-col gap-2 flex-1 min-w-0">
                   <div class="flex items-center gap-2.5 flex-wrap">
-                    <span class="font-bold text-base text-on-surface" th:text="${tutor.nguoiDung != null ? tutor.nguoiDung.hoTen : 'Chưa cập nhật'}">Nguyễn Văn A</span>
-                    <span class="px-2 py-0.5 rounded-full bg-accent-coral-subtle text-tertiary text-xs font-semibold">Chờ duyệt</span>
+                    <span class="font-bold text-lg text-on-surface" th:text="${tutor.hoTen != null ? tutor.hoTen : 'Chưa cập nhật'}">Nguyễn Văn A</span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-accent-coral-subtle text-tertiary text-xs font-bold border border-tertiary/30">Chờ duyệt</span>
                     <span class="text-xs text-on-surface-variant flex items-center gap-1">
                       <span class="material-symbols-outlined text-[14px]">calendar_today</span>
                       <span th:text="${#temporals.format(tutor.ngayTao, 'dd/MM/yyyy HH:mm')}">17/10/2026</span>
@@ -135,52 +157,195 @@
 
                   <!-- Liên hệ -->
                   <div class="flex items-center gap-4 text-xs text-on-surface-variant flex-wrap">
-                    <span class="flex items-center gap-1">
-                      <span class="material-symbols-outlined text-[15px]">mail</span>
-                      <span th:text="${tutor.nguoiDung != null ? tutor.nguoiDung.email : 'N/A'}">email@example.com</span>
+                    <span class="flex items-center gap-1 font-medium">
+                      <span class="material-symbols-outlined text-[15px] text-primary">mail</span>
+                      <span th:text="${tutor.email != null ? tutor.email : 'N/A'}">email@example.com</span>
                     </span>
-                    <span th:if="${tutor.nguoiDung != null && tutor.nguoiDung.soDienThoai != null}" class="flex items-center gap-1">
-                      <span class="material-symbols-outlined text-[15px]">call</span>
-                      <span th:text="${tutor.nguoiDung.soDienThoai}">0987654321</span>
+                    <span th:if="${tutor.soDienThoai != null}" class="flex items-center gap-1 font-medium">
+                      <span class="material-symbols-outlined text-[15px] text-primary">call</span>
+                      <span th:text="${tutor.soDienThoai}">0987654321</span>
                     </span>
                   </div>
 
                   <!-- Chuyên môn & Tự giới thiệu -->
-                  <div class="mt-2 p-3 rounded-lg bg-surface-card border border-surface-container/30 text-xs">
-                    <div class="font-semibold text-primary mb-1 flex items-center gap-1.5">
+                  <div class="p-3.5 rounded-lg bg-surface-card border border-surface-container/40 text-xs">
+                    <div class="font-bold text-primary mb-1 flex items-center gap-1.5">
                       <span class="material-symbols-outlined text-[16px]">psychology</span>
                       <span th:text="${tutor.tieuDeChuyenMon ?: 'Chuyên môn chưa cập nhật'}">Chuyên môn</span>
                     </div>
-                    <p class="text-on-surface-variant line-clamp-3 whitespace-pre-line" th:text="${tutor.gioiThieuBanThan ?: 'Chưa có lời giới thiệu bản thân.'}">Nội dung giới thiệu...</p>
+                    <p class="text-on-surface-variant line-clamp-2 leading-relaxed" th:text="${tutor.gioiThieuBanThan ?: 'Chưa có lời giới thiệu bản thân.'}">Nội dung giới thiệu...</p>
+                  </div>
+
+                  <!-- Danh sách chứng chỉ KYC đính kèm -->
+                  <div class="flex items-center gap-2 flex-wrap mt-1">
+                    <span class="text-[11px] font-semibold text-on-surface-variant flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[14px] text-tertiary">verified_user</span>
+                      Chứng chỉ đã nộp (<span th:text="${#lists.size(tutor.danhSachChungChi)}">0</span>):
+                    </span>
+                    <div th:if="${#lists.isEmpty(tutor.danhSachChungChi)}" class="text-[11px] text-on-surface-variant italic">
+                      Chưa tải lên chứng chỉ
+                    </div>
+                    <div th:unless="${#lists.isEmpty(tutor.danhSachChungChi)}" class="flex items-center gap-2 flex-wrap">
+                      <span th:each="cc : ${tutor.danhSachChungChi}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface-container text-on-surface text-[11px] font-medium border border-surface-container-high">
+                        <span class="material-symbols-outlined text-[13px] text-primary">workspace_premium</span>
+                        <span th:text="${cc.tenChungChi}">Bằng cấp</span>
+                        <span th:if="${cc.diemSoHoacXepLoai}" class="text-primary font-bold" th:text="'(' + ${cc.diemSoHoacXepLoai} + ')'"></span>
+                      </span>
+                    </div>
                   </div>
 
                   <!-- Video dạy thử nếu có -->
                   <div th:if="${tutor.linkVideoDayThu}" class="mt-1">
-                    <a th:href="${tutor.linkVideoDayThu}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-secondary hover:underline font-semibold">
-                      <span class="material-symbols-outlined text-[16px]">play_circle</span>
-                      Xem video dạy thử (mở tab mới)
+                    <a th:href="${tutor.linkVideoDayThu}" target="_blank" class="inline-flex items-center gap-1 text-xs text-secondary hover:underline font-semibold">
+                      <span class="material-symbols-outlined text-[16px]">smart_display</span>
+                      Xem video dạy thử demo (YouTube / Tab mới)
                     </a>
                   </div>
+
                 </div>
               </div>
 
-              <!-- Nút Thao tác Phê duyệt / Từ chối -->
-              <div class="flex items-center gap-3 shrink-0 self-end lg:self-center">
-                <!-- Nút Từ chối -->
-                <form th:action="@{/admin/tu-choi-gia-su/{id}(id=${tutor.id})}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn từ chối hồ sơ này không?');">
-                  <button type="submit" class="px-4 py-2.5 rounded-lg border border-error/30 text-error hover:bg-error-container text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
-                    <span class="material-symbols-outlined text-[16px]">close</span>
-                    Từ chối
-                  </button>
-                </form>
+              <!-- Nút Thao tác Phê duyệt / Từ chối / Xem chi tiết -->
+              <div class="flex flex-col sm:flex-row items-center gap-2.5 shrink-0 self-end lg:self-center">
+                <!-- Nút Xem chi tiết Modal -->
+                <button type="button" th:onclick="'openDetailModal(' + ${tutor.id} + ')'"
+                        class="px-4 py-2.5 rounded-lg border border-surface-container bg-surface-card hover:bg-surface-container text-on-surface text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm">
+                  <span class="material-symbols-outlined text-[16px] text-primary">visibility</span>
+                  Chi tiết hồ sơ
+                </button>
+
+                <!-- Nút Từ chối (mở modal nhập lý do) -->
+                <button type="button" th:onclick="'openRejectModal(' + ${tutor.id} + ', \'' + ${tutor.hoTen} + '\')'"
+                        class="px-4 py-2.5 rounded-lg border border-error/30 text-error hover:bg-error-container text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+                  <span class="material-symbols-outlined text-[16px]">close</span>
+                  Từ chối
+                </button>
 
                 <!-- Nút Phê duyệt -->
-                <form th:action="@{/admin/duyet-gia-su/{id}(id=${tutor.id})}" method="post" onsubmit="return confirm('Xác nhận phê duyệt gia sư này vào hệ thống?');">
-                  <button type="submit" class="px-4 py-2.5 rounded-lg bg-status-success hover:bg-emerald-600 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer">
+                <form th:action="@{/admin/duyet-gia-su/{id}(id=${tutor.id})}" method="post" onsubmit="return confirm('Xác nhận phê duyệt gia sư này và tự động cấp quyền ROLE_GIANG_VIEN?');">
+                  <button type="submit" class="px-5 py-2.5 rounded-lg bg-status-success hover:bg-emerald-600 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer">
                     <span class="material-symbols-outlined text-[16px]">check</span>
-                    Phê duyệt hồ sơ
+                    Phê duyệt KYC
                   </button>
                 </form>
+              </div>
+
+              <!-- ==================== MODAL XEM CHI TIẾT HỒ SƠ ==================== -->
+              <div th:id="'modal-detail-' + ${tutor.id}" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+                <div class="bg-surface-card w-full max-w-3xl rounded-2xl shadow-2xl border border-surface-container/60 overflow-hidden flex flex-col max-h-[90vh] my-auto">
+                  
+                  <!-- Modal Header -->
+                  <div class="px-6 py-4 bg-surface-container-low border-b border-surface-container/40 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-xl bg-accent-coral-subtle text-tertiary flex items-center justify-center font-bold text-base"
+                           th:text="${tutor.hoTen != null ? tutor.hoTen.substring(0, 1) : 'G'}">G</div>
+                      <div>
+                        <h3 class="font-bold text-base text-on-surface" th:text="${tutor.hoTen}">Tên gia sư</h3>
+                        <p class="text-xs text-on-surface-variant" th:text="${tutor.email}">email</p>
+                      </div>
+                    </div>
+                    <button type="button" th:onclick="'closeDetailModal(' + ${tutor.id} + ')'" class="w-8 h-8 rounded-lg text-on-surface-variant hover:bg-surface-container flex items-center justify-center cursor-pointer">
+                      <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                  </div>
+
+                  <!-- Modal Body -->
+                  <div class="p-6 space-y-5 overflow-y-auto flex-1 text-xs">
+                    
+                    <!-- 1. Chuyên môn & Tự giới thiệu -->
+                    <div class="bg-surface-container-low/50 p-4 rounded-xl border border-surface-container/30">
+                      <h4 class="font-bold text-sm text-primary mb-2 flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[18px]">badge</span>
+                        Chuyên môn & Giới thiệu bản thân
+                      </h4>
+                      <p class="font-semibold text-on-surface mb-2" th:text="${tutor.tieuDeChuyenMon}">Tiêu đề chuyên môn</p>
+                      <p class="text-on-surface-variant whitespace-pre-line leading-relaxed" th:text="${tutor.gioiThieuBanThan}">Lời giới thiệu...</p>
+                    </div>
+
+                    <!-- 2. Video dạy thử -->
+                    <div th:if="${tutor.linkVideoDayThu}" class="bg-surface-container-low/50 p-4 rounded-xl border border-surface-container/30">
+                      <h4 class="font-bold text-sm text-secondary mb-2 flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[18px]">play_circle</span>
+                        Video Dạy Thử Demo
+                      </h4>
+                      <div class="aspect-video w-full rounded-lg overflow-hidden bg-black/10">
+                        <iframe th:src="${tutor.linkVideoDayThu}" class="w-full h-full border-0" allowfullscreen></iframe>
+                      </div>
+                    </div>
+
+                    <!-- 3. Danh sách bằng cấp & chứng chỉ -->
+                    <div>
+                      <h4 class="font-bold text-sm text-on-surface mb-3 flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[18px] text-tertiary">verified_user</span>
+                        Bằng Cấp & Chứng Chỉ Năng Lực (<span th:text="${#lists.size(tutor.danhSachChungChi)}">0</span>)
+                      </h4>
+
+                      <div th:if="${#lists.isEmpty(tutor.danhSachChungChi)}" class="p-4 rounded-lg bg-surface-container-low text-center text-on-surface-variant">
+                        Ứng viên chưa đính kèm ảnh chứng chỉ nào.
+                      </div>
+
+                      <div th:unless="${#lists.isEmpty(tutor.danhSachChungChi)}" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div th:each="cc : ${tutor.danhSachChungChi}" class="p-4 rounded-xl border border-surface-container bg-surface-container-low/40 flex flex-col gap-2">
+                          <div class="h-40 rounded-lg overflow-hidden bg-surface-container border border-surface-container-high cursor-pointer relative group"
+                               th:onclick="'openImagePreview(\'' + ${cc.linkAnhChungChi} + '\', \'' + ${cc.tenChungChi} + '\')'">
+                            <img th:src="${cc.linkAnhChungChi}" th:alt="${cc.tenChungChi}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
+                            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1 font-semibold text-xs">
+                              <span class="material-symbols-outlined text-[18px]">zoom_in</span> Phóng to xem
+                            </div>
+                          </div>
+                          <div class="flex flex-col gap-1 mt-1">
+                            <span class="font-bold text-sm text-on-surface" th:text="${cc.tenChungChi}">Tên chứng chỉ</span>
+                            <div class="flex items-center justify-between text-on-surface-variant">
+                              <span>Xếp loại / Điểm: <strong class="text-primary" th:text="${cc.diemSoHoacXepLoai ?: 'N/A'}"></strong></span>
+                              <span class="px-2 py-0.5 rounded bg-status-success/10 text-status-success font-bold text-[10px]" th:text="${cc.trangThaiXacThuc}">CHO_XAC_THUC</span>
+                            </div>
+                            <span class="text-[11px] text-on-surface-variant" th:if="${cc.noiCap}" th:text="'Nơi cấp: ' + ${cc.noiCap}"></span>
+                            <span class="text-[11px] text-on-surface-variant" th:if="${cc.ngayCap}" th:text="'Ngày cấp: ' + ${#temporals.format(cc.ngayCap, 'dd/MM/yyyy')}"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 4. Thông tin tài khoản ngân hàng -->
+                    <div class="bg-surface-container-low/50 p-4 rounded-xl border border-surface-container/30 flex flex-col gap-2">
+                      <h4 class="font-bold text-sm text-on-surface flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[18px] text-secondary">account_balance</span>
+                        Tài Khoản Ngân Hàng Nhận Thù Lao
+                      </h4>
+                      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div>
+                          <span class="text-on-surface-variant">Ngân hàng:</span>
+                          <p class="font-bold text-on-surface" th:text="${tutor.tenNganHang ?: 'Chưa cập nhật'}">Techcombank</p>
+                        </div>
+                        <div>
+                          <span class="text-on-surface-variant">Số tài khoản:</span>
+                          <p class="font-bold text-primary" th:text="${tutor.soTaiKhoanNganHang ?: 'Chưa cập nhật'}">0123456789</p>
+                        </div>
+                        <div>
+                          <span class="text-on-surface-variant">Chủ tài khoản:</span>
+                          <p class="font-bold text-on-surface uppercase" th:text="${tutor.tenChuTaiKhoan ?: 'Chưa cập nhật'}">NGUYEN VAN A</p>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- Modal Footer -->
+                  <div class="px-6 py-4 bg-surface-container-low border-t border-surface-container/40 flex items-center justify-end gap-3">
+                    <button type="button" th:onclick="'closeDetailModal(' + ${tutor.id} + ')'" class="px-4 py-2 rounded-lg border border-surface-container text-on-surface text-xs font-semibold hover:bg-surface-container cursor-pointer">
+                      Đóng
+                    </button>
+                    <button type="button" th:onclick="'closeDetailModal(' + ${tutor.id} + '); openRejectModal(' + ${tutor.id} + ', \'' + ${tutor.hoTen} + '\');'" class="px-4 py-2 rounded-lg border border-error/30 text-error hover:bg-error-container text-xs font-bold cursor-pointer">
+                      Từ chối hồ sơ
+                    </button>
+                    <form th:action="@{/admin/duyet-gia-su/{id}(id=${tutor.id})}" method="post" onsubmit="return confirm('Xác nhận phê duyệt hồ sơ gia sư này?');">
+                      <button type="submit" class="px-5 py-2 rounded-lg bg-status-success hover:bg-emerald-600 text-white text-xs font-bold shadow-sm cursor-pointer">
+                        Phê duyệt ngay
+                      </button>
+                    </form>
+                  </div>
+
+                </div>
               </div>
 
             </div>
@@ -202,6 +367,7 @@
                   <th class="py-3 px-4">Liên hệ</th>
                   <th class="py-3 px-4">Chuyên môn</th>
                   <th class="py-3 px-4">Số dư ví</th>
+                  <th class="py-3 px-4">Chứng chỉ</th>
                   <th class="py-3 px-4">Trạng thái</th>
                   <th class="py-3 px-4 text-right">Ngày duyệt</th>
                 </tr>
@@ -210,17 +376,26 @@
                 <tr th:each="tutor : ${danhSachDaDuyet}" class="hover:bg-surface-container-low/40 transition-colors">
                   <td class="py-3.5 px-4 font-bold text-on-surface">
                     <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded-lg bg-accent-navy-subtle text-secondary flex items-center justify-center font-bold text-xs"
-                           th:text="${tutor.nguoiDung != null && tutor.nguoiDung.hoTen != null ? tutor.nguoiDung.hoTen.substring(0, 1) : 'G'}">G</div>
-                      <span th:text="${tutor.nguoiDung != null ? tutor.nguoiDung.hoTen : 'Chưa cập nhật'}">Gia sư</span>
+                      <div th:if="${tutor.anhDaiDien != null}" class="w-8 h-8 rounded-lg overflow-hidden shrink-0">
+                        <img th:src="${tutor.anhDaiDien}" th:alt="${tutor.hoTen}" class="w-full h-full object-cover"/>
+                      </div>
+                      <div th:unless="${tutor.anhDaiDien != null}" class="w-8 h-8 rounded-lg bg-accent-navy-subtle text-secondary flex items-center justify-center font-bold text-xs shrink-0"
+                           th:text="${tutor.hoTen != null && tutor.hoTen.length() > 0 ? tutor.hoTen.substring(0, 1) : 'G'}">G</div>
+                      <span th:text="${tutor.hoTen != null ? tutor.hoTen : 'Chưa cập nhật'}">Gia sư</span>
                     </div>
                   </td>
                   <td class="py-3.5 px-4 text-on-surface-variant">
-                    <div th:text="${tutor.nguoiDung != null ? tutor.nguoiDung.email : 'N/A'}">email</div>
-                    <div th:if="${tutor.nguoiDung != null && tutor.nguoiDung.soDienThoai != null}" class="text-[11px]" th:text="${tutor.nguoiDung.soDienThoai}">phone</div>
+                    <div th:text="${tutor.email != null ? tutor.email : 'N/A'}">email</div>
+                    <div th:if="${tutor.soDienThoai != null}" class="text-[11px]" th:text="${tutor.soDienThoai}">phone</div>
                   </td>
                   <td class="py-3.5 px-4 text-primary font-medium" th:text="${tutor.tieuDeChuyenMon ?: 'N/A'}">Chuyên môn</td>
                   <td class="py-3.5 px-4 font-bold text-on-surface" th:text="${#numbers.formatDecimal(tutor.soDuVi, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</td>
+                  <td class="py-3.5 px-4">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container text-on-surface text-[11px] font-semibold">
+                      <span class="material-symbols-outlined text-[13px] text-tertiary">workspace_premium</span>
+                      <span th:text="${#lists.size(tutor.danhSachChungChi)} + ' chứng chỉ'">0 chứng chỉ</span>
+                    </span>
+                  </td>
                   <td class="py-3.5 px-4">
                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-status-success/10 text-status-success font-semibold text-[11px]">
                       <span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>
@@ -248,22 +423,24 @@
                   <th class="py-3 px-4">Ứng viên</th>
                   <th class="py-3 px-4">Email</th>
                   <th class="py-3 px-4">Chuyên môn</th>
+                  <th class="py-3 px-4">Lý do từ chối</th>
                   <th class="py-3 px-4">Trạng thái</th>
                   <th class="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-surface-container/30">
                 <tr th:each="tutor : ${danhSachTuChoi}" class="hover:bg-surface-container-low/40 transition-colors">
-                  <td class="py-3.5 px-4 font-semibold text-on-surface" th:text="${tutor.nguoiDung != null ? tutor.nguoiDung.hoTen : 'N/A'}">Tên</td>
-                  <td class="py-3.5 px-4 text-on-surface-variant" th:text="${tutor.nguoiDung != null ? tutor.nguoiDung.email : 'N/A'}">Email</td>
+                  <td class="py-3.5 px-4 font-semibold text-on-surface" th:text="${tutor.hoTen != null ? tutor.hoTen : 'N/A'}">Tên</td>
+                  <td class="py-3.5 px-4 text-on-surface-variant" th:text="${tutor.email != null ? tutor.email : 'N/A'}">Email</td>
                   <td class="py-3.5 px-4 text-on-surface-variant" th:text="${tutor.tieuDeChuyenMon ?: 'N/A'}">Chuyên môn</td>
+                  <td class="py-3.5 px-4 text-error max-w-xs leading-relaxed" th:text="${tutor.lyDoTuChoi ?: 'Chưa cập nhật lý do.'}">Lý do</td>
                   <td class="py-3.5 px-4">
                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-error font-semibold text-[11px]">
                       Từ chối
                     </span>
                   </td>
                   <td class="py-3.5 px-4 text-right">
-                    <form th:action="@{/admin/duyet-gia-su/{id}(id=${tutor.id})}" method="post" class="inline-block" onsubmit="return confirm('Bạn muốn duyệt lại hồ sơ này?');">
+                    <form th:action="@{/admin/duyet-gia-su/{id}(id=${tutor.id})}" method="post" class="inline-block" onsubmit="return confirm('Bạn muốn duyệt lại và kích hoạt hồ sơ gia sư này?');">
                       <button type="submit" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-status-success hover:text-white text-xs font-semibold text-on-surface-variant transition-all cursor-pointer">
                         Duyệt lại
                       </button>
@@ -280,6 +457,54 @@
     </main>
   </div>
 
+  <!-- ==================== MODAL TỪ CHỐI KÈM LÝ DO ==================== -->
+  <div id="reject-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-surface-card w-full max-w-md rounded-2xl shadow-2xl border border-surface-container/60 p-6 flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-error">
+          <span class="material-symbols-outlined text-[24px]">cancel</span>
+          <h3 class="font-bold text-base text-on-surface">Từ Chối Hồ Sơ Gia Sư</h3>
+        </div>
+        <button type="button" onclick="closeRejectModal()" class="w-8 h-8 rounded-lg text-on-surface-variant hover:bg-surface-container flex items-center justify-center cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <p class="text-xs text-on-surface-variant">
+        Ứng viên: <strong id="reject-tutor-name" class="text-on-surface">Nguyễn Văn A</strong>. Vui lòng nhập lý do từ chối để thông báo đến ứng viên:
+      </p>
+
+      <form id="reject-form" method="post" action="">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-on-surface">Lý do từ chối:</label>
+          <textarea name="lyDoTuChoi" id="reject-reason" rows="4" required
+                    class="w-full px-3 py-2 rounded-lg border border-surface-container bg-surface-container-low text-xs text-on-surface focus:outline-none focus:border-tertiary"
+                    placeholder="Ví dụ: Bằng cấp chưa rõ nét, thiếu chứng chỉ ngoại ngữ hoặc video dạy thử chưa đạt yêu cầu..."></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 mt-4">
+          <button type="button" onclick="closeRejectModal()" class="px-4 py-2 rounded-lg border border-surface-container text-on-surface text-xs font-semibold hover:bg-surface-container cursor-pointer">
+            Hủy bỏ
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-error hover:bg-red-700 text-white text-xs font-bold shadow-sm cursor-pointer">
+            Xác nhận từ chối
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL PHÓNG TO ẢNH CHỨNG CHỈ (LIGHTBOX) ==================== -->
+  <div id="image-lightbox" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeImagePreview()">
+    <div class="relative max-w-4xl max-h-[90vh] flex flex-col items-center" onclick="event.stopPropagation()">
+      <button type="button" onclick="closeImagePreview()" class="absolute -top-10 right-0 text-white hover:text-tertiary flex items-center gap-1 text-xs font-bold cursor-pointer">
+        <span class="material-symbols-outlined text-[22px]">close</span> Đóng
+      </button>
+      <img id="lightbox-img" src="" alt="Chứng chỉ" class="max-w-full max-h-[80vh] rounded-xl object-contain shadow-2xl border border-white/20"/>
+      <p id="lightbox-caption" class="text-white text-xs mt-3 font-semibold text-center"></p>
+    </div>
+  </div>
+
   <script th:inline="javascript">
     function switchTutorTab(tab) {
       const tabs = ['pending', 'approved', 'rejected'];
@@ -294,6 +519,36 @@
           content.classList.add('hidden');
         }
       });
+    }
+
+    function openDetailModal(id) {
+      const modal = document.getElementById('modal-detail-' + id);
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeDetailModal(id) {
+      const modal = document.getElementById('modal-detail-' + id);
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function openRejectModal(id, tutorName) {
+      document.getElementById('reject-tutor-name').innerText = tutorName;
+      document.getElementById('reject-form').action = '/admin/tu-choi-gia-su/' + id;
+      document.getElementById('reject-modal').classList.remove('hidden');
+    }
+
+    function closeRejectModal() {
+      document.getElementById('reject-modal').classList.add('hidden');
+    }
+
+    function openImagePreview(url, caption) {
+      document.getElementById('lightbox-img').src = url;
+      document.getElementById('lightbox-caption').innerText = caption;
+      document.getElementById('image-lightbox').classList.remove('hidden');
+    }
+
+    function closeImagePreview() {
+      document.getElementById('image-lightbox').classList.add('hidden');
     }
   </script>
 </body>

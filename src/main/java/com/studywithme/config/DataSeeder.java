@@ -3,6 +3,8 @@ package com.studywithme.config;
 import com.studywithme.entity.*;
 import com.studywithme.entity.enums.admin.TrangThaiGiangVien;
 import com.studywithme.entity.enums.admin.TrangThaiKhoaHoc;
+import com.studywithme.entity.enums.admin.TrangThaiXacThuc;
+import com.studywithme.entity.enums.giaovien.LoaiChungChi;
 import com.studywithme.entity.enums.giaovien.TrinhDoKhoaHoc;
 import com.studywithme.entity.enums.shared.TrangThaiNguoiDung;
 import com.studywithme.entity.enums.shared.VaiTroName;
@@ -15,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -26,6 +30,7 @@ public class DataSeeder implements CommandLineRunner {
     private final VaiTroRepository vaiTroRepository;
     private final NguoiDungRepository nguoiDungRepository;
     private final HoSoGiangVienRepository hoSoGiangVienRepository;
+    private final ChungChiGiangVienRepository chungChiGiangVienRepository;
     private final BannerQuangCaoRepository bannerQuangCaoRepository;
     private final DonHangRepository donHangRepository;
     private final DanhMucRepository danhMucRepository;
@@ -377,37 +382,76 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void initGiangVienMau(VaiTro roleGiangVien) {
-        // 1. Thầy Hoàng Văn Nam (Toán)
-        taoGiangVienNeuChuaCo("tutor@studywithme.vn", "Tutor@123456", "Thầy Hoàng Văn Nam", "0912345678",
+        VaiTro roleHocVien = vaiTroRepository.findByTenVaiTro(VaiTroName.ROLE_HOC_VIEN).orElse(null);
+
+        // 1. Thầy Hoàng Văn Nam (Toán) - ĐÃ DUYỆT
+        HoSoGiangVien hsNam = taoGiangVienNeuChuaCo("tutor@studywithme.vn", "Tutor@123456", "Thầy Hoàng Văn Nam", "0912345678",
                 "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=400&auto=format&fit=crop&q=80",
                 "Thạc sĩ Sư Phạm Toán - 7 năm KN Luyện Thi",
                 "Tốt nghiệp thủ khoa ĐH Sư Phạm Hà Nội. Phương pháp giảng dạy trực quan, tư duy Casio và sơ đồ Mindmap.",
-                roleGiangVien);
+                "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                TrangThaiGiangVien.DA_DUYET, null, roleGiangVien);
+        taoChungChiNeuChuaCo(hsNam, LoaiChungChi.BANG_DAI_HOC, "Bằng Cử Nhân Sư Phạm Toán Học", "Thủ khoa Xuất sắc", "ĐH Sư Phạm Hà Nội", LocalDate.of(2018, 6, 25), "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800", TrangThaiXacThuc.DA_XAC_THUC);
 
-        // 2. Cô Mai Anh (Tiếng Anh / IELTS)
-        taoGiangVienNeuChuaCo("maianh@studywithme.vn", "Tutor@123456", "Cô Mai Anh", "0987112233",
+        // 2. Cô Mai Anh (Tiếng Anh / IELTS) - ĐÃ DUYỆT
+        HoSoGiangVien hsMaiAnh = taoGiangVienNeuChuaCo("maianh@studywithme.vn", "Tutor@123456", "Cô Mai Anh", "0987112233",
                 "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80",
                 "Thạc sĩ Ngôn ngữ - IELTS Overall 8.5",
                 "Giảng viên Hội đồng Anh với 6 năm kinh nghiệm, chuyên luyện Speaking & Writing band 7.0+ theo phương pháp phản xạ tự nhiên.",
-                roleGiangVien);
+                "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                TrangThaiGiangVien.DA_DUYET, null, roleGiangVien);
+        taoChungChiNeuChuaCo(hsMaiAnh, LoaiChungChi.IELTS, "IELTS Academic Test Report Form", "Band 8.5 Overall (L9.0, R9.0, W8.0, S8.0)", "British Council", LocalDate.of(2023, 4, 15), "https://images.unsplash.com/photo-1589330694653-dad6ef0140be?w=800", TrangThaiXacThuc.DA_XAC_THUC);
 
-        // 3. Thầy Vũ Minh Quân (Vật lý / KHTN)
+        // 3. Thầy Vũ Minh Quân (Vật lý / KHTN) - ĐÃ DUYỆT
         taoGiangVienNeuChuaCo("minhquan@studywithme.vn", "Tutor@123456", "Thầy Vũ Minh Quân", "0977223344",
                 "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80",
                 "Thủ khoa Bách Khoa - 5 năm Luyện thi KHTN & Vật Lý",
                 "Truyền cảm hứng học tập bằng thí nghiệm thực tế, nắm chắc bản chất vật lý 10-11-12 và mẹo giải trắc nghiệm 30s.",
-                roleGiangVien);
+                null, TrangThaiGiangVien.DA_DUYET, null, roleGiangVien);
 
-        // 4. Cô Nguyễn Thu Hà (Tiểu học / Toán tư duy)
+        // 4. Cô Nguyễn Thu Hà (Tiểu học / Toán tư duy) - ĐÃ DUYỆT
         taoGiangVienNeuChuaCo("thuha@studywithme.vn", "Tutor@123456", "Cô Nguyễn Thu Hà", "0966334455",
                 "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=400&auto=format&fit=crop&q=80",
                 "Cử nhân Sư phạm Tiểu học - Chuyên gia Toán Tư Duy",
                 "Đồng hành cùng học sinh lớp 1-5 phát triển tư duy logic, rèn nếp tự học sớm và tiếp cận Toán học qua hình ảnh sinh động.",
-                roleGiangVien);
+                null, TrangThaiGiangVien.DA_DUYET, null, roleGiangVien);
+
+        // 5. Ứng viên 1: Thầy Lê Quốc Bảo (Hóa Học) - ĐANG CHỜ DUYỆT (CHO_DUYET)
+        HoSoGiangVien hsBao = taoGiangVienNeuChuaCo("lebao.chem@studywithme.vn", "Tutor@123456", "Thầy Lê Quốc Bảo", "0934567890",
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80",
+                "Thạc Sĩ Hóa Học - 4 Năm Luyện Thi THPT & Chuyên Hóa",
+                "Tốt nghiệp Thạc sĩ ĐH Khoa học Tự nhiên. Có kinh nghiệm 4 năm bồi dưỡng học sinh giỏi Hóa cấp tỉnh và luyện thi THPT 9+. Mong muốn kết nối và mở các lớp kèm chuyên sâu.",
+                "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                TrangThaiGiangVien.CHO_DUYET, null, roleHocVien != null ? roleHocVien : roleGiangVien);
+        taoChungChiNeuChuaCo(hsBao, LoaiChungChi.BANG_DAI_HOC, "Bằng Cử Nhân Hóa Học Chính Quy", "Loại Giỏi", "ĐH Khoa Học Tự Nhiên - ĐHQG Hà Nội", LocalDate.of(2020, 7, 10), "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800", TrangThaiXacThuc.CHO_XAC_THUC);
+        taoChungChiNeuChuaCo(hsBao, LoaiChungChi.CHUNG_CHI_SU_PHAM, "Chứng Chỉ Nghiệp Vụ Sư Phạm Giảng Dạy", "Xuất sắc", "ĐH Sư Phạm Hà Nội", LocalDate.of(2021, 3, 20), "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800", TrangThaiXacThuc.CHO_XAC_THUC);
+
+        // 6. Ứng viên 2: Cô Trần Thị Thu Thảo (IELTS) - ĐANG CHỜ DUYỆT (CHO_DUYET)
+        HoSoGiangVien hsThao = taoGiangVienNeuChuaCo("thuthao.ielts@studywithme.vn", "Tutor@123456", "Cô Trần Thị Thu Thảo", "0945678901",
+                "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80",
+                "Cử Nhân Sư Phạm Anh - IELTS Overall 8.0",
+                "Chuyên luyện thi IELTS cấp tốc cho học sinh THPT chuẩn bị xét tuyển đại học. Tận tâm, lộ trình cá nhân hóa và phương pháp mở rộng từ vựng Collocation sinh động.",
+                "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                TrangThaiGiangVien.CHO_DUYET, null, roleHocVien != null ? roleHocVien : roleGiangVien);
+        taoChungChiNeuChuaCo(hsThao, LoaiChungChi.IELTS, "IELTS Academic Test Report Form", "Band 8.0 (L8.5, R8.5, W7.5, S7.5)", "IDP Education", LocalDate.of(2024, 2, 28), "https://images.unsplash.com/photo-1589330694653-dad6ef0140be?w=800", TrangThaiXacThuc.CHO_XAC_THUC);
+
+        // 7. Ứng viên 3: Đặng Đức Việt - BỊ TỪ CHỐI (TU_CHOI)
+        taoGiangVienNeuChuaCo("ducviet.math@studywithme.vn", "Tutor@123456", "Đặng Đức Việt", "0911223344",
+                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80",
+                "Sinh viên năm 3 ĐH Bách Khoa nhận dạy kèm Toán",
+                "Nhận dạy kèm Toán cấp 2 và cấp 3 online.",
+                null,
+                TrangThaiGiangVien.TU_CHOI,
+                "Hồ sơ chưa cung cấp đầy đủ bảng điểm/chứng chỉ sư phạm và chưa có video dạy thử demo theo tiêu chuẩn kiểm duyệt của StudyWithMe.",
+                roleHocVien != null ? roleHocVien : roleGiangVien);
+        
+        logger.info(">>> Đã khởi tạo danh sách giảng viên mẫu (4 đã duyệt, 2 chờ duyệt, 1 từ chối) thành công.");
     }
 
     private HoSoGiangVien taoGiangVienNeuChuaCo(String email, String matKhau, String hoTen, String soDienThoai,
-                                               String anhDaiDien, String tieuDe, String gioiThieu, VaiTro roleGiangVien) {
+                                               String anhDaiDien, String tieuDe, String gioiThieu,
+                                               String linkVideo, TrangThaiGiangVien trangThaiDuyet,
+                                               String lyDoTuChoi, VaiTro role) {
         NguoiDung user = nguoiDungRepository.findByEmail(email).orElseGet(() -> {
             NguoiDung u = NguoiDung.builder()
                     .email(email)
@@ -416,7 +460,7 @@ public class DataSeeder implements CommandLineRunner {
                     .soDienThoai(soDienThoai)
                     .anhDaiDien(anhDaiDien)
                     .trangThai(TrangThaiNguoiDung.HOAT_DONG)
-                    .danhSachVaiTro(Set.of(roleGiangVien))
+                    .danhSachVaiTro(role != null ? Set.of(role) : Set.of())
                     .build();
             return nguoiDungRepository.save(u);
         });
@@ -426,11 +470,36 @@ public class DataSeeder implements CommandLineRunner {
                     .nguoiDung(user)
                     .tieuDeChuyenMon(tieuDe)
                     .gioiThieuBanThan(gioiThieu)
-                    .trangThaiDuyet(TrangThaiGiangVien.DA_DUYET)
+                    .linkVideoDayThu(linkVideo)
+                    .trangThaiDuyet(trangThaiDuyet)
+                    .lyDoTuChoi(lyDoTuChoi)
                     .soDuVi(BigDecimal.ZERO)
+                    .tenNganHang("Techcombank")
+                    .soTaiKhoanNganHang("19036788990011")
+                    .tenChuTaiKhoan(hoTen.toUpperCase())
                     .build();
             return hoSoGiangVienRepository.save(hoSo);
         });
+    }
+
+    private void taoChungChiNeuChuaCo(HoSoGiangVien giangVien, LoaiChungChi loai, String ten, String diem,
+                                      String noiCap, LocalDate ngayCap, String linkAnh, TrangThaiXacThuc trangThai) {
+        if (giangVien == null || giangVien.getId() == null) return;
+        List<ChungChiGiangVien> list = chungChiGiangVienRepository.findByGiangVienId(giangVien.getId());
+        boolean exists = list.stream().anyMatch(c -> c.getTenChungChi().equalsIgnoreCase(ten));
+        if (!exists) {
+            ChungChiGiangVien cc = ChungChiGiangVien.builder()
+                    .giangVien(giangVien)
+                    .loaiChungChi(loai)
+                    .tenChungChi(ten)
+                    .diemSoHoacXepLoai(diem)
+                    .noiCap(noiCap)
+                    .ngayCap(ngayCap)
+                    .linkAnhChungChi(linkAnh)
+                    .trangThaiXacThuc(trangThai)
+                    .build();
+            chungChiGiangVienRepository.save(cc);
+        }
     }
 
     private void initKhoaHocMau() {

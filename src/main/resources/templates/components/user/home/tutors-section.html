@@ -31,7 +31,10 @@
             <div>
               <div class="flex items-start gap-4 mb-4">
                 <div class="relative shrink-0">
-                  <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center text-white text-xl font-bold ring-2 ring-primary-container/30"
+                  <div th:if="${tutor.nguoiDung != null and tutor.nguoiDung.anhDaiDien != null}" class="w-16 h-16 rounded-full overflow-hidden ring-2 ring-primary-container/30">
+                    <img th:src="${tutor.nguoiDung.anhDaiDien}" th:alt="${tutor.nguoiDung.hoTen}" class="w-full h-full object-cover"/>
+                  </div>
+                  <div th:unless="${tutor.nguoiDung != null and tutor.nguoiDung.anhDaiDien != null}" class="w-16 h-16 rounded-full bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center text-white text-xl font-bold ring-2 ring-primary-container/30"
                        th:text="${tutor.nguoiDung != null and tutor.nguoiDung.hoTen != null ? #strings.substring(tutor.nguoiDung.hoTen.trim(), 0, 1).toUpperCase() : 'GS'}">
                     GS
                   </div>

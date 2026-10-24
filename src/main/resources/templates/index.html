@@ -9,16 +9,22 @@
   <header th:replace="~{components/user/header :: main-header('home')}"></header>
 
   <main class="w-full pt-20 bg-background min-h-screen">
+    <!-- ==================== 1. HERO PROMOTION BANNER SLIDER (CMS) ==================== -->
+    <section th:replace="~{components/user/home/banner-slider :: banner-slider}"></section>
+
     <!-- ==================== 2. HERO & SMART FINDER ==================== -->
     <section th:replace="~{components/user/home/hero-section :: hero-section}"></section>
 
     <!-- ==================== 3. GRADE & PROGRAM QUICK SELECTOR ==================== -->
     <section th:replace="~{components/user/home/programs-section :: programs-section}"></section>
 
-    <!-- ==================== 4. TOP FEATURED TUTORS ==================== -->
+    <!-- ==================== 4. FEATURED & BEST SELLING COURSES ==================== -->
+    <section th:replace="~{components/user/home/courses-section :: courses-section}"></section>
+
+    <!-- ==================== 5. TOP FEATURED TUTORS ==================== -->
     <section th:replace="~{components/user/home/tutors-section :: tutors-section}"></section>
 
-    <!-- ==================== 5. WHY STUDYWITHME ==================== -->
+    <!-- ==================== 6. WHY STUDYWITHME ==================== -->
     <section th:replace="~{components/user/home/why-us-section :: why-us-section}"></section>
   </main>
 

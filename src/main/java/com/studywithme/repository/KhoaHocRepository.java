@@ -4,6 +4,7 @@ import com.studywithme.entity.KhoaHoc;
 import com.studywithme.entity.enums.admin.TrangThaiKhoaHoc;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,10 +15,13 @@ import java.util.Optional;
 
 @Repository
 public interface KhoaHocRepository extends JpaRepository<KhoaHoc, Long> {
+    @EntityGraph(attributePaths = {"giangVien", "giangVien.nguoiDung", "danhMuc"})
     Optional<KhoaHoc> findByDuongDanSlug(String duongDanSlug);
     boolean existsByDuongDanSlug(String duongDanSlug);
 
     List<KhoaHoc> findByGiangVienId(Long giangVienId);
+
+    @EntityGraph(attributePaths = {"giangVien", "giangVien.nguoiDung", "danhMuc"})
     Page<KhoaHoc> findByTrangThai(TrangThaiKhoaHoc trangThai, Pageable pageable);
 
     @Query("SELECT k FROM KhoaHoc k WHERE k.trangThai = 'DA_XUAT_BAN' " +
@@ -28,7 +32,11 @@ public interface KhoaHocRepository extends JpaRepository<KhoaHoc, Long> {
                                  Pageable pageable);
 
     long countByTrangThai(TrangThaiKhoaHoc trangThai);
+
+    @EntityGraph(attributePaths = {"giangVien", "giangVien.nguoiDung", "danhMuc"})
     List<KhoaHoc> findTop8ByTrangThaiOrderByTongSoHocVienDesc(TrangThaiKhoaHoc trangThai);
+
+    @EntityGraph(attributePaths = {"giangVien", "giangVien.nguoiDung", "danhMuc"})
     List<KhoaHoc> findTop5ByOrderByTongSoHocVienDesc();
     boolean existsByDanhMucId(Long danhMucId);
     long countByDanhMucId(Long danhMucId);

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <!-- ==================== FEATURED & TOP SELLING COURSES SECTION ==================== -->
+  <section th:fragment="courses-section" class="py-space-xl bg-surface-canvas relative" id="khoa-hoc-noi-bat">
+    <div class="max-w-7xl mx-auto px-6 lg:px-margin-desktop">
+      
+      <!-- Section Header -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent-cyan-subtle text-primary font-label-md text-label-md mb-2">
+            <span class="material-symbols-outlined text-[16px]">local_fire_department</span>
+            <span>KHÓA HỌC BẢN QUYỀN HOT NHẤT</span>
+          </div>
+          <h2 class="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
+            Khóa Học Video Bán Chạy Nhất Tuần Này
+          </h2>
+          <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mt-1">
+            Học tập chủ động mọi lúc mọi nơi cùng giáo trình chuẩn mực, hỗ trợ giải đáp bài tập 1-1 và có sẵn video học thử miễn phí.
+          </p>
+        </div>
+
+        <!-- Filter Category Tabs -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-2 md:pb-0 scrollbar-none shrink-0" id="course-filter-bar">
+          <button type="button" onclick="locKhoaHoc('all', this)"
+                  class="course-filter-btn px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer bg-primary text-on-primary shadow-xs">
+            Tất Cả
+          </button>
+          <button type="button" onclick="locKhoaHoc('CAP_3', this)"
+                  class="course-filter-btn px-4 py-2 rounded-full text-xs font-medium text-on-surface-variant bg-surface-container-low hover:bg-surface-container hover:text-on-surface transition-all cursor-pointer">
+            Lớp 10 - 12 (THPT)
+          </button>
+          <button type="button" onclick="locKhoaHoc('CAP_2', this)"
+                  class="course-filter-btn px-4 py-2 rounded-full text-xs font-medium text-on-surface-variant bg-surface-container-low hover:bg-surface-container hover:text-on-surface transition-all cursor-pointer">
+            Lớp 6 - 9 (THCS)
+          </button>
+          <button type="button" onclick="locKhoaHoc('CAP_1', this)"
+                  class="course-filter-btn px-4 py-2 rounded-full text-xs font-medium text-on-surface-variant bg-surface-container-low hover:bg-surface-container hover:text-on-surface transition-all cursor-pointer">
+            Tiểu Học (Lớp 1 - 5)
+          </button>
+          <button type="button" onclick="locKhoaHoc('IELTS,TOEIC', this)"
+                  class="course-filter-btn px-4 py-2 rounded-full text-xs font-medium text-on-surface-variant bg-surface-container-low hover:bg-surface-container hover:text-on-surface transition-all cursor-pointer">
+            IELTS &amp; TOEIC
+          </button>
+        </div>
+      </div>
+
+      <!-- Courses Grid Container -->
+      <div th:if="${!#lists.isEmpty(featuredCourses)}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="courses-grid">
+        
+        <!-- Individual Course Card -->
+        <div th:each="course : ${featuredCourses}"
+             th:attr="data-category=${course.thePhanLoai}"
+             class="course-card group bg-surface-container-lowest rounded-2xl p-4 shadow-sm hover:shadow-xl border border-surface-container flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
+          
+          <div>
+            <!-- Thumbnail Box with Tags -->
+            <div class="relative w-full aspect-video rounded-xl overflow-hidden mb-3 bg-surface-container-low">
+              <img th:src="${course.anhDaiDienKhoaHoc ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80'}"
+                   th:alt="${course.tieuDe}"
+                   class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"/>
+              
+              <!-- Badge Cấp / Chứng chỉ (Top Left) -->
+              <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold shadow-xs backdrop-blur-md"
+                    th:classappend="${course.thePhanLoai == 'IELTS' or course.thePhanLoai == 'TOEIC'} ? 'bg-accent-coral-subtle text-tertiary-container' : 'bg-surface-container-lowest/90 text-primary'"
+                    th:text="${course.thePhanLoai == 'CAP_3' ? 'THPT' : (course.thePhanLoai == 'CAP_2' ? 'THCS' : (course.thePhanLoai == 'CAP_1' ? 'Tiểu Học' : course.thePhanLoai))}">
+                THPT
+              </span>
+
+              <!-- Badge Giảm giá (Top Right) -->
+              <span th:if="${course.giaKhuyenMai != null and course.giaKhuyenMai < course.giaGoc}"
+                    class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md bg-tertiary-container text-white text-[11px] font-black shadow-xs">
+                -<span th:text="${#numbers.formatDecimal((1 - (course.giaKhuyenMai / course.giaGoc)) * 100, 0, 'NONE', 0, 'NONE')}">30</span>%
+              </span>
+
+              <!-- Trial Lesson Indicator (Bottom Right) -->
+              <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-slate-950/70 backdrop-blur-md text-white text-[10px] font-semibold flex items-center gap-1">
+                <span class="material-symbols-outlined text-[13px] text-status-success">play_circle</span>
+                Học thử miễn phí
+              </span>
+            </div>
+
+            <!-- Category & Rating -->
+            <div class="flex items-center justify-between gap-2 text-xs mb-1.5">
+              <span class="text-secondary font-semibold truncate"
+                    th:text="${course.danhMuc != null ? course.danhMuc.tenDanhMuc : 'Khóa học tiêu chuẩn'}">
+                Toán Học
+              </span>
+              <div class="flex items-center text-status-warning shrink-0">
+                <span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="font-bold text-on-surface ml-0.5" th:text="${course.diemDanhGiaTrungBinh}">4.9</span>
+                <span class="text-on-surface-variant text-[11px] ml-0.5">(<span th:text="${course.tongSoDanhGia}">120</span>)</span>
+              </div>
+            </div>
+
+            <!-- Course Title -->
+            <h3 class="font-bold text-sm text-on-surface group-hover:text-primary transition-colors line-clamp-2 leading-snug mb-3"
+                th:title="${course.tieuDe}"
+                th:text="${course.tieuDe}">
+              Chinh phục điểm 9+ môn Toán THPT Quốc Gia
+            </h3>
+
+            <!-- Tutor Info -->
+            <div class="flex items-center gap-2 mb-3 pt-2 border-t border-surface-container/60">
+              <div class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[11px] shrink-0">
+                <span th:text="${course.giangVien != null and course.giangVien.nguoiDung != null and course.giangVien.nguoiDung.hoTen != null ? #strings.substring(course.giangVien.nguoiDung.hoTen.trim(), 0, 1) : 'G'}">G</span>
+              </div>
+              <span class="text-xs text-on-surface-variant font-medium truncate"
+                    th:text="${course.giangVien != null and course.giangVien.nguoiDung != null ? course.giangVien.nguoiDung.hoTen : 'Gia sư StudyWithMe'}">
+                Thầy Hoàng Văn Nam
+              </span>
+              <span class="material-symbols-outlined text-primary text-[14px] shrink-0" title="Giảng viên đã kiểm duyệt">verified</span>
+            </div>
+          </div>
+
+          <!-- Bottom Card: Stats & Pricing -->
+          <div class="pt-2 border-t border-surface-container/60">
+            <!-- Student Count -->
+            <div class="flex items-center justify-between text-xs text-on-surface-variant mb-2">
+              <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-[15px] text-outline">group</span>
+                <span th:text="${#numbers.formatDecimal(course.tongSoHocVien, 0, 'COMMA', 0, 'POINT')} + ' học viên'">1,240 học viên</span>
+              </span>
+              <span class="text-[11px] text-status-success font-semibold">Tự học 24/7</span>
+            </div>
+
+            <!-- Price & Action Button -->
+            <div class="flex items-end justify-between gap-2 mt-1">
+              <div class="flex flex-col">
+                <span th:if="${course.giaKhuyenMai != null and course.giaKhuyenMai < course.giaGoc}"
+                      class="text-[11px] text-outline line-through"
+                      th:text="${#numbers.formatDecimal(course.giaGoc, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                  1.500.000 đ
+                </span>
+                <span class="text-base font-extrabold text-tertiary-container tracking-tight"
+                      th:text="${#numbers.formatDecimal(course.giaKhuyenMai ?: course.giaGoc, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                  899.000 đ
+                </span>
+              </div>
+
+              <!-- CTA Button -->
+              <a th:href="@{/login}"
+                 class="px-3.5 py-1.5 rounded-lg bg-surface-container-low hover:bg-primary hover:text-white text-primary text-xs font-bold transition-all flex items-center gap-1 shadow-xs cursor-pointer">
+                <span>Xem Khóa</span>
+                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Empty State Fallback -->
+      <div th:if="${#lists.isEmpty(featuredCourses)}" class="p-12 text-center bg-surface-container-low/40 rounded-2xl border border-dashed border-surface-container">
+        <span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">school</span>
+        <p class="text-base font-bold text-on-surface">Khóa học đang được cập nhật</p>
+        <p class="text-xs text-on-surface-variant mt-1">Các khóa học chất lượng cao đang được ban chuyên môn thẩm định và phát hành sớm.</p>
+      </div>
+
+      <!-- Bottom View All Button -->
+      <div class="mt-10 text-center">
+        <a href="#tim-gia-su" 
+           class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-surface-container-lowest hover:bg-surface-container border border-surface-container text-on-surface font-label-lg text-label-lg font-bold shadow-sm transition-all transform hover:-translate-y-0.5">
+          <span>Khám Phá Tất Cả Chương Trình &amp; Khóa Học</span>
+          <span class="material-symbols-outlined text-[18px]">east</span>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Client Script for Category Filter -->
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      function locKhoaHoc(category, clickedBtn) {
+        // 1. Update active button styles
+        const buttons = document.querySelectorAll('.course-filter-btn');
+        buttons.forEach(btn => {
+          btn.className = 'course-filter-btn px-4 py-2 rounded-full text-xs font-medium text-on-surface-variant bg-surface-container-low hover:bg-surface-container hover:text-on-surface transition-all cursor-pointer';
+        });
+        clickedBtn.className = 'course-filter-btn px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer bg-primary text-on-primary shadow-xs';
+
+        // 2. Filter Cards
+        const cards = document.querySelectorAll('.course-card');
+        const allowed = category.split(',');
+
+        cards.forEach(card => {
+          const cardCat = card.getAttribute('data-category');
+          if (category === 'all' || allowed.includes(cardCat)) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+      /*]]>*/
+    </script>
+  </section>
+</body>
+</html>

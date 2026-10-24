@@ -44,6 +44,13 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	classpath = files(classpath.files.collect { File f ->
+		file(f.absolutePath.replace('\u0111atn', 'datn'))
+	})
+	workingDir = file(workingDir.absolutePath.replace('\u0111atn', 'datn'))
+	jvmArgs = [
+		"-Djava.library.path=" + file('.').absolutePath.replace('\u0111atn', 'datn')
+	]
 }
 
 tasks.named('bootRun') {

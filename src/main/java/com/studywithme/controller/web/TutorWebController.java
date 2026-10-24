@@ -2,10 +2,12 @@ package com.studywithme.controller.web;
 
 import com.studywithme.entity.DangKyLopHoc;
 import com.studywithme.entity.HoSoGiangVien;
+import com.studywithme.entity.LichSuViTien;
 import com.studywithme.entity.LopHocTrucTuyen;
 import com.studywithme.entity.NguoiDung;
 import com.studywithme.repository.DangKyLopHocRepository;
 import com.studywithme.repository.HoSoGiangVienRepository;
+import com.studywithme.repository.LichSuViTienRepository;
 import com.studywithme.repository.LopHocTrucTuyenRepository;
 import com.studywithme.repository.NguoiDungRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +36,7 @@ public class TutorWebController {
     private final HoSoGiangVienRepository hoSoGiangVienRepository;
     private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
     private final DangKyLopHocRepository dangKyLopHocRepository;
-    private final com.studywithme.repository.LichSuViTienRepository lichSuViTienRepository;
+    private final LichSuViTienRepository lichSuViTienRepository;
 
     private Optional<HoSoGiangVien> getHoSoByPrincipal(Principal principal) {
         if (principal == null) return Optional.empty();
@@ -128,12 +130,12 @@ public class TutorWebController {
     @GetMapping("/vi-tien")
     public String wallet(Model model, Principal principal) {
         Optional<HoSoGiangVien> hoSoOpt = getHoSoByPrincipal(principal);
-        List<com.studywithme.entity.LichSuViTien> danhSachGiaoDich = hoSoOpt
+        List<LichSuViTien> danhSachGiaoDich = hoSoOpt
                 .map(hoSo -> lichSuViTienRepository.findByGiangVienIdOrderByNgayTaoDesc(hoSo.getId()))
                 .orElse(new ArrayList<>());
 
         BigDecimal tongThuNhap = danhSachGiaoDich.stream()
-                .map(com.studywithme.entity.LichSuViTien::getSoTienBienDong)
+                .map(LichSuViTien::getSoTienBienDong)
                 .filter(tien -> tien != null && tien.compareTo(BigDecimal.ZERO) > 0)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 

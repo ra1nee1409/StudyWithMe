@@ -1,12 +1,12 @@
 package com.studywithme.config;
 
-import com.studywithme.entity.NguoiDung;
-import com.studywithme.entity.VaiTro;
+import com.studywithme.entity.*;
+import com.studywithme.entity.enums.admin.TrangThaiGiangVien;
+import com.studywithme.entity.enums.admin.TrangThaiKhoaHoc;
+import com.studywithme.entity.enums.giaovien.TrinhDoKhoaHoc;
 import com.studywithme.entity.enums.shared.TrangThaiNguoiDung;
 import com.studywithme.entity.enums.shared.VaiTroName;
-import com.studywithme.repository.HoSoGiangVienRepository;
-import com.studywithme.repository.NguoiDungRepository;
-import com.studywithme.repository.VaiTroRepository;
+import com.studywithme.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +14,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Component
@@ -25,9 +26,12 @@ public class DataSeeder implements CommandLineRunner {
     private final VaiTroRepository vaiTroRepository;
     private final NguoiDungRepository nguoiDungRepository;
     private final HoSoGiangVienRepository hoSoGiangVienRepository;
-    private final com.studywithme.repository.BannerQuangCaoRepository bannerQuangCaoRepository;
-    private final com.studywithme.repository.DonHangRepository donHangRepository;
-    private final com.studywithme.repository.DanhMucRepository danhMucRepository;
+    private final BannerQuangCaoRepository bannerQuangCaoRepository;
+    private final DonHangRepository donHangRepository;
+    private final DanhMucRepository danhMucRepository;
+    private final KhoaHocRepository khoaHocRepository;
+    private final ChuongHocRepository chuongHocRepository;
+    private final BaiHocRepository baiHocRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -54,30 +58,7 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         // 3. Khởi tạo tài khoản Giảng viên mẫu
-        String tutorEmail = "tutor@studywithme.vn";
-        if (!nguoiDungRepository.existsByEmail(tutorEmail)) {
-            NguoiDung tutor = NguoiDung.builder()
-                    .email(tutorEmail)
-                    .matKhau(passwordEncoder.encode("Tutor@123456"))
-                    .hoTen("Thầy Hoàng Văn Nam")
-                    .soDienThoai("0912345678")
-                    .trangThai(TrangThaiNguoiDung.HOAT_DONG)
-                    .danhSachVaiTro(Set.of(roleGiangVien))
-                    .build();
-
-            NguoiDung savedTutor = nguoiDungRepository.save(tutor);
-
-            com.studywithme.entity.HoSoGiangVien hoSo = com.studywithme.entity.HoSoGiangVien.builder()
-                    .nguoiDung(savedTutor)
-                    .tieuDeChuyenMon("Thạc sĩ Sư Phạm Toán - 7 năm KN Luyện Thi")
-                    .gioiThieuBanThan("Tốt nghiệp thủ khoa ĐH Sư Phạm Hà Nội. Phương pháp giảng dạy trực quan, tư duy Casio và sơ đồ Mindmap.")
-                    .trangThaiDuyet(com.studywithme.entity.enums.admin.TrangThaiGiangVien.DA_DUYET)
-                    .soDuVi(java.math.BigDecimal.ZERO)
-                    .build();
-
-            hoSoGiangVienRepository.save(hoSo);
-            logger.info(">>> Đã khởi tạo tài khoản Giảng viên mẫu: {} / Tutor@123456", tutorEmail);
-        }
+        initGiangVienMau(roleGiangVien);
 
         // 4. Khởi tạo tài khoản Học sinh mẫu
         String studentEmail = "student@studywithme.vn";
@@ -160,6 +141,11 @@ public class DataSeeder implements CommandLineRunner {
         // 7. Khởi tạo cây danh mục chuẩn (Tiểu học, THCS, THPT, Ngoại ngữ) nếu chưa có danh mục nào
         if (danhMucRepository.count() == 0) {
             initDanhMucChuan();
+        }
+
+        // 8. Khởi tạo 8 khóa học mẫu nổi bật nếu chưa có khóa học nào
+        if (khoaHocRepository.count() == 0) {
+            initKhoaHocMau();
         }
     }
 
@@ -388,6 +374,198 @@ public class DataSeeder implements CommandLineRunner {
         ));
 
         logger.info(">>> Đã khởi tạo cấu trúc cây danh mục môn học & cấp học chuẩn thành công.");
+    }
+
+    private void initGiangVienMau(VaiTro roleGiangVien) {
+        // 1. Thầy Hoàng Văn Nam (Toán)
+        taoGiangVienNeuChuaCo("tutor@studywithme.vn", "Tutor@123456", "Thầy Hoàng Văn Nam", "0912345678",
+                "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=400&auto=format&fit=crop&q=80",
+                "Thạc sĩ Sư Phạm Toán - 7 năm KN Luyện Thi",
+                "Tốt nghiệp thủ khoa ĐH Sư Phạm Hà Nội. Phương pháp giảng dạy trực quan, tư duy Casio và sơ đồ Mindmap.",
+                roleGiangVien);
+
+        // 2. Cô Mai Anh (Tiếng Anh / IELTS)
+        taoGiangVienNeuChuaCo("maianh@studywithme.vn", "Tutor@123456", "Cô Mai Anh", "0987112233",
+                "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80",
+                "Thạc sĩ Ngôn ngữ - IELTS Overall 8.5",
+                "Giảng viên Hội đồng Anh với 6 năm kinh nghiệm, chuyên luyện Speaking & Writing band 7.0+ theo phương pháp phản xạ tự nhiên.",
+                roleGiangVien);
+
+        // 3. Thầy Vũ Minh Quân (Vật lý / KHTN)
+        taoGiangVienNeuChuaCo("minhquan@studywithme.vn", "Tutor@123456", "Thầy Vũ Minh Quân", "0977223344",
+                "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80",
+                "Thủ khoa Bách Khoa - 5 năm Luyện thi KHTN & Vật Lý",
+                "Truyền cảm hứng học tập bằng thí nghiệm thực tế, nắm chắc bản chất vật lý 10-11-12 và mẹo giải trắc nghiệm 30s.",
+                roleGiangVien);
+
+        // 4. Cô Nguyễn Thu Hà (Tiểu học / Toán tư duy)
+        taoGiangVienNeuChuaCo("thuha@studywithme.vn", "Tutor@123456", "Cô Nguyễn Thu Hà", "0966334455",
+                "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=400&auto=format&fit=crop&q=80",
+                "Cử nhân Sư phạm Tiểu học - Chuyên gia Toán Tư Duy",
+                "Đồng hành cùng học sinh lớp 1-5 phát triển tư duy logic, rèn nếp tự học sớm và tiếp cận Toán học qua hình ảnh sinh động.",
+                roleGiangVien);
+    }
+
+    private HoSoGiangVien taoGiangVienNeuChuaCo(String email, String matKhau, String hoTen, String soDienThoai,
+                                               String anhDaiDien, String tieuDe, String gioiThieu, VaiTro roleGiangVien) {
+        NguoiDung user = nguoiDungRepository.findByEmail(email).orElseGet(() -> {
+            NguoiDung u = NguoiDung.builder()
+                    .email(email)
+                    .matKhau(passwordEncoder.encode(matKhau))
+                    .hoTen(hoTen)
+                    .soDienThoai(soDienThoai)
+                    .anhDaiDien(anhDaiDien)
+                    .trangThai(TrangThaiNguoiDung.HOAT_DONG)
+                    .danhSachVaiTro(Set.of(roleGiangVien))
+                    .build();
+            return nguoiDungRepository.save(u);
+        });
+
+        return hoSoGiangVienRepository.findByNguoiDungId(user.getId()).orElseGet(() -> {
+            HoSoGiangVien hoSo = HoSoGiangVien.builder()
+                    .nguoiDung(user)
+                    .tieuDeChuyenMon(tieuDe)
+                    .gioiThieuBanThan(gioiThieu)
+                    .trangThaiDuyet(TrangThaiGiangVien.DA_DUYET)
+                    .soDuVi(BigDecimal.ZERO)
+                    .build();
+            return hoSoGiangVienRepository.save(hoSo);
+        });
+    }
+
+    private void initKhoaHocMau() {
+        HoSoGiangVien gvNam = hoSoGiangVienRepository.findByNguoiDungId(nguoiDungRepository.findByEmail("tutor@studywithme.vn").map(NguoiDung::getId).orElse(null)).orElse(null);
+        HoSoGiangVien gvMaiAnh = hoSoGiangVienRepository.findByNguoiDungId(nguoiDungRepository.findByEmail("maianh@studywithme.vn").map(NguoiDung::getId).orElse(null)).orElse(gvNam);
+        HoSoGiangVien gvQuan = hoSoGiangVienRepository.findByNguoiDungId(nguoiDungRepository.findByEmail("minhquan@studywithme.vn").map(NguoiDung::getId).orElse(null)).orElse(gvNam);
+        HoSoGiangVien gvHa = hoSoGiangVienRepository.findByNguoiDungId(nguoiDungRepository.findByEmail("thuha@studywithme.vn").map(NguoiDung::getId).orElse(null)).orElse(gvNam);
+
+        if (gvNam == null) return;
+
+        DanhMuc dmToanThpt = danhMucRepository.findByDuongDanSlug("toan-thpt").orElse(null);
+        DanhMuc dmIelts = danhMucRepository.findByDuongDanSlug("ielts-academic").orElse(null);
+        DanhMuc dmVatLy = danhMucRepository.findByDuongDanSlug("vat-ly-10-12").orElse(null);
+        DanhMuc dmVao10 = danhMucRepository.findByDuongDanSlug("luyen-thi-vao-10-chuyen").orElse(null);
+        DanhMuc dmToeic = danhMucRepository.findByDuongDanSlug("toeic-4-ky-nang").orElse(null);
+        DanhMuc dmToanTieuHoc = danhMucRepository.findByDuongDanSlug("toan-tieu-hoc").orElse(null);
+        DanhMuc dmKhtn = danhMucRepository.findByDuongDanSlug("khoa-hoc-tu-nhien").orElse(null);
+        DanhMuc dmGiaoTiep = danhMucRepository.findByDuongDanSlug("tieng-anh-giao-tiep").orElse(null);
+
+        // Khóa 1: Toán 12
+        taoKhoaHoc("Chinh Phục Điểm 9+ Môn Toán THPT Quốc Gia",
+                "chinh-phuc-diem-9-mon-toan-thpt",
+                "Khoá học toàn diện bám sát cấu trúc đề thi tốt nghiệp THPT Quốc Gia. Tổng hợp đầy đủ lý thuyết, phân dạng bài tập từ 7+ lên 9+, kỹ năng bấm máy Casio siêu nhanh và các chuyên đề Hình học không gian, Hàm số, Tích phân.",
+                "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&auto=format&fit=crop&q=80",
+                new BigDecimal("1500000"), new BigDecimal("899000"), "CAP_3", 1240, new BigDecimal("4.95"), 158,
+                gvNam, dmToanThpt);
+
+        // Khóa 2: IELTS 7.0+
+        taoKhoaHoc("Bứt Phá IELTS Academic 7.0+ 4 Kỹ Năng Toàn Diện",
+                "but-pha-ielts-academic-7-0-toan-dien",
+                "Lộ trình tinh gọn dành cho học viên mục tiêu band 7.0+ IELTS. Nâng cấp từ vựng C1-C2, chiến thuật Writing Task 1 & 2 logic, phản xạ Speaking tự nhiên với giảng viên 8.5 Overall.",
+                "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&auto=format&fit=crop&q=80",
+                new BigDecimal("2400000"), new BigDecimal("1650000"), "IELTS", 980, new BigDecimal("5.00"), 192,
+                gvMaiAnh, dmIelts);
+
+        // Khóa 3: Vật Lý 12
+        taoKhoaHoc("Lấy Gốc & Nâng Cao Vật Lý 12 - Ôn Thi Cực Nhanh",
+                "lay-goc-nang-cao-vat-ly-12",
+                "Phương pháp tư duy trực quan đồ thị và thí nghiệm ảo. Giải quyết triệt để các câu hỏi phân loại Dao động cơ, Sóng cơ và Dòng điện xoay chiều một cách dễ hiểu nhất.",
+                "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&auto=format&fit=crop&q=80",
+                new BigDecimal("1200000"), new BigDecimal("699000"), "CAP_3", 820, new BigDecimal("4.88"), 95,
+                gvQuan, dmVatLy);
+
+        // Khóa 4: Toán vào 10
+        taoKhoaHoc("Chiến Thuật Luyện Thi Vào 10 Môn Toán Điểm Cao",
+                "chien-thuat-luyen-thi-vao-10-mon-toan",
+                "Bí quyết làm chủ đề thi tuyển sinh lớp 10 các tỉnh thành và trường chuyên. Rèn luyện kỹ năng trình bày chặt chẽ, tối ưu hóa điểm số phần Hình học và Bất đẳng thức.",
+                "https://images.unsplash.com/photo-1596495578065-6e0763fa1178?w=800&auto=format&fit=crop&q=80",
+                new BigDecimal("1100000"), new BigDecimal("599000"), "CAP_2", 750, new BigDecimal("4.92"), 84,
+                gvNam, dmVao10);
+
+        // Khóa 5: TOEIC 750+
+        taoKhoaHoc("Luyện Thi TOEIC Cấp Tốc 750+ Dành Cho Sinh Viên",
+                "luyen-thi-toeic-cap-toc-750",
+                "Bộ mẹo tránh bẫy đề thi TOEIC mới nhất Format ETS. Nâng cao tốc độ Part 5-6-7, rèn tai nghe bắt từ khóa Part 3-4 để bứt phá mục tiêu chuẩn đầu ra đại học trong 2 tháng.",
+                "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&auto=format&fit=crop&q=80",
+                new BigDecimal("1300000"), new BigDecimal("750000"), "TOEIC", 690, new BigDecimal("4.85"), 73,
+                gvMaiAnh, dmToeic);
+
+        // Khóa 6: Toán tư duy 4-5
+        taoKhoaHoc("Toán Tư Duy & Giải Quyết Vấn Đề Lớp 4 - Lớp 5",
+                "toan-tu-duy-giai-quyet-van-de-lop-4-5",
+                "Giúp học sinh tiểu học khơi gợi niềm đam mê Toán học qua sơ đồ tư duy, các câu đố logic Singapore, chuẩn bị vững chắc kiến thức chuyển cấp lên THCS và thi CLC.",
+                "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&auto=format&fit=crop&q=80",
+                new BigDecimal("950000"), new BigDecimal("499000"), "CAP_1", 560, new BigDecimal("4.96"), 67,
+                gvHa, dmToanTieuHoc);
+
+        // Khóa 7: KHTN lớp 9
+        taoKhoaHoc("Khoa Học Tự Nhiên Lớp 9 - Trọn Bộ Lý, Hóa, Sinh",
+                "khoa-hoc-tu-nhien-lop-9-tron-bo",
+                "Bám sát bộ sách giáo khoa mới (Kết nối tri thức, Cánh diều). Tóm lược lý thuyết cốt lõi kèm chuỗi video thí nghiệm sống động giúp học sinh hiểu sâu nhớ lâu.",
+                "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=800&auto=format&fit=crop&q=80",
+                new BigDecimal("1000000"), new BigDecimal("550000"), "CAP_2", 480, new BigDecimal("4.89"), 52,
+                gvQuan, dmKhtn);
+
+        // Khóa 8: Tiếng Anh giao tiếp
+        taoKhoaHoc("Tiếng Anh Giao Tiếp Thực Chiến Cho Người Mất Gốc",
+                "tieng-anh-giao-tiep-thuc-chien-cho-nguoi-mat-goc",
+                "Chuẩn hóa phát âm IPA từ con số 0. Tự tin giao tiếp các chủ đề đời sống và công sở chỉ sau 60 ngày với các tình huống đóng vai thực tế.",
+                "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80",
+                new BigDecimal("1200000"), new BigDecimal("650000"), "IELTS", 430, new BigDecimal("4.91"), 46,
+                gvMaiAnh, dmGiaoTiep);
+
+        logger.info(">>> Đã khởi tạo 8 khóa học mẫu nổi bật thành công.");
+    }
+
+    private void taoKhoaHoc(String tieuDe, String slug, String moTa, String anhDaiDien,
+                            BigDecimal giaGoc, BigDecimal giaKhuyenMai, String thePhanLoai,
+                            int soHocVien, BigDecimal diemTb, int soDanhGia,
+                            HoSoGiangVien giangVien, DanhMuc danhMuc) {
+        if (danhMuc == null || giangVien == null) return;
+        if (khoaHocRepository.existsByDuongDanSlug(slug)) return;
+
+        KhoaHoc kh = KhoaHoc.builder()
+                .tieuDe(tieuDe)
+                .duongDanSlug(slug)
+                .moTaChiTiet(moTa)
+                .anhDaiDienKhoaHoc(anhDaiDien)
+                .giaGoc(giaGoc)
+                .giaKhuyenMai(giaKhuyenMai)
+                .thePhanLoai(thePhanLoai)
+                .trinhDo(TrinhDoKhoaHoc.MOI_TRINH_DO)
+                .trangThai(TrangThaiKhoaHoc.DA_XUAT_BAN)
+                .tongSoHocVien(soHocVien)
+                .diemDanhGiaTrungBinh(diemTb)
+                .tongSoDanhGia(soDanhGia)
+                .giangVien(giangVien)
+                .danhMuc(danhMuc)
+                .build();
+        KhoaHoc savedKh = khoaHocRepository.save(kh);
+
+        // Tạo 1 chương và 2 bài học (có bài học thử)
+        ChuongHoc c1 = chuongHocRepository.save(ChuongHoc.builder()
+                .khoaHoc(savedKh)
+                .tieuDeChuong("Chương 1: Giới thiệu & Lộ trình học tập")
+                .thuTuSapXep(1)
+                .build());
+
+        baiHocRepository.save(BaiHoc.builder()
+                .chuongHoc(c1)
+                .tieuDeBaiHoc("Bài 1: Giới thiệu khóa học & Phương pháp học hiệu quả")
+                .linkVideo("https://www.youtube.com/embed/dQw4w9WgXcQ")
+                .thoiLuongGiay(600)
+                .choPhepHocThu(true)
+                .thuTuSapXep(1)
+                .build());
+
+        baiHocRepository.save(BaiHoc.builder()
+                .chuongHoc(c1)
+                .tieuDeBaiHoc("Bài 2: Đánh giá năng lực đầu vào & Kế hoạch ôn tập")
+                .linkVideo("https://www.youtube.com/embed/dQw4w9WgXcQ")
+                .thoiLuongGiay(900)
+                .choPhepHocThu(true)
+                .thuTuSapXep(2)
+                .build());
     }
 
     private VaiTro initRole(VaiTroName vaiTroName, String moTa) {

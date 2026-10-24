@@ -63,4 +63,84 @@ public class NguoiDung {
     @UpdateTimestamp
     @Column(name = "ngay_cap_nhat", nullable = false)
     private LocalDateTime ngayCapNhat;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getMatKhau() {
+        return matKhau;
+    }
+
+    public void setMatKhau(String matKhau) {
+        this.matKhau = matKhau;
+    }
+
+    public String getHoTen() {
+        return hoTen;
+    }
+
+    public void setHoTen(String hoTen) {
+        this.hoTen = hoTen;
+    }
+
+    public String getSoDienThoai() {
+        return soDienThoai;
+    }
+
+    public void setSoDienThoai(String soDienThoai) {
+        this.soDienThoai = soDienThoai;
+    }
+
+    public String getAnhDaiDien() {
+        return anhDaiDien;
+    }
+
+    public void setAnhDaiDien(String anhDaiDien) {
+        this.anhDaiDien = anhDaiDien;
+    }
+
+    public TrangThaiNguoiDung getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(TrangThaiNguoiDung trangThai) {
+        this.trangThai = trangThai;
+    }
+
+    public Set<VaiTro> getDanhSachVaiTro() {
+        return danhSachVaiTro;
+    }
+
+    public void setDanhSachVaiTro(Set<VaiTro> danhSachVaiTro) {
+        this.danhSachVaiTro = danhSachVaiTro;
+    }
+
+    public LocalDateTime getNgayTao() {
+        return ngayTao;
+    }
+
+    public void setNgayTao(LocalDateTime ngayTao) {
+        this.ngayTao = ngayTao;
+    }
+
+    public LocalDateTime getNgayCapNhat() {
+        return ngayCapNhat;
+    }
+
+    public void setNgayCapNhat(LocalDateTime ngayCapNhat) {
+        this.ngayCapNhat = ngayCapNhat;
+    }
 }

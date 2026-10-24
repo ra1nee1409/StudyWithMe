@@ -1,5 +1,6 @@
 package com.studywithme.controller.web;
 
+import com.studywithme.dto.response.ThongKeTongQuanResponse;
 import com.studywithme.entity.HoSoGiangVien;
 import com.studywithme.entity.NguoiDung;
 import com.studywithme.entity.enums.admin.TrangThaiGiangVien;
@@ -9,6 +10,10 @@ import com.studywithme.repository.DanhGiaNhanXetRepository;
 import com.studywithme.repository.HoSoGiangVienRepository;
 import com.studywithme.repository.LopHocTrucTuyenRepository;
 import com.studywithme.repository.NguoiDungRepository;
+import com.studywithme.service.AdminThongKeService;
+import com.studywithme.service.BannerService;
+import com.studywithme.service.DanhMucService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,8 +27,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 import java.util.List;
 
-import lombok.RequiredArgsConstructor;
-
 @Controller
 @RequestMapping("/admin")
 @PreAuthorize("hasAuthority('ROLE_QUAN_TRI')")
@@ -35,9 +38,9 @@ public class AdminWebController {
     private final DangKyLopHocRepository dangKyLopHocRepository;
     private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
     private final DanhGiaNhanXetRepository danhGiaNhanXetRepository;
-    private final com.studywithme.service.AdminThongKeService adminThongKeService;
-    private final com.studywithme.service.BannerService bannerService;
-    private final com.studywithme.service.DanhMucService danhMucService;
+    private final AdminThongKeService adminThongKeService;
+    private final BannerService bannerService;
+    private final DanhMucService danhMucService;
 
     @ModelAttribute
     public void loadAdminCommonData(Model model, Principal principal) {
@@ -53,7 +56,7 @@ public class AdminWebController {
     // ==========================================
     @GetMapping({"", "/", "/dashboard"})
     public String dashboard(Model model) {
-        com.studywithme.dto.response.ThongKeTongQuanResponse thongKe = adminThongKeService.layThongKeTongQuan();
+        ThongKeTongQuanResponse thongKe = adminThongKeService.layThongKeTongQuan();
         model.addAttribute("thongKe", thongKe);
         model.addAttribute("tongDoanhThu", thongKe.getTongDoanhThu());
         model.addAttribute("tongNguoiDung", thongKe.getTongNguoiDung());

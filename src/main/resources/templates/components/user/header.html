@@ -36,6 +36,14 @@
 
       <!-- Auth & Actions -->
       <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <!-- Cart Icon Button -->
+        <a th:href="@{/cart}" class="relative p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors" title="Giỏ hàng khóa học">
+          <span class="material-symbols-outlined text-[22px]">shopping_cart</span>
+          <span id="cart-badge-count" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center hidden">
+            0
+          </span>
+        </a>
+
         <!-- Guest State (Shown when not logged in) -->
         <div id="nav-auth-guest" class="flex items-center gap-1 sm:gap-2 shrink-0">
           <a class="px-3.5 py-2 rounded-full font-label-lg text-label-lg whitespace-nowrap transition-colors"
@@ -134,7 +142,27 @@
         } catch (err) {
           console.warn('Không thể đọc phiên người dùng:', err);
         }
+
+        // Cập nhật số lượng giỏ hàng
+        updateCartBadgeCount();
       })();
+
+      function updateCartBadgeCount() {
+        try {
+          const cart = JSON.parse(localStorage.getItem('studywithme_cart') || '[]');
+          const badge = document.getElementById('cart-badge-count');
+          if (badge) {
+            if (cart.length > 0) {
+              badge.textContent = cart.length;
+              badge.classList.remove('hidden');
+            } else {
+              badge.classList.add('hidden');
+            }
+          }
+        } catch (e) {
+          console.warn('Lỗi đọc giỏ hàng:', e);
+        }
+      }
 
       function handleUserLogout() {
         localStorage.removeItem('studywithme_token');

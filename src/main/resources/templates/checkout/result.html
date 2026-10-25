@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Kết Quả Thanh Toán - StudyWithMe')}"></head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+
+  <!-- Header Navigation -->
+  <header th:replace="~{components/user/header :: main-header('checkout')}"></header>
+
+  <main class="flex-1 pt-24 pb-16 flex items-center justify-center">
+    <div class="max-w-2xl w-full mx-auto px-4 sm:px-6">
+
+      <!-- ==================== CASE 1: SUCCESSFUL PAYMENT ==================== -->
+      <div th:if="${result.thanhCong}" class="bg-surface-container-lowest border border-surface-container rounded-3xl p-8 sm:p-10 shadow-xl text-center space-y-6">
+        
+        <!-- Animated Success Icon -->
+        <div class="w-20 h-20 mx-auto rounded-full bg-status-success/15 border-2 border-status-success/30 flex items-center justify-center text-status-success">
+          <span class="material-symbols-outlined text-[44px]">check_circle</span>
+        </div>
+
+        <div>
+          <span class="px-3 py-1 rounded-full text-xs font-bold bg-status-success/15 text-status-success uppercase tracking-wider">
+            Giao dịch hoàn tất
+          </span>
+          <h1 class="text-2xl sm:text-3xl font-black text-on-surface mt-2">Thanh Toán Thành Công!</h1>
+          <p class="text-xs sm:text-sm text-on-surface-variant mt-1" th:text="${result.thongDiep}">
+            Đơn hàng của bạn đã được xác nhận và kích hoạt bản quyền học tập thành công.
+          </p>
+        </div>
+
+        <!-- Receipt Details Table -->
+        <div class="bg-surface-container-low border border-surface-container rounded-2xl p-5 text-left text-xs space-y-3">
+          <div class="flex justify-between items-center border-b border-surface-container pb-2">
+            <span class="text-on-surface-variant font-medium">Mã đơn hàng:</span>
+            <span class="font-mono font-bold text-on-surface" th:text="${result.maDonHang}">#SWM-12345</span>
+          </div>
+
+          <div class="flex justify-between items-center border-b border-surface-container pb-2" th:if="${result.maGiaoDichVnpay != null}">
+            <span class="text-on-surface-variant font-medium">Mã giao dịch VNPAY:</span>
+            <span class="font-mono font-semibold text-primary" th:text="${result.maGiaoDichVnpay}">14568923</span>
+          </div>
+
+          <div class="flex justify-between items-center border-b border-surface-container pb-2" th:if="${result.nganHang != null}">
+            <span class="text-on-surface-variant font-medium">Ngân hàng thanh toán:</span>
+            <span class="font-semibold text-on-surface" th:text="${result.nganHang}">NCB</span>
+          </div>
+
+          <div class="flex justify-between items-center border-b border-surface-container pb-2" th:if="${result.thoiGianThanhToan != null}">
+            <span class="text-on-surface-variant font-medium">Thời gian giao dịch:</span>
+            <span class="font-medium text-on-surface" th:text="${#temporals.format(result.thoiGianThanhToan, 'dd/MM/yyyy HH:mm:ss')}">25/10/2026 15:30:00</span>
+          </div>
+
+          <div class="flex justify-between items-baseline pt-1">
+            <span class="text-on-surface-variant font-bold uppercase text-[11px]">Tổng số tiền đã thanh toán:</span>
+            <span class="text-xl font-black text-primary" 
+                  th:text="${#numbers.formatDecimal(result.soTien, 0, 'POINT', 0, 'COMMA')} + ' đ'">
+              699.000 đ
+            </span>
+          </div>
+        </div>
+
+        <!-- Activated Courses List -->
+        <div th:if="${result.danhSachKhoaHoc != null and !result.danhSachKhoaHoc.isEmpty()}" class="text-left space-y-2">
+          <span class="text-xs font-bold text-on-surface block uppercase tracking-wider">Khóa học đã kích hoạt vào tài khoản:</span>
+          <div class="space-y-1.5">
+            <div th:each="tenKhoaHoc : ${result.danhSachKhoaHoc}" class="p-3 rounded-xl bg-surface-container-lowest border border-surface-container flex items-center justify-between text-xs">
+              <span class="font-bold text-on-surface truncate pr-2" th:text="${tenKhoaHoc}">Khóa học Toán 12</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-status-success/10 text-status-success shrink-0">Sẵn sàng học</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action CTAs -->
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <a th:href="@{/student/courses}" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-md">
+            <span class="material-symbols-outlined text-[18px]">play_circle</span>
+            <span>Vào Bàn Học Của Tôi Ngay</span>
+          </a>
+
+          <a th:href="@{/student/don-hang}" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-surface-container text-on-surface font-semibold text-xs flex items-center justify-center gap-2 hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined text-[18px]">receipt</span>
+            <span>Xem Đơn Hàng</span>
+          </a>
+
+          <a th:href="@{/}" class="w-full sm:w-auto px-4 py-3 rounded-2xl text-on-surface-variant font-semibold text-xs hover:text-primary transition-colors">
+            Trang chủ
+          </a>
+        </div>
+
+      </div>
+
+      <!-- ==================== CASE 2: FAILED OR CANCELLED PAYMENT ==================== -->
+      <div th:unless="${result.thanhCong}" class="bg-surface-container-lowest border border-error/30 rounded-3xl p-8 sm:p-10 shadow-xl text-center space-y-6">
+        
+        <!-- Error Icon -->
+        <div class="w-20 h-20 mx-auto rounded-full bg-error-container/30 border-2 border-error/40 flex items-center justify-center text-error">
+          <span class="material-symbols-outlined text-[44px]">cancel</span>
+        </div>
+
+        <div>
+          <span class="px-3 py-1 rounded-full text-xs font-bold bg-error-container/40 text-error uppercase tracking-wider">
+            Giao dịch không thành công
+          </span>
+          <h1 class="text-2xl sm:text-3xl font-black text-on-surface mt-2">Thanh Toán Thất Bại</h1>
+          <p class="text-xs sm:text-sm text-error font-medium mt-1" th:text="${result.thongDiep}">
+            Bạn đã hủy giao dịch trên cổng thanh toán VNPAY.
+          </p>
+        </div>
+
+        <!-- Error Details -->
+        <div class="bg-surface-container-low border border-surface-container rounded-2xl p-5 text-left text-xs space-y-2">
+          <div class="flex justify-between items-center" th:if="${result.maDonHang != null}">
+            <span class="text-on-surface-variant">Mã đơn hàng:</span>
+            <span class="font-mono font-bold text-on-surface" th:text="${result.maDonHang}">#SWM-12345</span>
+          </div>
+          <div class="flex justify-between items-center" th:if="${result.maLoi != null}">
+            <span class="text-on-surface-variant">Mã phản hồi từ VNPAY:</span>
+            <span class="font-mono font-bold text-error" th:text="${result.maLoi}">24</span>
+          </div>
+        </div>
+
+        <!-- Action CTAs -->
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <a th:href="@{/checkout}" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-md">
+            <span class="material-symbols-outlined text-[18px]">refresh</span>
+            <span>Thử Lại Thanh Toán</span>
+          </a>
+
+          <a th:href="@{/cart}" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-surface-container text-on-surface font-semibold text-xs flex items-center justify-center gap-2 hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined text-[18px]">shopping_cart</span>
+            <span>Về Giỏ Hàng</span>
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer th:replace="~{components/user/footer :: main-footer}"></footer>
+
+  <!-- Clean Cart upon success -->
+  <script th:if="${result.thanhCong}">
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        localStorage.removeItem('studywithme_cart');
+        if (typeof updateCartBadgeCount === 'function') {
+          updateCartBadgeCount();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  </script>
+
+</body>
+</html>

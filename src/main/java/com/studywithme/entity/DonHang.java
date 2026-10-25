@@ -59,4 +59,151 @@ public class DonHang {
     @CreationTimestamp
     @Column(name = "ngay_tao_don", nullable = false, updatable = false)
     private LocalDateTime ngayTaoDon;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getMaDonHang() {
+        return maDonHang;
+    }
+
+    public void setMaDonHang(String maDonHang) {
+        this.maDonHang = maDonHang;
+    }
+
+    public NguoiDung getNguoiDung() {
+        return nguoiDung;
+    }
+
+    public void setNguoiDung(NguoiDung nguoiDung) {
+        this.nguoiDung = nguoiDung;
+    }
+
+    public BigDecimal getTongTienThanhToan() {
+        return tongTienThanhToan;
+    }
+
+    public void setTongTienThanhToan(BigDecimal tongTienThanhToan) {
+        this.tongTienThanhToan = tongTienThanhToan;
+    }
+
+    public PhuongThucThanhToan getPhuongThucThanhToan() {
+        return phuongThucThanhToan;
+    }
+
+    public void setPhuongThucThanhToan(PhuongThucThanhToan phuongThucThanhToan) {
+        this.phuongThucThanhToan = phuongThucThanhToan;
+    }
+
+    public TrangThaiThanhToan getTrangThaiThanhToan() {
+        return trangThaiThanhToan;
+    }
+
+    public void setTrangThaiThanhToan(TrangThaiThanhToan trangThaiThanhToan) {
+        this.trangThaiThanhToan = trangThaiThanhToan;
+    }
+
+    public LocalDateTime getNgayThanhToan() {
+        return ngayThanhToan;
+    }
+
+    public void setNgayThanhToan(LocalDateTime ngayThanhToan) {
+        this.ngayThanhToan = ngayThanhToan;
+    }
+
+    public List<ChiTietDonHang> getDanhSachChiTiet() {
+        return danhSachChiTiet;
+    }
+
+    public void setDanhSachChiTiet(List<ChiTietDonHang> danhSachChiTiet) {
+        this.danhSachChiTiet = danhSachChiTiet;
+    }
+
+    public LocalDateTime getNgayTaoDon() {
+        return ngayTaoDon;
+    }
+
+    public void setNgayTaoDon(LocalDateTime ngayTaoDon) {
+        this.ngayTaoDon = ngayTaoDon;
+    }
+
+    public static DonHangBuilder builder() {
+        return new DonHangBuilder();
+    }
+
+    public static class DonHangBuilder {
+        private Long id;
+        private String maDonHang;
+        private NguoiDung nguoiDung;
+        private BigDecimal tongTienThanhToan = BigDecimal.ZERO;
+        private PhuongThucThanhToan phuongThucThanhToan = PhuongThucThanhToan.VNPAY;
+        private TrangThaiThanhToan trangThaiThanhToan = TrangThaiThanhToan.CHO_THANH_TOAN;
+        private LocalDateTime ngayThanhToan;
+        private List<ChiTietDonHang> danhSachChiTiet = new ArrayList<>();
+        private LocalDateTime ngayTaoDon;
+
+        public DonHangBuilder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public DonHangBuilder maDonHang(String maDonHang) {
+            this.maDonHang = maDonHang;
+            return this;
+        }
+
+        public DonHangBuilder nguoiDung(NguoiDung nguoiDung) {
+            this.nguoiDung = nguoiDung;
+            return this;
+        }
+
+        public DonHangBuilder tongTienThanhToan(BigDecimal tongTienThanhToan) {
+            this.tongTienThanhToan = tongTienThanhToan;
+            return this;
+        }
+
+        public DonHangBuilder phuongThucThanhToan(PhuongThucThanhToan phuongThucThanhToan) {
+            this.phuongThucThanhToan = phuongThucThanhToan;
+            return this;
+        }
+
+        public DonHangBuilder trangThaiThanhToan(TrangThaiThanhToan trangThaiThanhToan) {
+            this.trangThaiThanhToan = trangThaiThanhToan;
+            return this;
+        }
+
+        public DonHangBuilder ngayThanhToan(LocalDateTime ngayThanhToan) {
+            this.ngayThanhToan = ngayThanhToan;
+            return this;
+        }
+
+        public DonHangBuilder danhSachChiTiet(List<ChiTietDonHang> danhSachChiTiet) {
+            this.danhSachChiTiet = danhSachChiTiet;
+            return this;
+        }
+
+        public DonHangBuilder ngayTaoDon(LocalDateTime ngayTaoDon) {
+            this.ngayTaoDon = ngayTaoDon;
+            return this;
+        }
+
+        public DonHang build() {
+            DonHang dh = new DonHang();
+            dh.setId(this.id);
+            dh.setMaDonHang(this.maDonHang);
+            dh.setNguoiDung(this.nguoiDung);
+            dh.setTongTienThanhToan(this.tongTienThanhToan);
+            dh.setPhuongThucThanhToan(this.phuongThucThanhToan);
+            dh.setTrangThaiThanhToan(this.trangThaiThanhToan);
+            dh.setNgayThanhToan(this.ngayThanhToan);
+            dh.setDanhSachChiTiet(this.danhSachChiTiet);
+            dh.setNgayTaoDon(this.ngayTaoDon);
+            return dh;
+        }
+    }
 }

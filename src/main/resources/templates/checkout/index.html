@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Thanh Toán Đơn Hàng - StudyWithMe')}"></head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+
+  <!-- Header Navigation -->
+  <header th:replace="~{components/user/header :: main-header('checkout')}"></header>
+
+  <main class="flex-1 pt-24 pb-16">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- Breadcrumbs -->
+      <nav class="flex items-center gap-2 text-xs text-on-surface-variant mb-6">
+        <a th:href="@{/}" class="hover:text-primary flex items-center gap-1 transition-colors">
+          <span class="material-symbols-outlined text-[16px]">home</span>
+          Trang chủ
+        </a>
+        <span>/</span>
+        <a th:href="@{/cart}" class="hover:text-primary transition-colors">Giỏ hàng</a>
+        <span>/</span>
+        <span class="text-primary font-semibold">Thanh toán VNPAY</span>
+      </nav>
+
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-on-surface flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-primary text-[32px]">credit_card</span>
+          Thanh Toán Đơn Hàng
+        </h1>
+        <p class="text-sm text-on-surface-variant mt-1">
+          Hoàn tất thanh toán để kích hoạt ngay quyền truy cập bài học và bàn học trực tuyến.
+        </p>
+      </div>
+
+      <!-- Checkout Form wrapping the entire flow -->
+      <form th:action="@{/checkout/vnpay}" method="post" id="checkoutForm">
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          <!-- LEFT COLUMN: Customer Info, Payment Methods & Sandbox Test Box (2 cols) -->
+          <div class="lg:col-span-2 space-y-6">
+
+            <!-- 1. Customer Information Box -->
+            <div class="bg-surface-container-lowest border border-surface-container rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+              <div class="flex items-center justify-between border-b border-surface-container pb-4">
+                <h2 class="text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-[22px]">person_check</span>
+                  Thông Tin Học Viên Nhận Khóa Học
+                </h2>
+                <span th:if="${isLoggedIn}" class="px-3 py-1 rounded-full text-xs font-bold bg-status-success/10 text-status-success flex items-center gap-1 border border-status-success/20">
+                  <span class="material-symbols-outlined text-[14px]">verified</span>
+                  Đã đăng nhập
+                </span>
+                <a th:unless="${isLoggedIn}" th:href="@{/login(redirect='/checkout')}" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                  <span>Đăng nhập để nhận ưu đãi</span>
+                  <span class="material-symbols-outlined text-[14px]">login</span>
+                </a>
+              </div>
+
+              <!-- Logged In User Preview -->
+              <div th:if="${isLoggedIn}" class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div class="p-3.5 rounded-2xl bg-surface-container-low border border-surface-container">
+                  <span class="text-[11px] text-on-surface-variant block uppercase font-semibold">Họ và tên</span>
+                  <span class="font-bold text-sm text-on-surface truncate block" th:text="${currentUser.hoTen ?: 'Học viên StudyWithMe'}">Nguyễn Văn A</span>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-surface-container-low border border-surface-container">
+                  <span class="text-[11px] text-on-surface-variant block uppercase font-semibold">Địa chỉ Email</span>
+                  <span class="font-bold text-sm text-on-surface truncate block" th:text="${currentUser.email}">student@studywithme.vn</span>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-surface-container-low border border-surface-container">
+                  <span class="text-[11px] text-on-surface-variant block uppercase font-semibold">Số điện thoại</span>
+                  <span class="font-bold text-sm text-on-surface truncate block" th:text="${currentUser.soDienThoai ?: 'Chưa cập nhật'}">0912345678</span>
+                </div>
+              </div>
+
+              <!-- Guest Warning if not logged in -->
+              <div th:unless="${isLoggedIn}" class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs flex items-start gap-3">
+                <span class="material-symbols-outlined text-[20px] shrink-0">info</span>
+                <p>
+                  Bạn đang ở chế độ khách. Hệ thống khuyên bạn nên <a th:href="@{/login(redirect='/checkout')}" class="font-bold underline">Đăng nhập tài khoản</a> để khóa học được tự động thêm vào Bàn Học Của Tôi ngay sau khi thanh toán.
+                </p>
+              </div>
+
+              <!-- Order Note Input -->
+              <div class="pt-2">
+                <label for="ghiChu" class="text-xs font-semibold text-on-surface-variant block mb-1">Ghi chú đơn hàng (Tùy chọn):</label>
+                <input type="text" id="ghiChu" name="ghiChu" placeholder="Ví dụ: Mong muốn nhận thêm tài liệu ôn thi đính kèm..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30">
+              </div>
+            </div>
+
+            <!-- 2. Payment Method Selection -->
+            <div class="bg-surface-container-lowest border border-surface-container rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+              <h2 class="text-base sm:text-lg font-bold text-on-surface flex items-center gap-2 border-b border-surface-container pb-4">
+                <span class="material-symbols-outlined text-primary text-[22px]">account_balance_wallet</span>
+                Phương Thức Thanh Toán
+              </h2>
+
+              <div class="space-y-3">
+                <!-- VNPAY Option (Active & Default) -->
+                <label class="relative flex items-center justify-between p-4 sm:p-5 rounded-2xl border-2 border-primary bg-primary/5 cursor-pointer transition-all">
+                  <div class="flex items-center gap-4">
+                    <input type="radio" name="paymentMethod" value="VNPAY" checked class="w-4 h-4 text-primary focus:ring-primary">
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="font-bold text-sm text-on-surface">Cổng Thanh Toán Quốc Gia VNPAY</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary text-white">Khuyên dùng</span>
+                      </div>
+                      <p class="text-xs text-on-surface-variant mt-0.5">
+                        Thanh toán qua quét mã VNPAY-QR, Thẻ ATM 40+ ngân hàng nội địa, Thẻ quốc tế Visa / MasterCard.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="hidden sm:flex items-center gap-1.5 shrink-0 pl-2">
+                    <span class="px-2 py-1 rounded bg-white text-[11px] font-black text-blue-600 border border-slate-200">VN<span class="text-red-600">PAY</span></span>
+                    <span class="px-2 py-1 rounded bg-white text-[10px] font-bold text-slate-700 border border-slate-200">ATM</span>
+                    <span class="px-2 py-1 rounded bg-white text-[10px] font-bold text-slate-700 border border-slate-200">QR</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- 3. SANDBOX TEST CREDENTIALS BOX (Extremely helpful for Thesis grading) -->
+            <div class="bg-gradient-to-br from-primary/10 via-surface-container-low to-primary-container/10 border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-md space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[18px]">developer_mode</span>
+                  </span>
+                  <div>
+                    <h2 class="text-sm sm:text-base font-bold text-on-surface">Môi Trường Thử Nghiệm VNPAY Sandbox</h2>
+                    <span class="text-xs text-on-surface-variant">Thông tin thẻ thanh toán giả lập dành cho giám khảo chấm đồ án & test tính năng</span>
+                  </div>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-primary/20 text-primary border border-primary/30">
+                  TEST 100% AN TOÀN
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2 text-xs">
+                <!-- Bank -->
+                <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-3.5 rounded-2xl border border-surface-container">
+                  <span class="text-on-surface-variant block font-medium">Ngân hàng thử nghiệm:</span>
+                  <span class="font-bold text-sm text-primary" th:text="${vnpayCardBank}">NCB</span>
+                </div>
+
+                <!-- Card Number with Copy Button -->
+                <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-3.5 rounded-2xl border border-surface-container relative">
+                  <span class="text-on-surface-variant block font-medium">Số thẻ test:</span>
+                  <div class="flex items-center justify-between mt-0.5">
+                    <span id="cardNumberVal" class="font-mono font-bold text-sm text-on-surface" th:text="${vnpayCardNumber}">9704198526191432198</span>
+                    <button type="button" onclick="copyCardNumber()" title="Sao chép số thẻ" class="text-primary hover:opacity-80 p-1">
+                      <span class="material-symbols-outlined text-[16px]">content_copy</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Card Holder -->
+                <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-3.5 rounded-2xl border border-surface-container">
+                  <span class="text-on-surface-variant block font-medium">Tên chủ thẻ:</span>
+                  <span class="font-bold text-sm text-on-surface" th:text="${vnpayCardHolder}">NGUYEN VAN A</span>
+                </div>
+
+                <!-- Expiry Date -->
+                <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-3.5 rounded-2xl border border-surface-container">
+                  <span class="text-on-surface-variant block font-medium">Ngày phát hành:</span>
+                  <span class="font-mono font-bold text-sm text-on-surface" th:text="${vnpayCardDate}">07/15</span>
+                </div>
+
+                <!-- OTP -->
+                <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-3.5 rounded-2xl border border-surface-container">
+                  <span class="text-on-surface-variant block font-medium">Mật khẩu OTP xác nhận:</span>
+                  <span class="font-mono font-bold text-sm text-status-success" th:text="${vnpayCardOtp}">123456</span>
+                </div>
+
+                <!-- Terminal ID -->
+                <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-3.5 rounded-2xl border border-surface-container">
+                  <span class="text-on-surface-variant block font-medium">Mã Website (TmnCode):</span>
+                  <span class="font-mono font-bold text-sm text-on-surface" th:text="${vnpayTmnCode}">8QVUIHRL</span>
+                </div>
+              </div>
+
+              <div class="p-3 rounded-xl bg-primary/10 text-primary text-[11px] leading-relaxed flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px] shrink-0">help</span>
+                <span>Hướng dẫn: Sau khi bấm nút thanh toán bên dưới, bạn sẽ được chuyển đến trang của VNPAY. Chọn ngân hàng <strong>NCB</strong> và dán số thẻ ở trên để thanh toán thử nghiệm.</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN: Order Summary & Pay CTA (1 col) -->
+          <aside class="lg:col-span-1">
+            <div class="bg-surface-container-lowest border border-surface-container rounded-3xl p-6 sm:p-8 shadow-md space-y-6 sticky top-28">
+              <h2 class="text-lg font-bold text-on-surface flex items-center gap-2 border-b border-surface-container pb-4">
+                <span class="material-symbols-outlined text-primary text-[20px]">shopping_bag</span>
+                Sản Phẩm Đăng Ký
+              </h2>
+
+              <!-- Items List -->
+              <div class="space-y-3 max-h-[360px] overflow-y-auto pr-1">
+                <!-- If items retrieved via Spring Model -->
+                <div th:each="course : ${items}" class="p-3 rounded-2xl bg-surface-container-low border border-surface-container flex items-center gap-3">
+                  <input type="hidden" name="courseIds" th:value="${course.id}">
+                  <img th:src="${course.anhDaiDien ?: '/images/course-default.jpg'}" alt="Course Thumbnail" class="w-14 h-12 rounded-xl object-cover shrink-0 border border-surface-container">
+                  <div class="flex-1 min-w-0">
+                    <h3 class="font-bold text-xs text-on-surface truncate" th:text="${course.tieuDe}">Tên khóa học</h3>
+                    <span class="text-[11px] text-primary font-bold block" 
+                          th:text="${#numbers.formatDecimal(course.giaKhuyenMai != null ? course.giaKhuyenMai : course.giaGoc, 0, 'POINT', 0, 'COMMA')} + ' đ'">
+                      699.000 đ
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Client-side Fallback Container (if items passed via localStorage) -->
+                <div id="clientItemsFallback" class="space-y-3"></div>
+              </div>
+
+              <!-- Price Breakdown -->
+              <div class="pt-4 border-t border-surface-container space-y-2 text-xs">
+                <div class="flex justify-between items-center text-on-surface-variant">
+                  <span>Tạm tính học phí:</span>
+                  <span id="txtSubtotal" class="font-semibold text-on-surface" 
+                        th:text="${tongTien != null ? #numbers.formatDecimal(tongTien, 0, 'POINT', 0, 'COMMA') + ' đ' : '0 đ'}">0 đ</span>
+                </div>
+                <div class="flex justify-between items-center text-status-success">
+                  <span>Khuyến mãi:</span>
+                  <span>- 0 đ</span>
+                </div>
+              </div>
+
+              <!-- Final Total -->
+              <div class="pt-4 border-t border-surface-container flex justify-between items-baseline">
+                <div>
+                  <span class="text-xs text-on-surface-variant block uppercase font-bold">Tổng Thanh Toán:</span>
+                  <span class="text-[10px] text-outline">Thanh toán qua VNPAY Gateway</span>
+                </div>
+                <span id="txtFinalTotal" class="text-2xl font-black text-primary" 
+                      th:text="${tongTien != null ? #numbers.formatDecimal(tongTien, 0, 'POINT', 0, 'COMMA') + ' đ' : '0 đ'}">
+                  0 đ
+                </span>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" id="btnSubmitPayment" class="w-full py-4 px-6 rounded-2xl bg-primary text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 cursor-pointer">
+                <span class="material-symbols-outlined text-[20px]">bolt</span>
+                <span>Thanh Toán Qua VNPAY</span>
+              </button>
+
+              <div class="text-center">
+                <a th:href="@{/cart}" class="text-xs text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px]">arrow_back</span>
+                  <span>Quay lại giỏ hàng</span>
+                </a>
+              </div>
+            </div>
+          </aside>
+
+        </div>
+
+      </form>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer th:replace="~{components/user/footer :: main-footer}"></footer>
+
+  <!-- Script for Copy & LocalStorage Fallback -->
+  <script>
+    function copyCardNumber() {
+      const text = document.getElementById('cardNumberVal').innerText.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Đã sao chép số thẻ test: ' + text);
+      }).catch(err => {
+        console.error('Không thể sao chép:', err);
+      });
+    }
+
+    // Client-side fallback check
+    document.addEventListener('DOMContentLoaded', () => {
+      const serverInputs = document.querySelectorAll('input[name="courseIds"]');
+      if (serverInputs.length === 0) {
+        // Fallback: Read from localStorage cart
+        try {
+          const cart = JSON.parse(localStorage.getItem('studywithme_cart') || '[]');
+          const fallbackContainer = document.getElementById('clientItemsFallback');
+          let total = 0;
+          if (cart.length > 0) {
+            cart.forEach(item => {
+              total += (item.price || 0);
+              const div = document.createElement('div');
+              div.className = 'p-3 rounded-2xl bg-surface-container-low border border-surface-container flex items-center gap-3';
+              div.innerHTML = `
+                <input type="hidden" name="courseIds" value="${item.id}">
+                <img src="${item.thumbnail || '/images/course-default.jpg'}" alt="${item.title}" class="w-14 h-12 rounded-xl object-cover shrink-0 border border-surface-container">
+                <div class="flex-1 min-w-0">
+                  <h3 class="font-bold text-xs text-on-surface truncate">${item.title}</h3>
+                  <span class="text-[11px] text-primary font-bold block">${new Intl.NumberFormat('vi-VN').format(item.price || 0)} đ</span>
+                </div>
+              `;
+              fallbackContainer.appendChild(div);
+            });
+            const fmt = new Intl.NumberFormat('vi-VN').format(total) + ' đ';
+            document.getElementById('txtSubtotal').textContent = fmt;
+            document.getElementById('txtFinalTotal').textContent = fmt;
+          } else {
+            document.getElementById('btnSubmitPayment').disabled = true;
+            document.getElementById('btnSubmitPayment').classList.add('opacity-50', 'cursor-not-allowed');
+            fallbackContainer.innerHTML = '<p class="text-xs text-error">Chưa có khóa học nào được chọn. Vui lòng quay lại giỏ hàng.</p>';
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

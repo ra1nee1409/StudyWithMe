@@ -64,4 +64,12 @@ public class ApiResponse<T> {
                 .duLieu(null)
                 .build();
     }
+
+    public static <T> ApiResponse<T> error(String thongBao, T duLieu) {
+        return ApiResponse.<T>builder()
+                .thanhCong(false)
+                .thongBao(thongBao)
+                .duLieu(duLieu)
+                .build();
+    }
 }

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Giỏ Hàng - StudyWithMe')}"></head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+
+  <!-- Header Navigation -->
+  <header th:replace="~{components/user/header :: main-header('cart')}"></header>
+
+  <main class="flex-1 pt-24 pb-16">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- Breadcrumbs -->
+      <nav class="flex items-center gap-2 text-xs text-on-surface-variant mb-6">
+        <a th:href="@{/}" class="hover:text-primary flex items-center gap-1 transition-colors">
+          <span class="material-symbols-outlined text-[16px]">home</span>
+          Trang chủ
+        </a>
+        <span>/</span>
+        <span class="text-primary font-semibold">Giỏ hàng của bạn</span>
+      </nav>
+
+      <!-- Page Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-on-surface flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-primary text-[32px]">shopping_cart</span>
+            Giỏ Hàng Của Bạn
+          </h1>
+          <p class="text-sm text-on-surface-variant mt-1">
+            Kiểm tra các khóa học đã chọn trước khi tiến hành thanh toán an toàn qua VNPAY.
+          </p>
+        </div>
+        <button onclick="clearCart()" type="button" id="btnClearCart" class="hidden text-xs text-error hover:underline items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">delete_sweep</span>
+          Xóa toàn bộ giỏ hàng
+        </button>
+      </div>
+
+      <!-- Main Cart Layout Grid -->
+      <div id="cartContentContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- LEFT: Items List (2 cols) -->
+        <div class="lg:col-span-2 space-y-4">
+          <div id="cartItemsList" class="space-y-4">
+            <!-- Dynamic items rendered by JavaScript -->
+          </div>
+
+          <!-- Empty State (Hidden when items exist) -->
+          <div id="cartEmptyState" class="hidden bg-surface-container-lowest border border-surface-container rounded-3xl p-12 text-center space-y-4 shadow-sm">
+            <div class="w-20 h-20 mx-auto rounded-full bg-surface-container-low flex items-center justify-center text-outline">
+              <span class="material-symbols-outlined text-[44px]">remove_shopping_cart</span>
+            </div>
+            <h2 class="text-xl font-bold text-on-surface">Giỏ hàng của bạn đang trống</h2>
+            <p class="text-sm text-on-surface-variant max-w-md mx-auto">
+              Hãy khám phá hàng trăm khóa học chất lượng cao từ các gia sư và thủ khoa hàng đầu tại StudyWithMe.
+            </p>
+            <div class="pt-2">
+              <a th:href="@{/khoa-hoc}" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-white font-bold text-sm hover:bg-primary/90 transition-all shadow-md">
+                <span class="material-symbols-outlined text-[18px]">explore</span>
+                Khám Phá Khóa Học Ngay
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Order Summary Card (1 col) -->
+        <aside id="cartSummaryCol" class="lg:col-span-1">
+          <div class="bg-surface-container-lowest border border-surface-container rounded-3xl p-6 sm:p-8 shadow-md space-y-6 sticky top-28">
+            <h2 class="text-lg font-bold text-on-surface flex items-center gap-2 border-b border-surface-container pb-4">
+              <span class="material-symbols-outlined text-primary text-[20px]">receipt_long</span>
+              Tóm Tắt Đơn Hàng
+            </h2>
+
+            <!-- Stats -->
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between items-center text-on-surface-variant">
+                <span>Số lượng khóa học:</span>
+                <span id="cartCountSummary" class="font-bold text-on-surface">0</span>
+              </div>
+              <div class="flex justify-between items-center text-on-surface-variant">
+                <span>Tạm tính:</span>
+                <span id="cartSubtotal" class="font-semibold text-on-surface">0 đ</span>
+              </div>
+              <div class="flex justify-between items-center text-status-success">
+                <span>Ưu đãi áp dụng:</span>
+                <span id="cartDiscount">0 đ</span>
+              </div>
+            </div>
+
+            <!-- Total Price -->
+            <div class="pt-4 border-t border-surface-container flex justify-between items-baseline">
+              <div>
+                <span class="text-xs text-on-surface-variant block uppercase font-semibold">Tổng Thanh Toán</span>
+                <span class="text-[11px] text-outline">(Đã bao gồm VAT & tài liệu)</span>
+              </div>
+              <span id="cartTotal" class="text-2xl font-black text-primary">
+                0 đ
+              </span>
+            </div>
+
+            <!-- Checkout CTA Button -->
+            <button onclick="proceedToCheckout()" id="btnCheckout" type="button" class="w-full py-4 px-6 rounded-2xl bg-primary text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 cursor-pointer">
+              <span class="material-symbols-outlined text-[20px]">lock</span>
+              <span>Tiến Hành Thanh Toán</span>
+            </button>
+
+            <!-- Security badges -->
+            <div class="pt-2 border-t border-surface-container space-y-2 text-xs text-on-surface-variant">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-status-success text-[16px]">verified_user</span>
+                <span>Bảo mật giao dịch mã hóa 256-bit SSL</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[16px]">account_balance_wallet</span>
+                <span>Hỗ trợ cổng thanh toán Quốc gia VNPAY Sandbox</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer th:replace="~{components/user/footer :: main-footer}"></footer>
+
+  <!-- Cart Script -->
+  <script>
+    function formatMoney(amount) {
+      return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
+    }
+
+    function getCart() {
+      try {
+        return JSON.parse(localStorage.getItem('studywithme_cart') || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem('studywithme_cart', JSON.stringify(cart));
+      if (typeof updateCartBadgeCount === 'function') {
+        updateCartBadgeCount();
+      }
+    }
+
+    function renderCart() {
+      const cart = getCart();
+      const listEl = document.getElementById('cartItemsList');
+      const emptyEl = document.getElementById('cartEmptyState');
+      const summaryCol = document.getElementById('cartSummaryCol');
+      const btnClear = document.getElementById('btnClearCart');
+
+      if (!cart || cart.length === 0) {
+        listEl.innerHTML = '';
+        emptyEl.classList.remove('hidden');
+        summaryCol.classList.add('opacity-50', 'pointer-events-none');
+        btnClear.classList.add('hidden');
+        btnClear.classList.remove('inline-flex');
+        document.getElementById('cartCountSummary').textContent = '0';
+        document.getElementById('cartSubtotal').textContent = '0 đ';
+        document.getElementById('cartTotal').textContent = '0 đ';
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+      summaryCol.classList.remove('opacity-50', 'pointer-events-none');
+      btnClear.classList.remove('hidden');
+      btnClear.classList.add('inline-flex');
+
+      let total = 0;
+      let html = '';
+
+      cart.forEach((item, index) => {
+        total += (item.price || 0);
+        html += `
+          <div class="bg-surface-container-lowest border border-surface-container rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:border-primary/40 transition-colors">
+            <div class="flex items-center gap-4">
+              <img src="${item.thumbnail || '/images/course-default.jpg'}" alt="${item.title}" class="w-20 h-16 sm:w-24 sm:h-20 rounded-xl object-cover border border-surface-container shrink-0">
+              <div class="space-y-1">
+                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary">Khóa Học Video</span>
+                <h3 class="font-bold text-sm sm:text-base text-on-surface line-clamp-2">${item.title}</h3>
+                <span class="text-xs text-on-surface-variant flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px] text-status-success">verified</span>
+                  Truy cập học trọn đời
+                </span>
+              </div>
+            </div>
+
+            <div class="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto shrink-0 gap-2 border-t sm:border-t-0 pt-3 sm:pt-0 border-surface-container">
+              <span class="font-extrabold text-base sm:text-lg text-primary">${formatMoney(item.price || 0)}</span>
+              <button onclick="removeItem(${index})" type="button" class="text-xs text-error hover:text-error/80 flex items-center gap-1 px-2.5 py-1 rounded-lg hover:bg-error-container/30 transition-colors">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+                <span>Xóa</span>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      listEl.innerHTML = html;
+      document.getElementById('cartCountSummary').textContent = cart.length;
+      document.getElementById('cartSubtotal').textContent = formatMoney(total);
+      document.getElementById('cartTotal').textContent = formatMoney(total);
+    }
+
+    function removeItem(index) {
+      const cart = getCart();
+      cart.splice(index, 1);
+      saveCart(cart);
+      renderCart();
+    }
+
+    function clearCart() {
+      if (confirm('Bạn có chắc chắn muốn xóa tất cả khóa học khỏi giỏ hàng?')) {
+        saveCart([]);
+        renderCart();
+      }
+    }
+
+    function proceedToCheckout() {
+      const cart = getCart();
+      if (!cart || cart.length === 0) {
+        alert('Giỏ hàng của bạn đang trống.');
+        return;
+      }
+      const courseIds = cart.map(item => item.id).join(',');
+      window.location.href = `/checkout?courseIds=${encodeURIComponent(courseIds)}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCart();
+    });
+  </script>
+
+</body>
+</html>

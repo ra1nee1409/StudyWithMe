@@ -303,9 +303,15 @@ Trước khi dựng giao diện cho Admin hay Trang chủ, Backend cần có s�
 ---
 
 ## 🎒 GIAI ĐOẠN 4: PHÂN HỆ HỌC VIÊN (STUDENT PORTAL)
-*(Đang triển khai - Đã hoàn thành nền tảng & các trang cốt lõi)*
+*(Đang triển khai - Đã hoàn thành 4 trang cốt lõi)*
 
-* **Trang S1: Giỏ hàng & Đặt mua (Cart & Checkout) - [Sẵn sàng tích hợp]**: Đã hoàn thiện cấu hình hạ tầng **VNPAY Sandbox** ([VnpayConfig.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/config/VnpayConfig.java), [VnPayService.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/service/VnPayService.java)) với chữ ký bảo mật SHA512, DTOs Cart & Checkout sẵn sàng.
+* **Trang S1: Giỏ hàng & Thanh toán VNPAY Sandbox (Cart & Checkout) - ✅ HOÀN THÀNH 100%**:
+  - Giao diện Giỏ hàng ([cart/index.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/cart/index.html)): Tự động đồng bộ giỏ hàng, xóa từng môn/xóa tất cả, badge đếm số lượng giỏ hàng trên Header toàn sàn.
+  - Giao diện Thanh toán ([checkout/index.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/checkout/index.html)): Hiển thị thông tin học viên nhận bàn học, chọn cổng VNPAY, tích hợp **Khung thông tin thẻ test NCB Sandbox** (`9704198526191432198` / `07/15` / OTP: `123456`) kèm nút copy 1-click trực quan phục vụ hội đồng chấm đồ án.
+  - Giao diện Hóa đơn & Biên lai ([checkout/result.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/checkout/result.html)): Hiển thị mã đơn hàng `#SWM`, mã giao dịch VNPAY, số tiền đã trừ, danh sách khóa học kích hoạt bản quyền, nút "Vào Bàn Học Của Tôi Ngay".
+  - Backend: [PaymentWebController.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/controller/web/PaymentWebController.java), [PaymentApiController.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/controller/api/PaymentApiController.java), [PaymentServiceImpl.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/service/impl/PaymentServiceImpl.java).
+  - Tự động cộng 80% doanh thu bán khóa học vào ví giảng viên (`soDuVi` & `LichSuViTien`).
+  - Kiểm thử tích hợp: [PaymentVnPayIntegrationTest.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/test/java/com/studywithme/PaymentVnPayIntegrationTest.java) (5/5 tests passed).
 * **Trang S2: Khóa học của tôi (My Enrolled Courses) - ✅ HOÀN THÀNH 100%**: Danh sách khóa học video đã ghi danh ([courses.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/student/courses.html)), thanh tiến độ học tập (% completed), liên kết vào bài giảng, tích hợp sidebar và dashboard.
 * **Trang S3: Trình phát video học tập (Video Learning Player)**: Xem video bài học, đánh dấu hoàn thành, lưu giây dừng lại (`TienDoBaiHoc`).
 * **Trang S4: Lớp học trực tuyến của tôi (My Live Classes) - ✅ HOÀN THÀNH 100%**: Danh sách lớp gia sư kèm trực tiếp, lịch học tuần, nút click mở phòng học ([classes.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/student/classes.html)).

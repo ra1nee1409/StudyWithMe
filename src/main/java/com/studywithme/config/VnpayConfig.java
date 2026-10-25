@@ -49,6 +49,10 @@ public class VnpayConfig {
         return vnpPayUrl;
     }
 
+    public String getVnpUrl() {
+        return vnpPayUrl;
+    }
+
     public String getVnpReturnUrl() {
         return vnpReturnUrl;
     }

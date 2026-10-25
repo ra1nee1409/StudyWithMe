@@ -234,12 +234,23 @@
 
             <!-- CTA Actions -->
             <div class="space-y-3 pt-2">
-              <a th:href="@{/login}" class="w-full py-3.5 px-4 rounded-2xl bg-primary text-white font-bold text-sm text-center flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-md">
-                <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
-                <span>Đăng Ký Học Ngay</span>
+              <a th:href="@{'/checkout?courseId=' + ${course.id}}" class="w-full py-3.5 px-4 rounded-2xl bg-primary text-white font-bold text-sm text-center flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-md">
+                <span class="material-symbols-outlined text-[20px]">bolt</span>
+                <span>Đăng Ký Học Ngay (VNPAY)</span>
               </a>
 
-              <a th:href="@{/#tim-gia-su}" class="w-full py-3 px-4 rounded-2xl bg-surface-container-low text-on-surface font-semibold text-xs text-center flex items-center justify-center gap-2 hover:bg-surface-container transition-all">
+              <button type="button" 
+                      th:data-id="${course.id}"
+                      th:data-title="${course.tieuDe}"
+                      th:data-price="${course.giaKhuyenMai != null ? course.giaKhuyenMai : course.giaGoc}"
+                      th:data-thumb="${course.anhDaiDien ?: '/images/course-default.jpg'}"
+                      onclick="addCurrentCourseToCart(this)"
+                      class="w-full py-3 px-4 rounded-2xl bg-surface-container-low text-primary font-bold text-xs text-center flex items-center justify-center gap-2 hover:bg-primary/10 transition-all border border-primary/20">
+                <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+                <span>Thêm Vào Giỏ Hàng</span>
+              </button>
+
+              <a th:href="@{/#tim-gia-su}" class="w-full py-2.5 px-4 rounded-2xl bg-surface-container text-on-surface font-semibold text-xs text-center flex items-center justify-center gap-2 hover:bg-surface-container-high transition-all">
                 <span class="material-symbols-outlined text-[18px]">support_agent</span>
                 <span>Yêu Cầu Gia Sư Kèm 1-1</span>
               </a>
@@ -299,6 +310,40 @@
       const iframe = document.getElementById('videoIframe');
       iframe.src = "";
       modal.classList.add('hidden');
+    }
+
+    function addCurrentCourseToCart(btn) {
+      const id = parseInt(btn.getAttribute('data-id'));
+      const title = btn.getAttribute('data-title');
+      const price = parseFloat(btn.getAttribute('data-price') || '0');
+      const thumbnail = btn.getAttribute('data-thumb');
+
+      let cart = [];
+      try {
+        cart = JSON.parse(localStorage.getItem('studywithme_cart') || '[]');
+      } catch (e) {
+        cart = [];
+      }
+
+      if (cart.some(item => item.id === id)) {
+        alert('Khóa học này đã có sẵn trong giỏ hàng của bạn.');
+        return;
+      }
+
+      cart.push({ id, title, price, thumbnail });
+      localStorage.setItem('studywithme_cart', JSON.stringify(cart));
+
+      if (typeof updateCartBadgeCount === 'function') {
+        updateCartBadgeCount();
+      }
+
+      const origText = btn.innerHTML;
+      btn.innerHTML = `<span class="material-symbols-outlined text-[18px] text-status-success">check_circle</span> Đã Thêm Vào Giỏ!`;
+      btn.classList.add('bg-status-success/10', 'text-status-success');
+      setTimeout(() => {
+        btn.innerHTML = origText;
+        btn.classList.remove('bg-status-success/10', 'text-status-success');
+      }, 2000);
     }
   </script>
 

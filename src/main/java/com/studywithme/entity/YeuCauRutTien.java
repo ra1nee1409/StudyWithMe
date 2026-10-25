@@ -135,4 +135,47 @@ public class YeuCauRutTien {
     public void setNgayXuLy(LocalDateTime ngayXuLy) {
         this.ngayXuLy = ngayXuLy;
     }
+
+    public static YeuCauRutTienBuilder builder() {
+        return new YeuCauRutTienBuilder();
+    }
+
+    public static class YeuCauRutTienBuilder {
+        private Long id;
+        private HoSoGiangVien giangVien;
+        private BigDecimal soTienRut;
+        private String tenNganHang;
+        private String soTaiKhoan;
+        private String tenChuTaiKhoan;
+        private TrangThaiRutTien trangThai = TrangThaiRutTien.CHO_XU_LY;
+        private String ghiChuAdmin;
+        private LocalDateTime ngayTao;
+        private LocalDateTime ngayXuLy;
+
+        public YeuCauRutTienBuilder id(Long id) { this.id = id; return this; }
+        public YeuCauRutTienBuilder giangVien(HoSoGiangVien giangVien) { this.giangVien = giangVien; return this; }
+        public YeuCauRutTienBuilder soTienRut(BigDecimal soTienRut) { this.soTienRut = soTienRut; return this; }
+        public YeuCauRutTienBuilder tenNganHang(String tenNganHang) { this.tenNganHang = tenNganHang; return this; }
+        public YeuCauRutTienBuilder soTaiKhoan(String soTaiKhoan) { this.soTaiKhoan = soTaiKhoan; return this; }
+        public YeuCauRutTienBuilder tenChuTaiKhoan(String tenChuTaiKhoan) { this.tenChuTaiKhoan = tenChuTaiKhoan; return this; }
+        public YeuCauRutTienBuilder trangThai(TrangThaiRutTien trangThai) { this.trangThai = trangThai; return this; }
+        public YeuCauRutTienBuilder ghiChuAdmin(String ghiChuAdmin) { this.ghiChuAdmin = ghiChuAdmin; return this; }
+        public YeuCauRutTienBuilder ngayTao(LocalDateTime ngayTao) { this.ngayTao = ngayTao; return this; }
+        public YeuCauRutTienBuilder ngayXuLy(LocalDateTime ngayXuLy) { this.ngayXuLy = ngayXuLy; return this; }
+
+        public YeuCauRutTien build() {
+            YeuCauRutTien y = new YeuCauRutTien();
+            y.setId(id);
+            y.setGiangVien(giangVien);
+            y.setSoTienRut(soTienRut);
+            y.setTenNganHang(tenNganHang);
+            y.setSoTaiKhoan(soTaiKhoan);
+            y.setTenChuTaiKhoan(tenChuTaiKhoan);
+            y.setTrangThai(trangThai != null ? trangThai : TrangThaiRutTien.CHO_XU_LY);
+            y.setGhiChuAdmin(ghiChuAdmin);
+            y.setNgayTao(ngayTao);
+            y.setNgayXuLy(ngayXuLy);
+            return y;
+        }
+    }
 }

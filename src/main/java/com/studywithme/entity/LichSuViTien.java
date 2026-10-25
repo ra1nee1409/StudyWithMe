@@ -124,4 +124,44 @@ public class LichSuViTien {
     public void setNgayTao(LocalDateTime ngayTao) {
         this.ngayTao = ngayTao;
     }
+
+    public static LichSuViTienBuilder builder() {
+        return new LichSuViTienBuilder();
+    }
+
+    public static class LichSuViTienBuilder {
+        private Long id;
+        private HoSoGiangVien giangVien;
+        private BigDecimal soTienBienDong;
+        private BigDecimal soDuTruoc;
+        private BigDecimal soDuSau;
+        private LoaiGiaoDichVi loaiGiaoDich;
+        private Long maThamChieu;
+        private String moTaGiaoDich;
+        private LocalDateTime ngayTao;
+
+        public LichSuViTienBuilder id(Long id) { this.id = id; return this; }
+        public LichSuViTienBuilder giangVien(HoSoGiangVien giangVien) { this.giangVien = giangVien; return this; }
+        public LichSuViTienBuilder soTienBienDong(BigDecimal soTienBienDong) { this.soTienBienDong = soTienBienDong; return this; }
+        public LichSuViTienBuilder soDuTruoc(BigDecimal soDuTruoc) { this.soDuTruoc = soDuTruoc; return this; }
+        public LichSuViTienBuilder soDuSau(BigDecimal soDuSau) { this.soDuSau = soDuSau; return this; }
+        public LichSuViTienBuilder loaiGiaoDich(LoaiGiaoDichVi loaiGiaoDich) { this.loaiGiaoDich = loaiGiaoDich; return this; }
+        public LichSuViTienBuilder maThamChieu(Long maThamChieu) { this.maThamChieu = maThamChieu; return this; }
+        public LichSuViTienBuilder moTaGiaoDich(String moTaGiaoDich) { this.moTaGiaoDich = moTaGiaoDich; return this; }
+        public LichSuViTienBuilder ngayTao(LocalDateTime ngayTao) { this.ngayTao = ngayTao; return this; }
+
+        public LichSuViTien build() {
+            LichSuViTien l = new LichSuViTien();
+            l.setId(id);
+            l.setGiangVien(giangVien);
+            l.setSoTienBienDong(soTienBienDong);
+            l.setSoDuTruoc(soDuTruoc);
+            l.setSoDuSau(soDuSau);
+            l.setLoaiGiaoDich(loaiGiaoDich);
+            l.setMaThamChieu(maThamChieu);
+            l.setMoTaGiaoDich(moTaGiaoDich);
+            l.setNgayTao(ngayTao);
+            return l;
+        }
+    }
 }

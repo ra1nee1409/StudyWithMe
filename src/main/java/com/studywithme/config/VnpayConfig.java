@@ -25,10 +25,10 @@ public class VnpayConfig {
     public static final String VNP_CURR_CODE = "VND";
     public static final String VNP_LOCALE = "vn";
 
-    @Value("${vnpay.tmn-code:D5WOUB0R}")
+    @Value("${vnpay.tmn-code:8QVUIHRL}")
     private String vnpTmnCode;
 
-    @Value("${vnpay.hash-secret:P0VBLWZL2A99M9D5139H1B36Y834Q3C7}")
+    @Value("${vnpay.hash-secret:YGPVRKTMRYLFTYBORNHKQPBOUUBECMCG}")
     private String vnpHashSecret;
 
     @Value("${vnpay.url:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}")
@@ -36,6 +36,22 @@ public class VnpayConfig {
 
     @Value("${vnpay.return-url:http://localhost:8080/payment/vnpay-callback}")
     private String vnpReturnUrl;
+
+    public String getVnpTmnCode() {
+        return vnpTmnCode;
+    }
+
+    public String getVnpHashSecret() {
+        return vnpHashSecret;
+    }
+
+    public String getVnpPayUrl() {
+        return vnpPayUrl;
+    }
+
+    public String getVnpReturnUrl() {
+        return vnpReturnUrl;
+    }
 
     public static String hmacSHA512(final String key, final String data) {
         try {

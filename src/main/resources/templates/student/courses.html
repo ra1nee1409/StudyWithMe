@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Khóa học của tôi - StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== STUDENT SIDEBAR ==================== -->
+  <aside th:replace="~{components/student/sidebar :: student-sidebar('courses')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar -->
+    <header th:replace="~{components/student/header :: student-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Header Banner -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold">
+              <span class="material-symbols-outlined text-[16px]">play_circle</span>
+              Thư viện Video Bài giảng
+            </span>
+          </div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">Khóa Học Video Của Tôi</h1>
+          <p class="text-xs text-on-surface-variant">Tiếp tục bài giảng dang dở và theo dõi tiến độ hoàn thành các chương trình bạn đã ghi danh.</p>
+        </div>
+        <a th:href="@{/khoa-hoc}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container shadow-sm transition-all shrink-0">
+          <span class="material-symbols-outlined text-[18px]">explore</span>
+          <span>Khám Phá Khóa Mới</span>
+        </a>
+      </section>
+
+      <!-- Empty State -->
+      <div th:if="${#lists.isEmpty(danhSachGhiDanh)}" class="p-12 text-center bg-surface-card rounded-2xl border border-dashed border-surface-container/60 shadow-sm">
+        <div class="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3">
+          <span class="material-symbols-outlined text-4xl">video_library</span>
+        </div>
+        <h3 class="text-base font-bold text-on-surface">Bạn chưa ghi danh khóa học video nào</h3>
+        <p class="text-xs text-on-surface-variant max-w-md mx-auto mt-1 mb-5">Hàng trăm khóa học chất lượng từ các thủ khoa và giảng viên uy tín trên StudyWithMe đang chờ bạn khám phá.</p>
+        <a th:href="@{/khoa-hoc}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container shadow-sm transition-all">
+          <span class="material-symbols-outlined text-[18px]">school</span>
+          <span>Xem Danh Sách Khóa Học</span>
+        </a>
+      </div>
+
+      <!-- Enrolled Courses Grid -->
+      <div th:unless="${#lists.isEmpty(danhSachGhiDanh)}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div th:each="item : ${danhSachGhiDanh}"
+             class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 overflow-hidden flex flex-col justify-between hover:shadow-md transition-all group">
+          
+          <div>
+            <!-- Course Thumbnail & Category Badge -->
+            <div class="relative aspect-video w-full overflow-hidden bg-surface-container-low">
+              <img th:if="${item.khoaHoc != null && item.khoaHoc.hinhDaiDien != null}"
+                   th:src="${item.khoaHoc.hinhDaiDien}"
+                   th:alt="${item.khoaHoc.tieuDe}"
+                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+              <div th:unless="${item.khoaHoc != null && item.khoaHoc.hinhDaiDien != null}"
+                   class="w-full h-full flex items-center justify-center bg-primary/10 text-primary">
+                <span class="material-symbols-outlined text-4xl">play_circle</span>
+              </div>
+              <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-surface-card/90 backdrop-blur text-[11px] font-bold text-primary shadow-xs"
+                    th:text="${item.khoaHoc.danhMuc != null ? item.khoaHoc.danhMuc.tenDanhMuc : 'Khóa học'}">Toán 12</span>
+              <span class="absolute bottom-3 right-3 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur text-white text-[10px] font-semibold flex items-center gap-1">
+                <span class="material-symbols-outlined text-[12px]">schedule</span>
+                <span th:text="${item.phanTramTienDo != null ? item.phanTramTienDo : 0} + '% Hoàn thành'">0% Hoàn thành</span>
+              </span>
+            </div>
+
+            <div class="p-5 space-y-3">
+              <!-- Title -->
+              <h2 class="font-bold text-sm text-on-surface line-clamp-2 group-hover:text-primary transition-colors"
+                  th:text="${item.khoaHoc.tieuDe}">Tiêu đề khóa học video</h2>
+
+              <!-- Instructor Info -->
+              <div class="flex items-center gap-2.5 text-xs text-on-surface-variant">
+                <div class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[11px] shrink-0">
+                  <span th:text="${item.khoaHoc.giangVien != null && item.khoaHoc.giangVien.nguoiDung != null && item.khoaHoc.giangVien.nguoiDung.hoTen != null ? #strings.substring(item.khoaHoc.giangVien.nguoiDung.hoTen.trim(), 0, 1) : 'G'}">G</span>
+                </div>
+                <span class="truncate" th:text="${item.khoaHoc.giangVien != null && item.khoaHoc.giangVien.nguoiDung != null ? (item.khoaHoc.giangVien.nguoiDung.hoTen ?: item.khoaHoc.giangVien.nguoiDung.email) : 'Giảng viên StudyWithMe'}">Thầy Nguyễn Văn A</span>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="pt-2">
+                <div class="flex items-center justify-between text-[11px] text-on-surface-variant mb-1.5 font-medium">
+                  <span>Tiến độ học tập</span>
+                  <span class="font-bold text-primary" th:text="${item.phanTramTienDo != null ? item.phanTramTienDo : 0} + '%'">0%</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-surface-container-low overflow-hidden">
+                  <div class="h-full bg-primary rounded-full transition-all duration-500"
+                       th:style="'width: ' + ${item.phanTramTienDo != null ? item.phanTramTienDo : 0} + '%;'"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action Button -->
+          <div class="p-5 pt-0">
+            <a th:href="@{'/khoa-hoc/' + ${item.khoaHoc.duongDanThanThien}}"
+               class="w-full py-2.5 px-4 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-all">
+              <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+              <span th:text="${item.phanTramTienDo != null && item.phanTramTienDo > 0} ? 'Tiếp Tục Bài Học' : 'Bắt Đầu Bài Đầu Tiên'">Tiếp Tục Bài Học</span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

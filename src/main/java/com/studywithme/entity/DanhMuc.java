@@ -34,6 +34,7 @@ public class DanhMuc {
     @JoinColumn(name = "danh_muc_cha_id")
     private DanhMuc danhMucCha;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @OneToMany(mappedBy = "danhMucCha", cascade = CascadeType.ALL)
     @Builder.Default
     private List<DanhMuc> danhSachDanhMucCon = new ArrayList<>();

@@ -27,6 +27,7 @@ public class ChungChiGiangVien {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "giang_vien_id", nullable = false)
     private HoSoGiangVien giangVien;

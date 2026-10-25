@@ -67,33 +67,33 @@
           </div>
         </a>
 
-        <!-- Metric 2: Giờ học đã tích lũy -->
-        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3">
+        <!-- Metric 2: Khóa học video đã mua -->
+        <a th:href="@{/student/khoa-hoc}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-primary transition-all group">
           <div class="flex items-center justify-between">
-            <span class="text-xs text-on-surface-variant font-medium">Lớp học hoàn tất thanh toán</span>
-            <div class="w-10 h-10 rounded-xl bg-status-success/10 text-status-success flex items-center justify-center">
-              <span class="material-symbols-outlined text-[22px]">verified</span>
+            <span class="text-xs text-on-surface-variant font-medium group-hover:text-primary transition-colors">Khóa học video đã ghi danh</span>
+            <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px]">play_lesson</span>
             </div>
           </div>
           <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${soLopDangHoc ?: 0}">0</span>
-            <span class="text-xs text-on-surface-variant font-medium">lớp hợp lệ</span>
+            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${soKhoaHocDangHoc ?: 0}">0</span>
+            <span class="text-xs text-on-surface-variant font-medium">khóa học video</span>
           </div>
-        </div>
+        </a>
 
-        <!-- Metric 3: Chuyên cần -->
-        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3">
+        <!-- Metric 3: Khóa học yêu thích -->
+        <a th:href="@{/student/yeu-thich}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-primary transition-all group">
           <div class="flex items-center justify-between">
-            <span class="text-xs text-on-surface-variant font-medium">Tỷ lệ chuyên cần</span>
-            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center">
-              <span class="material-symbols-outlined text-[22px]">military_tech</span>
+            <span class="text-xs text-on-surface-variant font-medium group-hover:text-primary transition-colors">Mục quan tâm đã lưu</span>
+            <div class="w-10 h-10 rounded-xl bg-error-container/20 text-error flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px]">favorite</span>
             </div>
           </div>
           <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-status-success tracking-tight" th:text="${soLopDangHoc != null && soLopDangHoc > 0 ? '100%' : '0%'}">0%</span>
-            <span class="text-xs text-on-surface-variant font-medium">tiêu chuẩn tham gia</span>
+            <span class="text-3xl font-extrabold text-on-surface tracking-tight" th:text="${soYeuThich ?: 0}">0</span>
+            <span class="text-xs text-on-surface-variant font-medium">mục theo dõi</span>
           </div>
-        </div>
+        </a>
 
         <!-- Metric 4: Gia sư đồng hành -->
         <a th:href="@{/student/gia-su}" class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 hover:border-primary transition-all group">
@@ -251,6 +251,44 @@
           </div>
         </div>
       </div>
+
+      <!-- 5. Khóa học video đang theo học -->
+      <section th:if="${!#lists.isEmpty(danhSachGhiDanh)}" class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
+          <div>
+            <h2 class="text-base font-bold text-on-surface">Khóa Học Video Của Tôi</h2>
+            <p class="text-xs text-on-surface-variant">Tiếp tục xem các bài giảng theo lộ trình học tập</p>
+          </div>
+          <a th:href="@{/student/khoa-hoc}" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+            <span>Xem tất cả (<span th:text="${#lists.size(danhSachGhiDanh)}">0</span>)</span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div th:each="item : ${#lists.size(danhSachGhiDanh) > 3 ? danhSachGhiDanh.subList(0, 3) : danhSachGhiDanh}"
+               class="p-4 rounded-xl bg-surface-container-low/60 border border-surface-container/50 hover:border-primary/40 transition-all flex flex-col justify-between gap-3">
+            <div>
+              <div class="flex items-center justify-between text-xs text-on-surface-variant mb-1">
+                <span class="font-bold text-primary" th:text="${item.khoaHoc.danhMuc != null ? item.khoaHoc.danhMuc.tenDanhMuc : 'Khóa học'}">Toán học</span>
+                <span class="font-bold" th:text="${(item.phanTramTienDo ?: 0) + '% Hoàn thành'}">0%</span>
+              </div>
+              <h3 class="text-sm font-bold text-on-surface line-clamp-1" th:text="${item.khoaHoc.tieuDe}">Tiêu đề khóa học</h3>
+              <div class="w-full h-1.5 rounded-full bg-surface-container mt-2 overflow-hidden">
+                <div class="h-full bg-primary rounded-full" th:style="'width: ' + ${item.phanTramTienDo ?: 0} + '%;'"></div>
+              </div>
+            </div>
+            <div class="pt-2 flex items-center justify-between border-t border-surface-container/30">
+              <span class="text-[11px] text-on-surface-variant truncate"
+                    th:text="${item.khoaHoc.giangVien != null && item.khoaHoc.giangVien.nguoiDung != null ? item.khoaHoc.giangVien.nguoiDung.hoTen : 'Giảng viên'}">GV</span>
+              <a th:href="@{'/khoa-hoc/' + ${item.khoaHoc.duongDanThanThien}}" class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline">
+                <span>Vào học</span>
+                <span class="material-symbols-outlined text-[14px]">play_arrow</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
     </main>
   </div>

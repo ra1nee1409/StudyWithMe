@@ -29,6 +29,7 @@ public class DangKyLopHoc {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lop_hoc_id", nullable = false)
     private LopHocTrucTuyen lopHoc;

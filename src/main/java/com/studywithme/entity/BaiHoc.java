@@ -20,6 +20,7 @@ public class BaiHoc {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chuong_hoc_id", nullable = false)
     private ChuongHoc chuongHoc;

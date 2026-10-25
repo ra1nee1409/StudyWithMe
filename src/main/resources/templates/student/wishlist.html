@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Khóa học yêu thích - StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== STUDENT SIDEBAR ==================== -->
+  <aside th:replace="~{components/student/sidebar :: student-sidebar('wishlist')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar -->
+    <header th:replace="~{components/student/header :: student-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Header Banner -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-error-container/20 text-error text-xs font-bold">
+              <span class="material-symbols-outlined text-[16px]">favorite</span>
+              Mục Đã Lưu Quan Tâm
+            </span>
+          </div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">Danh Sách Khóa Học & Gia Sư Yêu Thích</h1>
+          <p class="text-xs text-on-surface-variant">Lưu lại để dễ dàng đăng ký khi có đợt ưu đãi học phí hoặc lịch học phù hợp.</p>
+        </div>
+        <a th:href="@{/khoa-hoc}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container shadow-sm transition-all shrink-0">
+          <span class="material-symbols-outlined text-[18px]">add</span>
+          <span>Khám Phá Thêm</span>
+        </a>
+      </section>
+
+      <!-- Empty State -->
+      <div th:if="${#lists.isEmpty(danhSachYeuThich)}" class="p-12 text-center bg-surface-card rounded-2xl border border-dashed border-surface-container/60 shadow-sm">
+        <div class="w-16 h-16 rounded-2xl bg-error-container/20 text-error flex items-center justify-center mx-auto mb-3">
+          <span class="material-symbols-outlined text-4xl">favorite_border</span>
+        </div>
+        <h3 class="text-base font-bold text-on-surface">Chưa có mục nào trong danh sách yêu thích</h3>
+        <p class="text-xs text-on-surface-variant max-w-md mx-auto mt-1 mb-5">Bạn có thể bấm biểu tượng trái tim ở các khóa học hoặc hồ sơ gia sư để lưu lại theo dõi.</p>
+        <div class="flex items-center justify-center gap-3">
+          <a th:href="@{/khoa-hoc}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container shadow-sm transition-all">
+            <span class="material-symbols-outlined text-[18px]">school</span>
+            <span>Khám Phá Khóa Học</span>
+          </a>
+          <a th:href="@{/gia-su}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-surface-container-low text-on-surface text-xs font-bold hover:bg-surface-container border border-surface-container transition-all">
+            <span class="material-symbols-outlined text-[18px]">person_search</span>
+            <span>Tìm Gia Sư Uy Tín</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Wishlist Grid -->
+      <div th:unless="${#lists.isEmpty(danhSachYeuThich)}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div th:each="yt : ${danhSachYeuThich}"
+             class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-5 flex flex-col justify-between hover:shadow-md transition-all">
+          <div class="flex items-center justify-between mb-3">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold"
+                  th:classappend="${yt.loaiYeuThich != null && yt.loaiYeuThich.name() == 'KHOA_HOC'} ? 'bg-primary/10 text-primary' : 'bg-status-success/10 text-status-success'"
+                  th:text="${yt.loaiYeuThich != null && yt.loaiYeuThich.name() == 'KHOA_HOC'} ? 'Khóa Học Video' : 'Gia Sư Trực Tuyến'">Khóa học</span>
+            <span class="text-xs text-on-surface-variant" th:text="${#temporals.format(yt.ngayTao, 'dd/MM/yyyy')}">25/10/2026</span>
+          </div>
+
+          <div class="py-2">
+            <h2 class="font-bold text-sm text-on-surface" th:text="'Mục yêu thích #' + ${yt.mucTieuId}">Mục yêu thích</h2>
+            <p class="text-xs text-on-surface-variant mt-1">Đã lưu vào danh sách quan tâm của bạn.</p>
+          </div>
+
+          <div class="pt-4 border-t border-surface-container/40 flex items-center gap-3">
+            <a th:href="${yt.loaiYeuThich != null && yt.loaiYeuThich.name() == 'KHOA_HOC'} ? @{/khoa-hoc} : @{/gia-su}"
+               class="flex-1 py-2 px-3 rounded-xl bg-primary text-white text-xs font-bold text-center hover:bg-primary-container transition-all">
+              Xem Chi Tiết
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

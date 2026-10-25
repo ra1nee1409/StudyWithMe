@@ -4,6 +4,7 @@ import com.studywithme.entity.DonHang;
 import com.studywithme.entity.enums.shared.TrangThaiThanhToan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,8 +13,13 @@ import java.util.Optional;
 
 @Repository
 public interface DonHangRepository extends JpaRepository<DonHang, Long> {
+
+    @EntityGraph(attributePaths = {"danhSachChiTiet", "nguoiDung"})
     Optional<DonHang> findByMaDonHang(String maDonHang);
+
+    @EntityGraph(attributePaths = {"danhSachChiTiet"})
     List<DonHang> findByNguoiDungIdOrderByNgayTaoDonDesc(Long nguoiDungId);
+
     Page<DonHang> findByTrangThaiThanhToan(TrangThaiThanhToan trangThaiThanhToan, Pageable pageable);
 
     @org.springframework.data.jpa.repository.Query("SELECT COALESCE(SUM(d.tongTienThanhToan), 0) FROM DonHang d WHERE d.trangThaiThanhToan = :trangThai")

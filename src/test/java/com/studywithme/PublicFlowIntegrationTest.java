@@ -93,6 +93,26 @@ class PublicFlowIntegrationTest {
                 .andExpect(view().name("register"));
     }
 
+    @Test
+    @DisplayName("1.4. Kiểm tra Trang Danh mục Khóa học (/khoa-hoc) trả về HTTP 200")
+    void testTrangKhoaHocRender() throws Exception {
+        mockMvc.perform(get("/khoa-hoc"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("courses/index"))
+                .andExpect(model().attributeExists("courses"))
+                .andExpect(model().attributeExists("totalCourses"));
+    }
+
+    @Test
+    @DisplayName("1.5. Kiểm tra Trang Đội ngũ Gia sư (/gia-su) trả về HTTP 200")
+    void testTrangGiaSuRender() throws Exception {
+        mockMvc.perform(get("/gia-su"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("tutors/index"))
+                .andExpect(model().attributeExists("tutors"))
+                .andExpect(model().attributeExists("totalTutors"));
+    }
+
     // =========================================================================
     // 2. KIỂM THỬ PUBLIC REST APIS (KHÔNG CẦN TOKEN)
     // =========================================================================
@@ -131,6 +151,24 @@ class PublicFlowIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.thanhCong").value(true))
                 .andExpect(jsonPath("$.duLieu").isArray());
+    }
+
+    @Test
+    @DisplayName("2.5. Kiểm tra API Public Tìm kiếm Khóa học (/api/public/khoa-hoc)")
+    void testApiPublicLocKhoaHoc() throws Exception {
+        mockMvc.perform(get("/api/public/khoa-hoc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.thanhCong").value(true))
+                .andExpect(jsonPath("$.duLieu.content").isArray());
+    }
+
+    @Test
+    @DisplayName("2.6. Kiểm tra API Public Tìm kiếm Gia sư (/api/public/giang-vien)")
+    void testApiPublicLocGiangVien() throws Exception {
+        mockMvc.perform(get("/api/public/giang-vien"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.thanhCong").value(true))
+                .andExpect(jsonPath("$.duLieu.content").isArray());
     }
 
     // =========================================================================

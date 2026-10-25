@@ -15,4 +15,5 @@ public interface DanhSachYeuThichRepository extends JpaRepository<DanhSachYeuThi
     Optional<DanhSachYeuThich> findByNguoiDungIdAndLoaiYeuThichAndMucTieuId(Long nguoiDungId, LoaiYeuThich loaiYeuThich, Long mucTieuId);
     boolean existsByNguoiDungIdAndLoaiYeuThichAndMucTieuId(Long nguoiDungId, LoaiYeuThich loaiYeuThich, Long mucTieuId);
     void deleteByNguoiDungIdAndLoaiYeuThichAndMucTieuId(Long nguoiDungId, LoaiYeuThich loaiYeuThich, Long mucTieuId);
+    long countByNguoiDungId(Long nguoiDungId);
 }

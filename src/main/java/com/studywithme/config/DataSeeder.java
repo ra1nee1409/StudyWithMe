@@ -35,6 +35,8 @@ public class DataSeeder implements CommandLineRunner {
     private final KhoaHocRepository khoaHocRepository;
     private final ChuongHocRepository chuongHocRepository;
     private final BaiHocRepository baiHocRepository;
+    private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
+    private final YeuCauRutTienRepository yeuCauRutTienRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataSeeder(VaiTroRepository vaiTroRepository,
@@ -47,6 +49,8 @@ public class DataSeeder implements CommandLineRunner {
                       KhoaHocRepository khoaHocRepository,
                       ChuongHocRepository chuongHocRepository,
                       BaiHocRepository baiHocRepository,
+                      LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
+                      YeuCauRutTienRepository yeuCauRutTienRepository,
                       PasswordEncoder passwordEncoder) {
         this.vaiTroRepository = vaiTroRepository;
         this.nguoiDungRepository = nguoiDungRepository;
@@ -58,6 +62,8 @@ public class DataSeeder implements CommandLineRunner {
         this.khoaHocRepository = khoaHocRepository;
         this.chuongHocRepository = chuongHocRepository;
         this.baiHocRepository = baiHocRepository;
+        this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
+        this.yeuCauRutTienRepository = yeuCauRutTienRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -173,6 +179,16 @@ public class DataSeeder implements CommandLineRunner {
         // 8. Khởi tạo 8 khóa học mẫu nổi bật nếu chưa có khóa học nào
         if (khoaHocRepository.count() == 0) {
             initKhoaHocMau();
+        }
+
+        // 9. Khởi tạo các lớp học gia sư trực tuyến đang mở nếu chưa có lớp nào
+        if (lopHocTrucTuyenRepository.count() == 0) {
+            initLopHocMau();
+        }
+
+        // 10. Khởi tạo các lệnh yêu cầu rút tiền mẫu nếu chưa có
+        if (yeuCauRutTienRepository.count() == 0) {
+            initYeuCauRutTienMau();
         }
     }
 
@@ -532,14 +548,26 @@ public class DataSeeder implements CommandLineRunner {
 
         if (gvNam == null) return;
 
-        DanhMuc dmToanThpt = danhMucRepository.findByDuongDanSlug("toan-thpt").orElse(null);
-        DanhMuc dmIelts = danhMucRepository.findByDuongDanSlug("ielts-academic").orElse(null);
-        DanhMuc dmVatLy = danhMucRepository.findByDuongDanSlug("vat-ly-10-12").orElse(null);
-        DanhMuc dmVao10 = danhMucRepository.findByDuongDanSlug("luyen-thi-vao-10-chuyen").orElse(null);
-        DanhMuc dmToeic = danhMucRepository.findByDuongDanSlug("toeic-4-ky-nang").orElse(null);
-        DanhMuc dmToanTieuHoc = danhMucRepository.findByDuongDanSlug("toan-tieu-hoc").orElse(null);
-        DanhMuc dmKhtn = danhMucRepository.findByDuongDanSlug("khoa-hoc-tu-nhien").orElse(null);
-        DanhMuc dmGiaoTiep = danhMucRepository.findByDuongDanSlug("tieng-anh-giao-tiep").orElse(null);
+        List<DanhMuc> allCategories = danhMucRepository.findAll();
+        if (allCategories.isEmpty()) return;
+
+        DanhMuc defaultDm = allCategories.get(0);
+        DanhMuc dmToanThpt = danhMucRepository.findByDuongDanSlug("toan-thpt")
+                .orElseGet(() -> allCategories.stream().filter(d -> d.getDuongDanSlug().contains("cap-3") || d.getDuongDanSlug().contains("thpt")).findFirst().orElse(defaultDm));
+        DanhMuc dmIelts = danhMucRepository.findByDuongDanSlug("ielts-academic")
+                .orElseGet(() -> allCategories.stream().filter(d -> d.getDuongDanSlug().contains("ielts")).findFirst().orElse(defaultDm));
+        DanhMuc dmVatLy = danhMucRepository.findByDuongDanSlug("vat-ly-10-12")
+                .orElseGet(() -> allCategories.stream().filter(d -> d.getDuongDanSlug().contains("cap-3") || d.getDuongDanSlug().contains("ly")).findFirst().orElse(defaultDm));
+        DanhMuc dmVao10 = danhMucRepository.findByDuongDanSlug("luyen-thi-vao-10-chuyen")
+                .orElseGet(() -> allCategories.stream().filter(d -> d.getDuongDanSlug().contains("cap-2")).findFirst().orElse(defaultDm));
+        DanhMuc dmToeic = danhMucRepository.findByDuongDanSlug("toeic-4-ky-nang")
+                .orElseGet(() -> allCategories.stream().filter(d -> d.getDuongDanSlug().contains("toeic")).findFirst().orElse(defaultDm));
+        DanhMuc dmToanTieuHoc = danhMucRepository.findByDuongDanSlug("toan-tieu-hoc")
+                .orElseGet(() -> allCategories.stream().filter(d -> d.getDuongDanSlug().contains("cap-1")).findFirst().orElse(defaultDm));
+        DanhMuc dmKhtn = danhMucRepository.findByDuongDanSlug("khoa-hoc-tu-nhien")
+                .orElseGet(() -> allCategories.stream().filter(d -> d.getDuongDanSlug().contains("cap-2")).findFirst().orElse(defaultDm));
+        DanhMuc dmGiaoTiep = danhMucRepository.findByDuongDanSlug("tieng-anh-giao-tiep")
+                .orElseGet(() -> allCategories.stream().filter(d -> d.getDuongDanSlug().contains("ielts") || d.getDuongDanSlug().contains("toeic")).findFirst().orElse(defaultDm));
 
         // Khóa 1: Toán 12
         taoKhoaHoc("Chinh Phục Điểm 9+ Môn Toán THPT Quốc Gia",
@@ -605,13 +633,46 @@ public class DataSeeder implements CommandLineRunner {
                 new BigDecimal("1200000"), new BigDecimal("650000"), "IELTS", 430, new BigDecimal("4.91"), 46,
                 gvMaiAnh, dmGiaoTiep);
 
-        logger.info(">>> Đã khởi tạo 8 khóa học mẫu nổi bật thành công.");
+        // Khóa 9: Đang chờ duyệt (CHO_DUYET)
+        taoKhoaHoc("Khóa Học Luyện Đề ĐGNL ĐHQG 2026 - Tư Duy Định Lượng",
+                "luyen-de-dgnl-dhqg-2026-tu-duy-dinh-luong",
+                "Tổng hợp 20 đề thi chuẩn ma trận đề thi ĐGNL ĐHQG Hà Nội & TP.HCM. Phân tích chi tiết từng dạng câu hỏi phân loại điểm 900+ kèm video hướng dẫn phương pháp giải.",
+                "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop&q=80",
+                new BigDecimal("1400000"), new BigDecimal("790000"), "CAP_3", 0, BigDecimal.ZERO, 0,
+                gvNam, dmToanThpt, TrangThaiKhoaHoc.CHO_DUYET, null);
+
+        // Khóa 10: Đang chờ duyệt (CHO_DUYET)
+        taoKhoaHoc("Mastering IELTS Writing Task 2: Cấu Trúc Luận Điểm 8.0+",
+                "mastering-ielts-writing-task-2-8-0",
+                "Chiến lược tư duy phản biện và phát triển ý tưởng cho 5 dạng đề Writing Task 2. Cung cấp 50 bài luận mẫu Band 8.5 kèm hệ thống từ vựng C1-C2 chuyên sâu.",
+                "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=80",
+                new BigDecimal("1800000"), new BigDecimal("990000"), "IELTS", 0, BigDecimal.ZERO, 0,
+                gvMaiAnh, dmIelts, TrangThaiKhoaHoc.CHO_DUYET, null);
+
+        // Khóa 11: Bị từ chối (TU_CHOI)
+        taoKhoaHoc("Tuyệt Kỹ Bấm Máy Tính Casio 580VNX Giải Nhanh Toán 12",
+                "tuyet-ky-bam-may-tinh-casio-580vnx",
+                "Kỹ thuật giải nhanh trắc nghiệm 30s các dạng Toán giải tích, đạo hàm và số phức dành cho học sinh lớp 12 chuẩn bị thi tốt nghiệp.",
+                "https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?w=800&auto=format&fit=crop&q=80",
+                new BigDecimal("800000"), new BigDecimal("390000"), "CAP_3", 0, BigDecimal.ZERO, 0,
+                gvNam, dmToanThpt, TrangThaiKhoaHoc.TU_CHOI,
+                "Video bài giảng chất lượng 360p mờ, âm thanh micro có tiếng ồn và đề cương chưa đầy đủ các chương trọng tâm.");
+
+        logger.info(">>> Đã khởi tạo các khóa học mẫu (8 đã xuất bản, 2 chờ duyệt, 1 từ chối) thành công.");
     }
 
     private void taoKhoaHoc(String tieuDe, String slug, String moTa, String anhDaiDien,
                             BigDecimal giaGoc, BigDecimal giaKhuyenMai, String thePhanLoai,
                             int soHocVien, BigDecimal diemTb, int soDanhGia,
                             HoSoGiangVien giangVien, DanhMuc danhMuc) {
+        taoKhoaHoc(tieuDe, slug, moTa, anhDaiDien, giaGoc, giaKhuyenMai, thePhanLoai, soHocVien, diemTb, soDanhGia, giangVien, danhMuc, TrangThaiKhoaHoc.DA_XUAT_BAN, null);
+    }
+
+    private void taoKhoaHoc(String tieuDe, String slug, String moTa, String anhDaiDien,
+                            BigDecimal giaGoc, BigDecimal giaKhuyenMai, String thePhanLoai,
+                            int soHocVien, BigDecimal diemTb, int soDanhGia,
+                            HoSoGiangVien giangVien, DanhMuc danhMuc,
+                            TrangThaiKhoaHoc trangThai, String lyDoTuChoi) {
         if (danhMuc == null || giangVien == null) return;
         if (khoaHocRepository.existsByDuongDanSlug(slug)) return;
 
@@ -624,7 +685,8 @@ public class DataSeeder implements CommandLineRunner {
                 .giaKhuyenMai(giaKhuyenMai)
                 .thePhanLoai(thePhanLoai)
                 .trinhDo(TrinhDoKhoaHoc.MOI_TRINH_DO)
-                .trangThai(TrangThaiKhoaHoc.DA_XUAT_BAN)
+                .trangThai(trangThai)
+                .lyDoTuChoi(lyDoTuChoi)
                 .tongSoHocVien(soHocVien)
                 .diemDanhGiaTrungBinh(diemTb)
                 .tongSoDanhGia(soDanhGia)
@@ -657,6 +719,128 @@ public class DataSeeder implements CommandLineRunner {
                 .choPhepHocThu(true)
                 .thuTuSapXep(2)
                 .build());
+    }
+
+    private void initLopHocMau() {
+        NguoiDung uNam = nguoiDungRepository.findByEmail("tutor@studywithme.vn").orElse(null);
+        NguoiDung uMaiAnh = nguoiDungRepository.findByEmail("maianh@studywithme.vn").orElse(null);
+        NguoiDung uMinhQuan = nguoiDungRepository.findByEmail("minhquan@studywithme.vn").orElse(null);
+
+        HoSoGiangVien gvNam = (uNam != null) ? hoSoGiangVienRepository.findByNguoiDungId(uNam.getId()).orElse(null) : null;
+        HoSoGiangVien gvMaiAnh = (uMaiAnh != null) ? hoSoGiangVienRepository.findByNguoiDungId(uMaiAnh.getId()).orElse(null) : null;
+        HoSoGiangVien gvMinhQuan = (uMinhQuan != null) ? hoSoGiangVienRepository.findByNguoiDungId(uMinhQuan.getId()).orElse(null) : null;
+
+        List<DanhMuc> allCats = danhMucRepository.findAll();
+        DanhMuc defaultDm = !allCats.isEmpty() ? allCats.get(0) : null;
+        if (defaultDm == null) return;
+
+        DanhMuc dmToanThpt = danhMucRepository.findByDuongDanSlug("toan-thpt")
+                .orElseGet(() -> allCats.stream().filter(d -> d.getDuongDanSlug().contains("cap-3") || d.getDuongDanSlug().contains("thpt")).findFirst().orElse(defaultDm));
+        DanhMuc dmIelts = danhMucRepository.findByDuongDanSlug("ielts-academic")
+                .orElseGet(() -> allCats.stream().filter(d -> d.getDuongDanSlug().contains("ielts")).findFirst().orElse(defaultDm));
+        DanhMuc dmVatLy = danhMucRepository.findByDuongDanSlug("vat-ly-10-12")
+                .orElseGet(() -> allCats.stream().filter(d -> d.getDuongDanSlug().contains("cap-3") || d.getDuongDanSlug().contains("ly")).findFirst().orElse(defaultDm));
+
+        if (gvNam != null && dmToanThpt != null) {
+            lopHocTrucTuyenRepository.save(com.studywithme.entity.LopHocTrucTuyen.builder()
+                    .giangVien(gvNam)
+                    .danhMuc(dmToanThpt)
+                    .tieuDeLop("Lớp Kèm Toán 12 Nâng Cao - Ôn Thi THPT Quốc Gia Điểm 9+")
+                    .moTaLop("Học trực tuyến tương tác 2 chiều qua Google Meet. Luyện chuyên đề Hàm số, Tọa độ không gian Oxyz và Tích phân vận dụng cao.")
+                    .siSoToiDa(15)
+                    .hocPhiMoiHocVien(new BigDecimal("1500000"))
+                    .lichHocTrongTuan("Thứ 2 & Thứ 5 (19:30 - 21:00)")
+                    .linkPhongHoc("https://meet.google.com/studywithme-math")
+                    .trangThai(com.studywithme.entity.enums.giaovien.TrangThaiLopHoc.DANG_MO_DANG_KY)
+                    .build());
+
+            lopHocTrucTuyenRepository.save(com.studywithme.entity.LopHocTrucTuyen.builder()
+                    .giangVien(gvNam)
+                    .danhMuc(dmToanThpt)
+                    .tieuDeLop("Khóa Gia Sư 1-Kèm-1: Chinh Phục Hình Học Không Gian")
+                    .moTaLop("Kèm riêng 1-1 hỗ trợ lấy lại gốc hình học không gian, dựng hình, khoảng cách và góc theo phương pháp tọa độ hóa.")
+                    .siSoToiDa(1)
+                    .hocPhiMoiHocVien(new BigDecimal("3500000"))
+                    .lichHocTrongTuan("Thứ 7 & Chủ Nhật (08:30 - 10:00)")
+                    .linkPhongHoc("https://meet.google.com/studywithme-math1on1")
+                    .trangThai(com.studywithme.entity.enums.giaovien.TrangThaiLopHoc.DANG_MO_DANG_KY)
+                    .build());
+        }
+
+        if (gvMaiAnh != null && dmIelts != null) {
+            lopHocTrucTuyenRepository.save(com.studywithme.entity.LopHocTrucTuyen.builder()
+                    .giangVien(gvMaiAnh)
+                    .danhMuc(dmIelts)
+                    .tieuDeLop("Lớp IELTS Speaking & Writing Intensive 7.0+ (Nhóm Nhỏ 8 Bạn)")
+                    .moTaLop("Sửa bài 1-1 từng tuần, mock test speaking trực tiếp với giảng viên đạt IELTS 8.5. Cung cấp bộ Forecast đề thi mới nhất.")
+                    .siSoToiDa(8)
+                    .hocPhiMoiHocVien(new BigDecimal("2800000"))
+                    .lichHocTrongTuan("Thứ 3 & Thứ 6 (20:00 - 21:30)")
+                    .linkPhongHoc("https://meet.google.com/studywithme-ielts")
+                    .trangThai(com.studywithme.entity.enums.giaovien.TrangThaiLopHoc.DANG_MO_DANG_KY)
+                    .build());
+        }
+
+        if (gvMinhQuan != null && dmVatLy != null) {
+            lopHocTrucTuyenRepository.save(com.studywithme.entity.LopHocTrucTuyen.builder()
+                    .giangVien(gvMinhQuan)
+                    .danhMuc(dmVatLy)
+                    .tieuDeLop("Lớp Bứt Phá Vật Lý 12 - Chuyên Đề Dao Động Cơ & Điện Xoay Chiều")
+                    .moTaLop("Phương pháp giải nhanh bằng vòng tròn lượng giác và giản đồ vecto buộc chuẩn. Bài tập trắc nghiệm có chấm điểm tự động.")
+                    .siSoToiDa(12)
+                    .hocPhiMoiHocVien(new BigDecimal("1400000"))
+                    .lichHocTrongTuan("Thứ 4 & Thứ 7 (18:30 - 20:00)")
+                    .linkPhongHoc("https://meet.google.com/studywithme-physics")
+                    .trangThai(com.studywithme.entity.enums.giaovien.TrangThaiLopHoc.DANG_MO_DANG_KY)
+                    .build());
+        }
+
+        logger.info(">>> Đã khởi tạo các lớp gia sư trực tuyến mẫu thành công.");
+    }
+
+    private void initYeuCauRutTienMau() {
+        HoSoGiangVien gvNam = hoSoGiangVienRepository.findByNguoiDungEmail("tutor@studywithme.vn").orElse(null);
+        HoSoGiangVien gvMaiAnh = hoSoGiangVienRepository.findByNguoiDungEmail("maianh@studywithme.vn").orElse(null);
+        HoSoGiangVien gvBao = hoSoGiangVienRepository.findByNguoiDungEmail("lebao.chem@studywithme.vn").orElse(null);
+
+        if (gvNam != null) {
+            yeuCauRutTienRepository.save(com.studywithme.entity.YeuCauRutTien.builder()
+                    .giangVien(gvNam)
+                    .soTienRut(new BigDecimal("2000000"))
+                    .tenNganHang("Vietcombank")
+                    .soTaiKhoan("0123456789")
+                    .tenChuTaiKhoan("HOANG VAN NAM")
+                    .trangThai(com.studywithme.entity.enums.admin.TrangThaiRutTien.CHO_XU_LY)
+                    .build());
+        }
+
+        if (gvMaiAnh != null) {
+            yeuCauRutTienRepository.save(com.studywithme.entity.YeuCauRutTien.builder()
+                    .giangVien(gvMaiAnh)
+                    .soTienRut(new BigDecimal("1500000"))
+                    .tenNganHang("MB Bank")
+                    .soTaiKhoan("999988887777")
+                    .tenChuTaiKhoan("MAI ANH")
+                    .trangThai(com.studywithme.entity.enums.admin.TrangThaiRutTien.DA_CHUYEN_TIEN)
+                    .ghiChuAdmin("Mã GD: FT26298374928 - Đã hoàn tất chuyển khoản thành công")
+                    .ngayXuLy(java.time.LocalDateTime.now().minusHours(4))
+                    .build());
+        }
+
+        if (gvBao != null) {
+            yeuCauRutTienRepository.save(com.studywithme.entity.YeuCauRutTien.builder()
+                    .giangVien(gvBao)
+                    .soTienRut(new BigDecimal("5000000"))
+                    .tenNganHang("Techcombank")
+                    .soTaiKhoan("1903456781234")
+                    .tenChuTaiKhoan("LE QUOC BAO")
+                    .trangThai(com.studywithme.entity.enums.admin.TrangThaiRutTien.TU_CHOI)
+                    .ghiChuAdmin("Tên chủ tài khoản Techcombank không khớp với hồ sơ KYC giảng viên")
+                    .ngayXuLy(java.time.LocalDateTime.now().minusDays(1))
+                    .build());
+        }
+
+        logger.info(">>> Đã khởi tạo các lệnh rút tiền mẫu (1 chờ xử lý, 1 đã chuyển, 1 từ chối) thành công.");
     }
 
     private VaiTro initRole(VaiTroName vaiTroName, String moTa) {

@@ -5,9 +5,9 @@
     <div class="h-20 w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
       <!-- Logo -->
       <div class="flex items-center gap-space-md shrink-0">
-        <a class="flex items-center gap-space-sm" th:href="@{/}">
-          <span class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center text-white font-black text-xl shadow-md">S</span>
-          <span class="font-headline-sm text-headline-sm text-primary tracking-tight font-bold hidden sm:inline-block">StudyWithMe</span>
+        <a class="flex items-center gap-2.5 group" th:href="@{/}">
+          <img th:src="@{/images/logo-icon.png}" src="/images/logo-icon.png" alt="StudyWithMe Logo" class="h-10 w-10 object-contain transition-transform group-hover:scale-105">
+          <img th:src="@{/images/logo-text.png}" src="/images/logo-text.png" alt="StudyWithMe" class="h-7 object-contain hidden sm:inline-block transition-opacity group-hover:opacity-90">
         </a>
       </div>
 
@@ -20,8 +20,11 @@
       <!-- Main Navigation -->
       <nav class="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0">
         <a class="px-3.5 py-2 rounded-lg font-label-lg text-label-lg whitespace-nowrap transition-colors"
-           th:classappend="${activePage == 'home'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
-           th:href="@{/#tim-gia-su}">Tìm Gia Sư</a>
+           th:classappend="${activePage == 'courses'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
+           th:href="@{/khoa-hoc}">Khóa Học</a>
+        <a class="px-3.5 py-2 rounded-lg font-label-lg text-label-lg whitespace-nowrap transition-colors"
+           th:classappend="${activePage == 'tutors'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
+           th:href="@{/gia-su}">Tìm Gia Sư</a>
         <a class="px-3.5 py-2 rounded-lg text-on-surface-variant font-label-lg text-label-lg whitespace-nowrap hover:text-primary hover:bg-surface-container-low transition-colors"
            th:href="@{/#lop-1-kem-1}">Các Cấp Học</a>
         <a class="px-3.5 py-2 rounded-lg text-on-surface-variant font-label-lg text-label-lg whitespace-nowrap hover:text-primary hover:bg-surface-container-low transition-colors"

@@ -5,6 +5,15 @@
   <aside th:fragment="tutor-sidebar(activeTab)" class="fixed left-0 top-0 h-screen w-72 bg-surface-card z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-r border-surface-container">
     <div class="flex flex-col flex-1 min-h-0">
       
+      <!-- Brand Logo Header -->
+      <div class="px-5 py-4 border-b border-surface-container flex items-center justify-between">
+        <a th:href="@{/}" class="flex items-center gap-2 group">
+          <img th:src="@{/images/logo-icon.png}" src="/images/logo-icon.png" alt="StudyWithMe" class="h-7 w-7 object-contain transition-transform group-hover:scale-105">
+          <img th:src="@{/images/logo-text.png}" src="/images/logo-text.png" alt="StudyWithMe" class="h-5 object-contain">
+        </a>
+        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-tertiary-container/20 text-tertiary">Giảng viên</span>
+      </div>
+
       <!-- Tutor Profile Box -->
       <div class="p-5 bg-surface-container-low/60 border-b border-surface-container/40">
         <div class="flex items-center gap-3 mb-3">

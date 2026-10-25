@@ -67,6 +67,7 @@ public class LopHocTrucTuyen {
     @Builder.Default
     private TrangThaiLopHoc trangThai = TrangThaiLopHoc.DANG_MO_DANG_KY;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @OneToMany(mappedBy = "lopHoc", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<DangKyLopHoc> danhSachHocVien = new ArrayList<>();

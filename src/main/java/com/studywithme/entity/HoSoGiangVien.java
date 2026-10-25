@@ -66,6 +66,7 @@ public class HoSoGiangVien {
     @Builder.Default
     private List<ChungChiGiangVien> danhSachChungChi = new ArrayList<>();
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @OneToMany(mappedBy = "giangVien", cascade = CascadeType.ALL)
     @Builder.Default
     private List<LichSuViTien> lichSuGiaoDichVi = new ArrayList<>();

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <!-- ==================== SHARED VIDEO DEMO MODAL COMPONENT ==================== -->
+  <div th:fragment="video-modal" id="videoDemoModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-surface-card rounded-2xl shadow-2xl border border-surface-container max-w-3xl w-full overflow-hidden animate-fade-in flex flex-col">
+      <div class="px-5 py-3.5 bg-surface-container-low border-b border-surface-container flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[20px]">smart_display</span>
+          <h4 id="videoModalTitle" class="font-bold text-sm text-on-surface">Video Dạy Thử Demo</h4>
+        </div>
+        <button type="button" onclick="closeDemoModal()" class="w-8 h-8 rounded-lg text-on-surface-variant hover:bg-surface-container flex items-center justify-center cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="aspect-video w-full bg-black">
+        <iframe id="videoModalIframe" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

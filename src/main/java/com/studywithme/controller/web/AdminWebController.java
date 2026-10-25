@@ -10,6 +10,12 @@ import com.studywithme.repository.DanhGiaNhanXetRepository;
 import com.studywithme.repository.HoSoGiangVienRepository;
 import com.studywithme.repository.LopHocTrucTuyenRepository;
 import com.studywithme.repository.NguoiDungRepository;
+import com.studywithme.entity.enums.admin.TrangThaiKhoaHoc;
+import com.studywithme.entity.enums.admin.TrangThaiRutTien;
+import com.studywithme.repository.KhoaHocRepository;
+import com.studywithme.repository.YeuCauRutTienRepository;
+import com.studywithme.service.AdminKhoaHocService;
+import com.studywithme.service.AdminTaiChinhService;
 import com.studywithme.service.AdminThongKeService;
 import com.studywithme.service.BannerService;
 import com.studywithme.service.DanhMucService;
@@ -35,6 +41,7 @@ public class AdminWebController {
 
     private final NguoiDungRepository nguoiDungRepository;
     private final HoSoGiangVienRepository hoSoGiangVienRepository;
+    private final KhoaHocRepository khoaHocRepository;
     private final DangKyLopHocRepository dangKyLopHocRepository;
     private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
     private final DanhGiaNhanXetRepository danhGiaNhanXetRepository;
@@ -42,18 +49,26 @@ public class AdminWebController {
     private final BannerService bannerService;
     private final DanhMucService danhMucService;
     private final GiangVienKycService giangVienKycService;
+    private final AdminKhoaHocService adminKhoaHocService;
+    private final AdminTaiChinhService adminTaiChinhService;
+    private final YeuCauRutTienRepository yeuCauRutTienRepository;
 
     public AdminWebController(NguoiDungRepository nguoiDungRepository,
                               HoSoGiangVienRepository hoSoGiangVienRepository,
+                              KhoaHocRepository khoaHocRepository,
                               DangKyLopHocRepository dangKyLopHocRepository,
                               LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
                               DanhGiaNhanXetRepository danhGiaNhanXetRepository,
                               AdminThongKeService adminThongKeService,
                               BannerService bannerService,
                               DanhMucService danhMucService,
-                              GiangVienKycService giangVienKycService) {
+                              GiangVienKycService giangVienKycService,
+                              AdminKhoaHocService adminKhoaHocService,
+                              AdminTaiChinhService adminTaiChinhService,
+                              YeuCauRutTienRepository yeuCauRutTienRepository) {
         this.nguoiDungRepository = nguoiDungRepository;
         this.hoSoGiangVienRepository = hoSoGiangVienRepository;
+        this.khoaHocRepository = khoaHocRepository;
         this.dangKyLopHocRepository = dangKyLopHocRepository;
         this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
         this.danhGiaNhanXetRepository = danhGiaNhanXetRepository;
@@ -61,6 +76,9 @@ public class AdminWebController {
         this.bannerService = bannerService;
         this.danhMucService = danhMucService;
         this.giangVienKycService = giangVienKycService;
+        this.adminKhoaHocService = adminKhoaHocService;
+        this.adminTaiChinhService = adminTaiChinhService;
+        this.yeuCauRutTienRepository = yeuCauRutTienRepository;
     }
 
     @ModelAttribute
@@ -69,6 +87,8 @@ public class AdminWebController {
         model.addAttribute("tongNguoiDung", nguoiDungRepository.count());
         model.addAttribute("tongGiaSu", hoSoGiangVienRepository.countByTrangThaiDuyet(TrangThaiGiangVien.DA_DUYET));
         model.addAttribute("hoSoChoDuyet", hoSoGiangVienRepository.countByTrangThaiDuyet(TrangThaiGiangVien.CHO_DUYET));
+        model.addAttribute("khoaHocChoDuyet", khoaHocRepository.countByTrangThai(TrangThaiKhoaHoc.CHO_DUYET));
+        model.addAttribute("lenhRutTienChoDuyet", yeuCauRutTienRepository.countByTrangThai(TrangThaiRutTien.CHO_XU_LY));
         model.addAttribute("tongLopHoc", lopHocTrucTuyenRepository.count());
     }
 
@@ -175,4 +195,64 @@ public class AdminWebController {
         model.addAttribute("danhSachDanhGia", danhGiaNhanXetRepository.findAll());
         return "admin/classes";
     }
+
+    // ==========================================
+    // 7. MỤC KIỂM DUYỆT KHÓA HỌC (TRANG A5)
+    // ==========================================
+    @GetMapping({"/khoa-hoc/kiem-duyet", "/courses", "/courses/moderation"})
+    public String kiemDuyetKhoaHocPage(Model model) {
+        model.addAttribute("danhSachChoDuyet", adminKhoaHocService.layDanhSachKhoaHoc(TrangThaiKhoaHoc.CHO_DUYET));
+        model.addAttribute("danhSachDaXuatBan", adminKhoaHocService.layDanhSachKhoaHoc(TrangThaiKhoaHoc.DA_XUAT_BAN));
+        model.addAttribute("danhSachTuChoi", adminKhoaHocService.layDanhSachKhoaHoc(TrangThaiKhoaHoc.TU_CHOI));
+        model.addAttribute("thongKeKiemDuyet", adminKhoaHocService.layThongKe());
+        return "admin/course-moderation";
+    }
+
+    @PostMapping({"/khoa-hoc/{id}/phe-duyet", "/courses/{id}/approve"})
+    public String pheDuyetKhoaHocAction(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        adminKhoaHocService.pheDuyetKhoaHoc(id);
+        redirectAttributes.addFlashAttribute("message", "Đã phê duyệt và xuất bản khóa học thành công!");
+        return "redirect:/admin/khoa-hoc/kiem-duyet";
+    }
+
+    @PostMapping({"/khoa-hoc/{id}/tu-choi", "/courses/{id}/reject"})
+    public String tuChoiKhoaHocAction(@PathVariable Long id,
+                                      @RequestParam(name = "lyDoTuChoi", required = false) String lyDoTuChoi,
+                                      RedirectAttributes redirectAttributes) {
+        adminKhoaHocService.tuChoiKhoaHoc(id, lyDoTuChoi);
+        redirectAttributes.addFlashAttribute("message", "Đã từ chối khóa học và lưu lý do thành công!");
+        return "redirect:/admin/khoa-hoc/kiem-duyet";
+    }
+
+    // ==========================================
+    // 8. MỤC QUẢN LÝ TÀI CHÍNH & RÚT TIỀN (TRANG A7)
+    // ==========================================
+    @GetMapping({"/tai-chinh/rut-tien", "/payouts"})
+    public String payoutsPage(Model model) {
+        model.addAttribute("danhSachChoXuLy", adminTaiChinhService.layDanhSachYeuCauRutTien(TrangThaiRutTien.CHO_XU_LY));
+        model.addAttribute("danhSachDaChuyen", adminTaiChinhService.layDanhSachYeuCauRutTien(TrangThaiRutTien.DA_CHUYEN_TIEN));
+        model.addAttribute("danhSachTuChoi", adminTaiChinhService.layDanhSachYeuCauRutTien(TrangThaiRutTien.TU_CHOI));
+        model.addAttribute("thongKeRutTien", adminTaiChinhService.layThongKeRutTien());
+        return "admin/payouts";
+    }
+
+    @PostMapping({"/tai-chinh/rut-tien/{id}/xac-nhan", "/payouts/{id}/approve"})
+    public String xacNhanChuyenTienAction(@PathVariable Long id,
+                                          @RequestParam(name = "ghiChuAdmin", required = false) String ghiChuAdmin,
+                                          RedirectAttributes redirectAttributes) {
+        adminTaiChinhService.xacNhanChuyenTien(id, ghiChuAdmin);
+        redirectAttributes.addFlashAttribute("message", "Đã xác nhận giải ngân chuyển tiền thành công!");
+        return "redirect:/admin/tai-chinh/rut-tien";
+    }
+
+    @PostMapping({"/tai-chinh/rut-tien/{id}/tu-choi", "/payouts/{id}/reject"})
+    public String tuChoiRutTienAction(@PathVariable Long id,
+                                      @RequestParam(name = "lyDoTuChoi") String lyDoTuChoi,
+                                      RedirectAttributes redirectAttributes) {
+        adminTaiChinhService.tuChoiRutTien(id, lyDoTuChoi);
+        redirectAttributes.addFlashAttribute("message", "Đã từ chối lệnh rút tiền và hoàn tiền về ví giảng viên thành công!");
+        return "redirect:/admin/tai-chinh/rut-tien";
+    }
 }
+
+

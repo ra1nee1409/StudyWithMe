@@ -57,13 +57,13 @@ public class HomeWebController {
         return "index";
     }
 
-    @GetMapping("/login")
+    @GetMapping({"/login", "/dang-nhap"})
     public String login(Model model) {
         model.addAttribute("title", "Đăng nhập tài khoản - StudyWithMe");
         return "login";
     }
 
-    @GetMapping("/register")
+    @GetMapping({"/register", "/dang-ky"})
     public String register(Model model) {
         model.addAttribute("title", "Đăng ký tài khoản - StudyWithMe");
         return "register";

@@ -36,4 +36,14 @@ public class ChiTietDonHang {
 
     @Column(name = "don_gia", nullable = false, precision = 15, scale = 2)
     private BigDecimal donGia;
+
+    @Transient
+    private String tenSanPham;
+
+    public String getTenSanPham() {
+        if (tenSanPham != null && !tenSanPham.isBlank()) {
+            return tenSanPham;
+        }
+        return loaiSanPham == LoaiSanPhamDonHang.KHOA_HOC_VIDEO ? "Khóa học trực tuyến" : "Lớp học gia sư trực tuyến";
+    }
 }

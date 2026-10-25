@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Quản Lý Rút Tiền - Quản trị StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== SIDEBAR COMPONENT ==================== -->
+  <aside th:replace="~{components/admin/sidebar :: admin-sidebar('payouts')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar Component -->
+    <header th:replace="~{components/admin/header :: admin-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Flash Notification Message -->
+      <div th:if="${message}" class="p-4 rounded-xl bg-status-success/10 border border-status-success/30 text-status-success flex items-center gap-3 shadow-sm animate-fade-in">
+        <span class="material-symbols-outlined text-[22px]">check_circle</span>
+        <span class="text-sm font-semibold" th:text="${message}"></span>
+      </div>
+
+      <!-- Header Banner -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-xl shadow-sm border border-surface-container/40">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-secondary text-xs font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              Trang A7 • Quản Lý Tài Chính & Lệnh Rút Tiền
+            </span>
+            <span class="text-outline-variant">•</span>
+            <span class="text-xs text-on-surface-variant">Giải ngân thù lao giảng viên & đối soát số dư</span>
+          </div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">
+            Quản Lý Lệnh Rút Tiền (Payout Approval)
+          </h1>
+          <p class="text-xs text-on-surface-variant">
+            Xác minh thông tin tài khoản ngân hàng, phê duyệt lệnh rút tiền từ ví giảng viên và tự động hoàn tiền vào ví nếu từ chối lệnh.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a th:href="@{/admin/dashboard}" class="px-4 py-2 rounded-lg border border-surface-container text-xs font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            Về Dashboard
+          </a>
+        </div>
+      </section>
+
+      <!-- KPI Thống kê Tài chính & Rút tiền -->
+      <section class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <!-- 1. Tiền chờ xử lý -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-xs text-on-surface-variant font-medium">Tổng tiền chờ giải ngân</span>
+            <span class="text-2xl font-extrabold text-tertiary tracking-tight mt-1" 
+                  th:text="${thongKeRutTien != null && thongKeRutTien.tongTienChoXuLy != null ? #numbers.formatDecimal(thongKeRutTien.tongTienChoXuLy, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">
+              0 đ
+            </span>
+            <span class="text-[11px] text-tertiary font-semibold mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">hourglass_top</span>
+              <span th:text="${(thongKeRutTien != null ? thongKeRutTien.soLenhChoXuLy : 0) + ' lệnh chờ duyệt'}">0 lệnh chờ duyệt</span>
+            </span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-accent-coral-subtle text-tertiary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[26px]">pending_actions</span>
+          </div>
+        </div>
+
+        <!-- 2. Lệnh chờ duyệt -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-xs text-on-surface-variant font-medium">Lệnh chờ xử lý</span>
+            <span class="text-3xl font-extrabold text-on-surface tracking-tight mt-1" 
+                  th:text="${thongKeRutTien != null ? thongKeRutTien.soLenhChoXuLy : 0}">
+              0
+            </span>
+            <span class="text-[11px] text-secondary font-semibold mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">notifications_active</span>
+              Cần kiểm tra ngân hàng
+            </span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-primary-container/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[26px]">receipt_long</span>
+          </div>
+        </div>
+
+        <!-- 3. Đã giải ngân thành công -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-xs text-on-surface-variant font-medium">Đã giải ngân thành công</span>
+            <span class="text-2xl font-extrabold text-status-success tracking-tight mt-1" 
+                  th:text="${thongKeRutTien != null && thongKeRutTien.tongTienDaChuyen != null ? #numbers.formatDecimal(thongKeRutTien.tongTienDaChuyen, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">
+              0 đ
+            </span>
+            <span class="text-[11px] text-status-success font-semibold mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">check_circle</span>
+              <span th:text="${(thongKeRutTien != null ? thongKeRutTien.soLenhDaChuyen : 0) + ' lệnh hoàn tất'}">0 lệnh hoàn tất</span>
+            </span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-status-success/10 text-status-success flex items-center justify-center">
+            <span class="material-symbols-outlined text-[26px]">account_balance</span>
+          </div>
+        </div>
+
+        <!-- 4. Lệnh bị từ chối -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-xs text-on-surface-variant font-medium">Lệnh bị từ chối</span>
+            <span class="text-3xl font-extrabold text-status-error tracking-tight mt-1" 
+                  th:text="${thongKeRutTien != null ? thongKeRutTien.soLenhTuChoi : 0}">
+              0
+            </span>
+            <span class="text-[11px] text-status-error font-semibold mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">replay</span>
+              Đã hoàn tiền về ví gia sư
+            </span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-status-error/10 text-status-error flex items-center justify-center">
+            <span class="material-symbols-outlined text-[26px]">cancel</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Navigation Tabs -->
+      <section class="bg-surface-card rounded-xl shadow-sm border border-surface-container/40 p-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-container/40 pb-4">
+          <!-- Tab Buttons -->
+          <div class="flex items-center gap-2 overflow-x-auto">
+            <button onclick="switchTab('tab-pending')" id="btn-tab-pending"
+                    class="tab-btn px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 bg-primary text-white shadow-sm">
+              <span class="material-symbols-outlined text-[18px]">hourglass_top</span>
+              <span>Chờ xử lý</span>
+              <span class="px-2 py-0.5 rounded-full bg-white/20 text-white text-[11px]" 
+                    th:text="${#lists.size(danhSachChoXuLy)}">0</span>
+            </button>
+
+            <button onclick="switchTab('tab-approved')" id="btn-tab-approved"
+                    class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">verified</span>
+              <span>Đã chuyển tiền</span>
+              <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px]" 
+                    th:text="${#lists.size(danhSachDaChuyen)}">0</span>
+            </button>
+
+            <button onclick="switchTab('tab-rejected')" id="btn-tab-rejected"
+                    class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">cancel</span>
+              <span>Bị từ chối</span>
+              <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px]" 
+                    th:text="${#lists.size(danhSachTuChoi)}">0</span>
+            </button>
+          </div>
+
+          <!-- Quick Search Bar -->
+          <div class="relative w-full sm:w-72">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+            <input type="text" id="payoutSearchInput" onkeyup="filterPayoutTable()" 
+                   placeholder="Tìm theo tên, STK, ngân hàng..."
+                   class="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-surface-container bg-surface-canvas text-on-surface focus:outline-none focus:border-primary transition-all">
+          </div>
+        </div>
+
+        <!-- ==================== TAB 1: CHỜ XỬ LÝ (PENDING) ==================== -->
+        <div id="tab-pending" class="tab-content mt-4">
+          <!-- Empty State -->
+          <div th:if="${#lists.isEmpty(danhSachChoXuLy)}" class="py-12 flex flex-col items-center justify-center text-center">
+            <div class="w-16 h-16 rounded-full bg-status-success/10 text-status-success flex items-center justify-center mb-3">
+              <span class="material-symbols-outlined text-[32px]">task_alt</span>
+            </div>
+            <h3 class="text-base font-bold text-on-surface">Không có lệnh rút tiền nào đang chờ xử lý</h3>
+            <p class="text-xs text-on-surface-variant mt-1 max-w-sm">
+              Tuyệt vời! Toàn bộ yêu cầu rút tiền của giảng viên đã được giải ngân chuyển khoản đầy đủ.
+            </p>
+          </div>
+
+          <!-- Table Lệnh rút tiền chờ duyệt -->
+          <div th:unless="${#lists.isEmpty(danhSachChoXuLy)}" class="overflow-x-auto">
+            <table class="w-full text-left border-collapse payout-table">
+              <thead>
+                <tr class="border-b border-surface-container/60 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                  <th class="py-3 px-4">Mã lệnh / Ngày tạo</th>
+                  <th class="py-3 px-4">Giảng viên</th>
+                  <th class="py-3 px-4 text-right">Số tiền rút</th>
+                  <th class="py-3 px-4">Tài khoản thụ hưởng</th>
+                  <th class="py-3 px-4">Số dư ví còn lại</th>
+                  <th class="py-3 px-4 text-center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-surface-container/40 text-xs">
+                <tr th:each="yc : ${danhSachChoXuLy}" class="hover:bg-surface-container-low/50 transition-colors payout-row">
+                  <!-- Mã lệnh & Ngày tạo -->
+                  <td class="py-3.5 px-4">
+                    <div class="flex flex-col">
+                      <span class="font-bold text-primary" th:text="${'#YC-' + yc.id}">#YC-1</span>
+                      <span class="text-[11px] text-on-surface-variant" 
+                            th:text="${yc.ngayTao != null ? #temporals.format(yc.ngayTao, 'dd/MM/yyyy HH:mm') : ''}">
+                        25/10/2026 10:30
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- Giảng viên -->
+                  <td class="py-3.5 px-4">
+                    <div class="flex items-center gap-3">
+                      <img th:src="${yc.anhDaiDien ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}"
+                           class="w-9 h-9 rounded-full object-cover border border-surface-container shadow-sm" alt="Avatar">
+                      <div class="flex flex-col">
+                        <span class="font-bold text-on-surface tutor-name" th:text="${yc.tenGiangVien}">Thầy Hoàng Văn Nam</span>
+                        <span class="text-[11px] text-on-surface-variant" th:text="${yc.emailGiangVien}">tutor@studywithme.vn</span>
+                        <span class="text-[10px] text-on-surface-variant" th:if="${yc.soDienThoai}" th:text="${yc.soDienThoai}">0988776655</span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Số tiền rút -->
+                  <td class="py-3.5 px-4 text-right">
+                    <span class="text-sm font-extrabold text-tertiary" 
+                          th:text="${yc.soTienRut != null ? #numbers.formatDecimal(yc.soTienRut, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">
+                      2,000,000 đ
+                    </span>
+                  </td>
+
+                  <!-- Tài khoản thụ hưởng -->
+                  <td class="py-3.5 px-4">
+                    <div class="flex flex-col">
+                      <div class="flex items-center gap-1.5 font-bold text-on-surface bank-name">
+                        <span class="material-symbols-outlined text-[16px] text-secondary">account_balance</span>
+                        <span th:text="${yc.tenNganHang}">Vietcombank</span>
+                      </div>
+                      <div class="text-[11px] font-mono text-primary font-semibold tracking-wide bank-acc" th:text="${yc.soTaiKhoan}">
+                        0123456789
+                      </div>
+                      <div class="text-[10px] text-on-surface-variant uppercase font-medium bank-owner" th:text="${yc.tenChuTaiKhoan}">
+                        HOANG VAN NAM
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Số dư ví còn lại -->
+                  <td class="py-3.5 px-4">
+                    <span class="font-semibold text-on-surface" 
+                          th:text="${yc.soDuViHienTai != null ? #numbers.formatDecimal(yc.soDuViHienTai, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">
+                      4,850,000 đ
+                    </span>
+                  </td>
+
+                  <!-- Thao tác -->
+                  <td class="py-3.5 px-4">
+                    <div class="flex items-center justify-center gap-2">
+                      <!-- Nút Xác nhận chuyển tiền -->
+                      <button type="button"
+                              th:attr="onclick='openApproveModal(' + ${yc.id} + ', \'' + ${yc.tenGiangVien} + '\', \'' + ${yc.soTienRut != null ? #numbers.formatDecimal(yc.soTienRut, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'} + '\', \'' + ${yc.tenNganHang} + '\', \'' + ${yc.soTaiKhoan} + '\', \'' + ${yc.tenChuTaiKhoan} + '\')'"
+                              class="px-3 py-1.5 rounded-lg bg-status-success text-white font-bold hover:bg-status-success/90 transition-all flex items-center gap-1 shadow-sm">
+                        <span class="material-symbols-outlined text-[16px]">check</span>
+                        <span>Đã chuyển tiền</span>
+                      </button>
+
+                      <!-- Nút Từ chối hoàn tiền -->
+                      <button type="button"
+                              th:attr="onclick='openRejectModal(' + ${yc.id} + ', \'' + ${yc.tenGiangVien} + '\', \'' + ${yc.soTienRut != null ? #numbers.formatDecimal(yc.soTienRut, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'} + '\')'"
+                              class="px-3 py-1.5 rounded-lg bg-status-error/10 text-status-error border border-status-error/20 font-bold hover:bg-status-error hover:text-white transition-all flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">close</span>
+                        <span>Từ chối</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 2: ĐÃ CHUYỂN TIỀN (APPROVED) ==================== -->
+        <div id="tab-approved" class="tab-content mt-4 hidden">
+          <!-- Empty State -->
+          <div th:if="${#lists.isEmpty(danhSachDaChuyen)}" class="py-12 flex flex-col items-center justify-center text-center">
+            <div class="w-16 h-16 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center mb-3">
+              <span class="material-symbols-outlined text-[32px]">history</span>
+            </div>
+            <h3 class="text-base font-bold text-on-surface">Chưa có lịch sử giải ngân</h3>
+            <p class="text-xs text-on-surface-variant mt-1">Các lệnh rút tiền sau khi được Admin xác nhận sẽ hiển thị tại đây.</p>
+          </div>
+
+          <!-- Table Đã chuyển tiền -->
+          <div th:unless="${#lists.isEmpty(danhSachDaChuyen)}" class="overflow-x-auto">
+            <table class="w-full text-left border-collapse payout-table">
+              <thead>
+                <tr class="border-b border-surface-container/60 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                  <th class="py-3 px-4">Mã lệnh</th>
+                  <th class="py-3 px-4">Giảng viên</th>
+                  <th class="py-3 px-4 text-right">Số tiền giải ngân</th>
+                  <th class="py-3 px-4">Tài khoản nhận</th>
+                  <th class="py-3 px-4">Ghi chú giao dịch</th>
+                  <th class="py-3 px-4">Ngày xử lý</th>
+                  <th class="py-3 px-4 text-center">Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-surface-container/40 text-xs">
+                <tr th:each="yc : ${danhSachDaChuyen}" class="hover:bg-surface-container-low/50 transition-colors payout-row">
+                  <td class="py-3.5 px-4 font-bold text-primary" th:text="${'#YC-' + yc.id}">#YC-1</td>
+                  <td class="py-3.5 px-4 font-semibold text-on-surface tutor-name" th:text="${yc.tenGiangVien}">Cô Mai Anh</td>
+                  <td class="py-3.5 px-4 text-right font-extrabold text-status-success" 
+                      th:text="${yc.soTienRut != null ? #numbers.formatDecimal(yc.soTienRut, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">
+                    1,500,000 đ
+                  </td>
+                  <td class="py-3.5 px-4">
+                    <span class="font-bold text-on-surface bank-name" th:text="${yc.tenNganHang}">MB Bank</span>
+                    <span class="text-[11px] text-on-surface-variant font-mono block bank-acc" th:text="${yc.soTaiKhoan}">99998888</span>
+                  </td>
+                  <td class="py-3.5 px-4 text-on-surface-variant max-w-xs truncate" th:text="${yc.ghiChuAdmin ?: 'Đã chuyển khoản thành công'}">
+                    Đã chuyển khoản
+                  </td>
+                  <td class="py-3.5 px-4 text-[11px] text-on-surface-variant" 
+                      th:text="${yc.ngayXuLy != null ? #temporals.format(yc.ngayXuLy, 'dd/MM/yyyy HH:mm') : ''}">
+                    25/10/2026 11:00
+                  </td>
+                  <td class="py-3.5 px-4 text-center">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-status-success/10 text-status-success font-bold text-[11px]">
+                      <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                      Thành công
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 3: BỊ TỪ CHỐI (REJECTED) ==================== -->
+        <div id="tab-rejected" class="tab-content mt-4 hidden">
+          <!-- Empty State -->
+          <div th:if="${#lists.isEmpty(danhSachTuChoi)}" class="py-12 flex flex-col items-center justify-center text-center">
+            <div class="w-16 h-16 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center mb-3">
+              <span class="material-symbols-outlined text-[32px]">thumb_up</span>
+            </div>
+            <h3 class="text-base font-bold text-on-surface">Không có lệnh nào bị từ chối</h3>
+            <p class="text-xs text-on-surface-variant mt-1">Tất cả các yêu cầu rút tiền đều hợp lệ và được xử lý trơn tru.</p>
+          </div>
+
+          <!-- Table Bị từ chối -->
+          <div th:unless="${#lists.isEmpty(danhSachTuChoi)}" class="overflow-x-auto">
+            <table class="w-full text-left border-collapse payout-table">
+              <thead>
+                <tr class="border-b border-surface-container/60 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                  <th class="py-3 px-4">Mã lệnh</th>
+                  <th class="py-3 px-4">Giảng viên</th>
+                  <th class="py-3 px-4 text-right">Số tiền yêu cầu</th>
+                  <th class="py-3 px-4">Tài khoản khai báo</th>
+                  <th class="py-3 px-4">Lý do từ chối</th>
+                  <th class="py-3 px-4">Ngày từ chối</th>
+                  <th class="py-3 px-4 text-center">Trạng thái hoàn tiền</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-surface-container/40 text-xs">
+                <tr th:each="yc : ${danhSachTuChoi}" class="hover:bg-surface-container-low/50 transition-colors payout-row">
+                  <td class="py-3.5 px-4 font-bold text-primary" th:text="${'#YC-' + yc.id}">#YC-2</td>
+                  <td class="py-3.5 px-4 font-semibold text-on-surface tutor-name" th:text="${yc.tenGiangVien}">Thầy Lê Quốc Bảo</td>
+                  <td class="py-3.5 px-4 text-right font-extrabold text-status-error" 
+                      th:text="${yc.soTienRut != null ? #numbers.formatDecimal(yc.soTienRut, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">
+                    5,000,000 đ
+                  </td>
+                  <td class="py-3.5 px-4">
+                    <span class="font-bold text-on-surface bank-name" th:text="${yc.tenNganHang}">Techcombank</span>
+                    <span class="text-[11px] text-on-surface-variant font-mono block bank-acc" th:text="${yc.soTaiKhoan}">190345678</span>
+                  </td>
+                  <td class="py-3.5 px-4 text-status-error font-medium" th:text="${yc.ghiChuAdmin ?: 'Thông tin tài khoản không hợp lệ'}">
+                    Sai tên chủ tài khoản thụ hưởng
+                  </td>
+                  <td class="py-3.5 px-4 text-[11px] text-on-surface-variant" 
+                      th:text="${yc.ngayXuLy != null ? #temporals.format(yc.ngayXuLy, 'dd/MM/yyyy HH:mm') : ''}">
+                    24/10/2026 15:45
+                  </td>
+                  <td class="py-3.5 px-4 text-center">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-status-error/10 text-status-error font-bold text-[11px]">
+                      <span class="material-symbols-outlined text-[14px]">replay</span>
+                      Đã hoàn ví 100%
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==================== MODAL XÁC NHẬN CHUYỂN TIỀN ==================== -->
+  <div id="approveModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+    <div class="bg-surface-card rounded-2xl w-full max-w-md shadow-2xl border border-surface-container overflow-hidden">
+      <div class="px-6 py-5 border-b border-surface-container flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-status-success/10 text-status-success flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px]">payments</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-on-surface">Xác Nhận Giải Ngân Chuyển Tiền</h3>
+            <p class="text-xs text-on-surface-variant">Lệnh rút tiền <span id="approveModalId" class="font-mono text-primary font-bold">#YC-0</span></p>
+          </div>
+        </div>
+        <button onclick="closeApproveModal()" class="text-on-surface-variant hover:text-on-surface transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form id="approveForm" method="post" action="">
+        <div class="p-6 space-y-4">
+          <!-- Thông tin tóm tắt -->
+          <div class="p-4 rounded-xl bg-surface-container-low/70 border border-surface-container space-y-2 text-xs">
+            <div class="flex justify-between">
+              <span class="text-on-surface-variant">Giảng viên:</span>
+              <span id="approveTutorName" class="font-bold text-on-surface">--</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-on-surface-variant">Số tiền chuyển:</span>
+              <span id="approveAmount" class="font-extrabold text-sm text-status-success">--</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-on-surface-variant">Ngân hàng:</span>
+              <span id="approveBank" class="font-bold text-on-surface">--</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-on-surface-variant">Số tài khoản:</span>
+              <span id="approveAccount" class="font-mono font-bold text-primary">--</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-on-surface-variant">Chủ tài khoản:</span>
+              <span id="approveOwner" class="font-bold uppercase text-on-surface">--</span>
+            </div>
+          </div>
+
+          <!-- Nhập ghi chú / Mã GD -->
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1.5">Ghi chú chuyển khoản / Mã biên lai ngân hàng (Tùy chọn):</label>
+            <input type="text" name="ghiChuAdmin" placeholder="VD: FT26298374928 - Vietcombank iB@nking"
+                   class="w-full px-3.5 py-2 text-xs rounded-lg border border-surface-container bg-surface-canvas text-on-surface focus:outline-none focus:border-primary">
+          </div>
+        </div>
+
+        <div class="px-6 py-4 bg-surface-container-low/40 border-t border-surface-container flex items-center justify-end gap-2.5">
+          <button type="button" onclick="closeApproveModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:bg-surface-container transition-all">
+            Hủy bỏ
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-status-success text-white text-xs font-bold hover:bg-status-success/90 transition-all flex items-center gap-1.5 shadow-sm">
+            <span class="material-symbols-outlined text-[16px]">check_circle</span>
+            Xác nhận đã chuyển tiền
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL TỪ CHỐI RÚT TIỀN ==================== -->
+  <div id="rejectModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+    <div class="bg-surface-card rounded-2xl w-full max-w-md shadow-2xl border border-surface-container overflow-hidden">
+      <div class="px-6 py-5 border-b border-surface-container flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-status-error/10 text-status-error flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px]">cancel</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-on-surface">Từ Chối Lệnh Rút Tiền</h3>
+            <p class="text-xs text-on-surface-variant">Lệnh rút tiền <span id="rejectModalId" class="font-mono text-primary font-bold">#YC-0</span></p>
+          </div>
+        </div>
+        <button onclick="closeRejectModal()" class="text-on-surface-variant hover:text-on-surface transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form id="rejectForm" method="post" action="">
+        <div class="p-6 space-y-4">
+          <!-- Thông báo hoàn tiền -->
+          <div class="p-3.5 rounded-xl bg-accent-coral-subtle/50 border border-tertiary/20 flex items-start gap-2.5 text-xs text-tertiary">
+            <span class="material-symbols-outlined text-[18px] shrink-0 mt-0.5">info</span>
+            <div>
+              <p class="font-bold">Lưu ý về số dư ví:</p>
+              <p class="text-[11px] mt-0.5">
+                Khi từ chối, hệ thống sẽ tự động hoàn trả số tiền <span id="rejectAmount" class="font-bold text-status-error">--</span> về ví của giảng viên <span id="rejectTutorName" class="font-bold text-on-surface">--</span>.
+              </p>
+            </div>
+          </div>
+
+          <!-- Gợi ý lý do nhanh -->
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1.5">Gợi ý lý do nhanh:</label>
+            <div class="flex flex-wrap gap-1.5">
+              <button type="button" onclick="setQuickReason('Số tài khoản ngân hàng không tồn tại hoặc bị khóa')"
+                      class="px-2.5 py-1 rounded-full text-[11px] bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors">
+                Sai số tài khoản
+              </button>
+              <button type="button" onclick="setQuickReason('Tên chủ tài khoản không khớp với hồ sơ KYC giảng viên')"
+                      class="px-2.5 py-1 rounded-full text-[11px] bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors">
+                Không khớp chủ thẻ
+              </button>
+              <button type="button" onclick="setQuickReason('Ngân hàng thụ hưởng đang bảo trì giao dịch liên ngân hàng, vui lòng thử lại sau')"
+                      class="px-2.5 py-1 rounded-full text-[11px] bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors">
+                Ngân hàng bảo trì
+              </button>
+            </div>
+          </div>
+
+          <!-- Textarea nhập lý do -->
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1.5">Lý do từ chối gửi về cho Giảng viên (*):</label>
+            <textarea id="lyDoTuChoiInput" name="lyDoTuChoi" required rows="3"
+                      placeholder="Nhập chi tiết lý do từ chối để giảng viên cập nhật lại thông tin tài khoản..."
+                      class="w-full px-3.5 py-2.5 text-xs rounded-lg border border-surface-container bg-surface-canvas text-on-surface focus:outline-none focus:border-status-error transition-all resize-none"></textarea>
+          </div>
+        </div>
+
+        <div class="px-6 py-4 bg-surface-container-low/40 border-t border-surface-container flex items-center justify-end gap-2.5">
+          <button type="button" onclick="closeRejectModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:bg-surface-container transition-all">
+            Hủy bỏ
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-status-error text-white text-xs font-bold hover:bg-status-error/90 transition-all flex items-center gap-1.5 shadow-sm">
+            <span class="material-symbols-outlined text-[16px]">replay</span>
+            Từ chối & Hoàn tiền ví
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    // Chuyển đổi Tab
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-primary', 'text-white', 'shadow-sm');
+        btn.classList.add('text-on-surface-variant', 'font-semibold');
+      });
+
+      const activeBtn = document.getElementById('btn-' + tabId);
+      activeBtn.classList.remove('text-on-surface-variant', 'font-semibold');
+      activeBtn.classList.add('bg-primary', 'text-white', 'shadow-sm');
+    }
+
+    // Lọc tìm kiếm theo bảng
+    function filterPayoutTable() {
+      const q = document.getElementById('payoutSearchInput').value.toLowerCase();
+      document.querySelectorAll('.payout-row').forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+
+    // Modal Xác nhận Chuyển tiền
+    function openApproveModal(id, tutorName, amount, bank, account, owner) {
+      document.getElementById('approveModalId').innerText = '#YC-' + id;
+      document.getElementById('approveTutorName').innerText = tutorName;
+      document.getElementById('approveAmount').innerText = amount;
+      document.getElementById('approveBank').innerText = bank;
+      document.getElementById('approveAccount').innerText = account;
+      document.getElementById('approveOwner').innerText = owner;
+      document.getElementById('approveForm').action = '/admin/tai-chinh/rut-tien/' + id + '/xac-nhan';
+      document.getElementById('approveModal').classList.remove('hidden');
+    }
+
+    function closeApproveModal() {
+      document.getElementById('approveModal').classList.add('hidden');
+    }
+
+    // Modal Từ chối
+    function openRejectModal(id, tutorName, amount) {
+      document.getElementById('rejectModalId').innerText = '#YC-' + id;
+      document.getElementById('rejectTutorName').innerText = tutorName;
+      document.getElementById('rejectAmount').innerText = amount;
+      document.getElementById('lyDoTuChoiInput').value = '';
+      document.getElementById('rejectForm').action = '/admin/tai-chinh/rut-tien/' + id + '/tu-choi';
+      document.getElementById('rejectModal').classList.remove('hidden');
+    }
+
+    function closeRejectModal() {
+      document.getElementById('rejectModal').classList.add('hidden');
+    }
+
+    function setQuickReason(text) {
+      document.getElementById('lyDoTuChoiInput').value = text;
+    }
+
+    // Đóng modal khi bấm phím Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeApproveModal();
+        closeRejectModal();
+      }
+    });
+  </script>
+</body>
+</html>

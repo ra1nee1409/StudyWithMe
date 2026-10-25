@@ -5,6 +5,15 @@
   <aside th:fragment="student-sidebar(activeTab)" class="fixed left-0 top-0 h-screen w-72 bg-surface-card z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-r border-surface-container">
     <div class="flex flex-col flex-1 min-h-0">
       
+      <!-- Brand Logo Header -->
+      <div class="px-5 py-4 border-b border-surface-container flex items-center justify-between">
+        <a th:href="@{/}" class="flex items-center gap-2 group">
+          <img th:src="@{/images/logo-icon.png}" src="/images/logo-icon.png" alt="StudyWithMe" class="h-7 w-7 object-contain transition-transform group-hover:scale-105">
+          <img th:src="@{/images/logo-text.png}" src="/images/logo-text.png" alt="StudyWithMe" class="h-5 object-contain">
+        </a>
+        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary">Học viên</span>
+      </div>
+
       <!-- Student Profile Box -->
       <div class="p-5 bg-surface-container-low/60 border-b border-surface-container/40">
         <div class="flex items-center gap-3 mb-3">
@@ -34,15 +43,35 @@
           <span>Bàn học của tôi</span>
         </a>
 
-        <!-- 2. Lớp học trực tuyến của tôi -->
-        <a th:href="@{/student/lop-hoc}"
-           th:classappend="${activeTab == 'classes'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
-           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
-          <span class="material-symbols-outlined text-[20px]">video_camera_front</span>
-          <span>Lớp học trực tuyến</span>
+        <!-- 2. Khóa học của tôi (Video Packages) -->
+        <a th:href="@{/student/khoa-hoc}"
+           th:classappend="${activeTab == 'courses'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all group">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[20px]">play_lesson</span>
+            <span>Khóa học của tôi</span>
+          </div>
+          <span th:if="${soKhoaHocDangHoc != null && soKhoaHocDangHoc > 0}"
+                th:classappend="${activeTab == 'courses'} ? 'bg-white/20 text-white' : 'bg-primary/10 text-primary'"
+                class="px-2 py-0.5 rounded-full text-[11px] font-bold"
+                th:text="${soKhoaHocDangHoc}">0</span>
         </a>
 
-        <!-- 3. Thời khóa biểu học tập -->
+        <!-- 3. Lớp học trực tuyến của tôi -->
+        <a th:href="@{/student/lop-hoc}"
+           th:classappend="${activeTab == 'classes'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all group">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[20px]">video_camera_front</span>
+            <span>Lớp học trực tuyến</span>
+          </div>
+          <span th:if="${soLopDangHoc != null && soLopDangHoc > 0}"
+                th:classappend="${activeTab == 'classes'} ? 'bg-white/20 text-white' : 'bg-status-success/10 text-status-success'"
+                class="px-2 py-0.5 rounded-full text-[11px] font-bold"
+                th:text="${soLopDangHoc}">0</span>
+        </a>
+
+        <!-- 4. Thời khóa biểu học tập -->
         <a th:href="@{/student/lich-hoc}"
            th:classappend="${activeTab == 'schedule'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
@@ -50,7 +79,7 @@
           <span>Thời khóa biểu</span>
         </a>
 
-        <!-- 4. Gia sư của tôi -->
+        <!-- 5. Gia sư của tôi -->
         <a th:href="@{/student/gia-su}"
            th:classappend="${activeTab == 'tutors'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
@@ -58,7 +87,21 @@
           <span>Gia sư của tôi</span>
         </a>
 
-        <!-- 5. Học phí & Đơn hàng -->
+        <!-- 6. Danh sách yêu thích -->
+        <a th:href="@{/student/yeu-thich}"
+           th:classappend="${activeTab == 'wishlist'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all group">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[20px]">favorite</span>
+            <span>Khóa học yêu thích</span>
+          </div>
+          <span th:if="${soYeuThich != null && soYeuThich > 0}"
+                th:classappend="${activeTab == 'wishlist'} ? 'bg-white/20 text-white' : 'bg-error-container/20 text-error'"
+                class="px-2 py-0.5 rounded-full text-[11px] font-bold"
+                th:text="${soYeuThich}">0</span>
+        </a>
+
+        <!-- 7. Học phí & Đơn hàng -->
         <a th:href="@{/student/don-hang}"
            th:classappend="${activeTab == 'orders'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
@@ -66,7 +109,7 @@
           <span>Lịch sử học phí</span>
         </a>
 
-        <!-- 6. Hồ sơ cá nhân -->
+        <!-- 8. Hồ sơ cá nhân -->
         <a th:href="@{/student/ho-so}"
            th:classappend="${activeTab == 'profile'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">

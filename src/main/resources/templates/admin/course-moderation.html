@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Kiểm Duyệt Khóa Học - Quản trị StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== SIDEBAR COMPONENT ==================== -->
+  <aside th:replace="~{components/admin/sidebar :: admin-sidebar('course-moderation')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar Component -->
+    <header th:replace="~{components/admin/header :: admin-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Flash Notification Message -->
+      <div th:if="${message}" class="p-4 rounded-xl bg-status-success/10 border border-status-success/30 text-status-success flex items-center gap-3 shadow-sm animate-fade-in">
+        <span class="material-symbols-outlined text-[22px]">check_circle</span>
+        <span class="text-sm font-semibold" th:text="${message}"></span>
+      </div>
+
+      <!-- Header Banner -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-xl shadow-sm border border-surface-container/40">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-secondary text-xs font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              Trang A5 • Kiểm Duyệt Nội Dung Khóa Học
+            </span>
+            <span class="text-outline-variant">•</span>
+            <span class="text-xs text-on-surface-variant">Thẩm định giáo trình, bài giảng video & bản quyền</span>
+          </div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">
+            Kiểm Duyệt & Xuất Bản Khóa Học
+          </h1>
+          <p class="text-xs text-on-surface-variant">
+            Kiểm tra chất lượng video, tính hoàn thiện của đề cương và bản quyền bài giảng do giảng viên gửi lên trước khi mở bán công khai.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a th:href="@{/admin/dashboard}" class="px-4 py-2 rounded-lg border border-surface-container text-xs font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            Về Dashboard
+          </a>
+        </div>
+      </section>
+
+      <!-- KPI Thống kê Khóa học -->
+      <section class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <!-- Chờ duyệt -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-xs text-on-surface-variant font-medium">Khóa học chờ duyệt</span>
+            <span class="text-3xl font-extrabold text-tertiary tracking-tight" th:text="${thongKeKiemDuyet != null ? thongKeKiemDuyet.choDuyet : #lists.size(danhSachChoDuyet)}">0</span>
+            <span class="text-[11px] text-tertiary font-semibold mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">pending_actions</span>
+              Cần kiểm tra video
+            </span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-accent-coral-subtle text-tertiary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[26px]">hourglass_top</span>
+          </div>
+        </div>
+
+        <!-- Đã xuất bản -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-xs text-on-surface-variant font-medium">Đã xuất bản (Công khai)</span>
+            <span class="text-3xl font-extrabold text-status-success tracking-tight" th:text="${thongKeKiemDuyet != null ? thongKeKiemDuyet.daXuatBan : #lists.size(danhSachDaXuatBan)}">0</span>
+            <span class="text-[11px] text-status-success font-semibold mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">check_circle</span>
+              Đang hoạt động trên sàn
+            </span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-status-success/10 text-status-success flex items-center justify-center">
+            <span class="material-symbols-outlined text-[26px]">verified</span>
+          </div>
+        </div>
+
+        <!-- Bị từ chối -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-xs text-on-surface-variant font-medium">Bị từ chối (Cần sửa)</span>
+            <span class="text-3xl font-extrabold text-error tracking-tight" th:text="${thongKeKiemDuyet != null ? thongKeKiemDuyet.tuChoi : #lists.size(danhSachTuChoi)}">0</span>
+            <span class="text-[11px] text-error font-semibold mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">error</span>
+              Giảng viên cần nộp lại
+            </span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-error-container/40 text-error flex items-center justify-center">
+            <span class="material-symbols-outlined text-[26px]">cancel</span>
+          </div>
+        </div>
+
+        <!-- Tổng khóa học -->
+        <div class="bg-surface-card p-5 rounded-xl shadow-sm border border-surface-container/30 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-xs text-on-surface-variant font-medium">Tổng số khóa học</span>
+            <span class="text-3xl font-extrabold text-primary tracking-tight" th:text="${thongKeKiemDuyet != null ? thongKeKiemDuyet.tongCong : 0}">0</span>
+            <span class="text-[11px] text-primary font-semibold mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">video_library</span>
+              Toàn hệ thống StudyWithMe
+            </span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[26px]">folder_special</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Danh sách Khóa học với Tabs -->
+      <section class="bg-surface-card rounded-xl shadow-sm border border-surface-container/40 overflow-hidden flex flex-col">
+        <!-- Tabs Header -->
+        <div class="border-b border-surface-container flex items-center justify-between px-6 pt-4">
+          <div class="flex items-center gap-2">
+            <!-- Tab Chờ duyệt -->
+            <button type="button" onclick="switchCourseTab('cho_duyet')" id="tabBtn-cho_duyet"
+                    class="tab-btn px-4 py-3 text-sm font-bold border-b-2 border-tertiary text-tertiary flex items-center gap-2 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">hourglass_top</span>
+              <span>Chờ kiểm duyệt</span>
+              <span class="px-2 py-0.5 rounded-full text-xs bg-accent-coral-subtle text-tertiary font-bold"
+                    th:text="${#lists.size(danhSachChoDuyet)}">0</span>
+            </button>
+
+            <!-- Tab Đã xuất bản -->
+            <button type="button" onclick="switchCourseTab('da_xuat_ban')" id="tabBtn-da_xuat_ban"
+                    class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">verified</span>
+              <span>Đã xuất bản</span>
+              <span class="px-2 py-0.5 rounded-full text-xs bg-surface-container text-on-surface-variant font-medium"
+                    th:text="${#lists.size(danhSachDaXuatBan)}">0</span>
+            </button>
+
+            <!-- Tab Bị từ chối -->
+            <button type="button" onclick="switchCourseTab('tu_choi')" id="tabBtn-tu_choi"
+                    class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">cancel</span>
+              <span>Bị từ chối</span>
+              <span class="px-2 py-0.5 rounded-full text-xs bg-surface-container text-on-surface-variant font-medium"
+                    th:text="${#lists.size(danhSachTuChoi)}">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ==================== PANEL 1: CHỜ DUYỆT ==================== -->
+        <div id="tabPanel-cho_duyet" class="tab-panel p-6 flex flex-col gap-4">
+          <!-- Empty State -->
+          <div th:if="${#lists.isEmpty(danhSachChoDuyet)}" class="py-16 flex flex-col items-center justify-center text-center">
+            <div class="w-16 h-16 rounded-full bg-status-success/10 text-status-success flex items-center justify-center mb-3">
+              <span class="material-symbols-outlined text-[32px]">task_alt</span>
+            </div>
+            <h3 class="text-base font-bold text-on-surface">Không có khóa học nào chờ kiểm duyệt!</h3>
+            <p class="text-xs text-on-surface-variant max-w-sm mt-1">Toàn bộ khóa học được gửi lên đều đã được thẩm định và phê duyệt hoàn tất.</p>
+          </div>
+
+          <!-- Course Grid List -->
+          <div th:if="${not #lists.isEmpty(danhSachChoDuyet)}" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div th:each="kh : ${danhSachChoDuyet}" class="bg-surface-container-low/50 border border-surface-container hover:border-tertiary/40 rounded-xl p-5 flex flex-col gap-4 transition-all hover:shadow-md">
+              <div class="flex items-start gap-4">
+                <!-- Thumbnail -->
+                <div class="relative w-36 h-24 rounded-lg overflow-hidden bg-surface-container shrink-0 border border-surface-container shadow-sm">
+                  <img th:src="${kh.anhDaiDienKhoaHoc ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800'}"
+                       src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800"
+                       alt="Thumbnail" class="w-full h-full object-cover">
+                  <span class="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/70 text-white text-[10px] font-bold"
+                        th:text="${kh.thePhanLoai ?: 'Khóa học'}"></span>
+                </div>
+
+                <!-- Info -->
+                <div class="flex flex-col flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary-fixed/50 text-secondary"
+                          th:text="${kh.tenDanhMuc ?: 'Chung'}"></span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-tertiary/10 text-tertiary">Chờ kiểm duyệt</span>
+                  </div>
+
+                  <h3 class="text-sm font-bold text-on-surface line-clamp-2 hover:text-primary transition-colors" th:text="${kh.tieuDe}"></h3>
+
+                  <div class="flex items-center gap-2 mt-2">
+                    <div class="w-5 h-5 rounded-full overflow-hidden bg-surface-container shrink-0">
+                      <img th:src="${kh.anhDaiDienGiangVien ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200'}" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-xs font-medium text-on-surface truncate" th:text="${kh.tenGiangVien}"></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Price & Curriculum Meta -->
+              <div class="flex items-center justify-between text-xs py-2 px-3 rounded-lg bg-surface-card border border-surface-container/40">
+                <div class="flex items-center gap-3 text-on-surface-variant">
+                  <span class="flex items-center gap-1 font-medium">
+                    <span class="material-symbols-outlined text-[16px] text-primary">menu_book</span>
+                    <span th:text="${kh.tongSoChuong} + ' chương'"></span>
+                  </span>
+                  <span class="flex items-center gap-1 font-medium">
+                    <span class="material-symbols-outlined text-[16px] text-secondary">smart_display</span>
+                    <span th:text="${kh.tongSoBaiHoc} + ' bài giảng'"></span>
+                  </span>
+                </div>
+                <div class="text-right">
+                  <span class="font-bold text-sm text-primary"
+                        th:text="${#numbers.formatDecimal(kh.giaKhuyenMai != null ? kh.giaKhuyenMai : kh.giaGoc, 0, 'POINT', 0, 'COMMA')} + ' đ'"></span>
+                  <span th:if="${kh.giaKhuyenMai != null && kh.giaKhuyenMai < kh.giaGoc}" class="text-[11px] text-on-surface-variant line-through ml-1"
+                        th:text="${#numbers.formatDecimal(kh.giaGoc, 0, 'POINT', 0, 'COMMA')} + ' đ'"></span>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex items-center justify-between gap-2 pt-2 border-t border-surface-container/40">
+                <button type="button" th:onclick="'openCoursePreviewModal(' + ${kh.id} + ')'"
+                        class="px-3 py-1.5 rounded-lg border border-primary/30 text-primary hover:bg-primary/5 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer">
+                  <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                  <span>Xem đề cương & bài giảng</span>
+                </button>
+
+                <div class="flex items-center gap-2">
+                  <!-- Form Approve -->
+                  <form th:action="@{/admin/khoa-hoc/{id}/phe-duyet(id=${kh.id})}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn phê duyệt và xuất bản khóa học này?')">
+                    <button type="submit" class="px-3 py-1.5 rounded-lg bg-status-success text-white hover:bg-status-success/90 text-xs font-semibold flex items-center gap-1 transition-all shadow-sm cursor-pointer">
+                      <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                      <span>Phê duyệt</span>
+                    </button>
+                  </form>
+
+                  <!-- Button Open Reject Modal -->
+                  <button type="button" th:onclick="'openCourseRejectModal(' + ${kh.id} + ', \'' + ${#strings.escapeJavaScript(kh.tieuDe)} + '\')'"
+                          class="px-3 py-1.5 rounded-lg bg-error-container text-error hover:bg-error hover:text-white text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer">
+                    <span class="material-symbols-outlined text-[16px]">cancel</span>
+                    <span>Từ chối</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PANEL 2: ĐÃ XUẤT BẢN ==================== -->
+        <div id="tabPanel-da_xuat_ban" class="tab-panel p-6 hidden flex flex-col gap-4">
+          <div th:if="${#lists.isEmpty(danhSachDaXuatBan)}" class="py-16 text-center text-xs text-on-surface-variant">
+            Chưa có khóa học nào được xuất bản.
+          </div>
+
+          <div th:if="${not #lists.isEmpty(danhSachDaXuatBan)}" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div th:each="kh : ${danhSachDaXuatBan}" class="bg-surface-card border border-surface-container rounded-xl p-5 flex flex-col gap-4">
+              <div class="flex items-start gap-4">
+                <div class="relative w-36 h-24 rounded-lg overflow-hidden bg-surface-container shrink-0 border border-surface-container">
+                  <img th:src="${kh.anhDaiDienKhoaHoc ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800'}" class="w-full h-full object-cover">
+                  <span class="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/70 text-white text-[10px] font-bold"
+                        th:text="${kh.thePhanLoai ?: 'Khóa học'}"></span>
+                </div>
+                <div class="flex flex-col flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary-fixed/50 text-secondary"
+                          th:text="${kh.tenDanhMuc ?: 'Chung'}"></span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-status-success/10 text-status-success">Đã xuất bản</span>
+                  </div>
+                  <h3 class="text-sm font-bold text-on-surface line-clamp-2" th:text="${kh.tieuDe}"></h3>
+                  <span class="text-xs text-on-surface-variant mt-1" th:text="'Giảng viên: ' + ${kh.tenGiangVien}"></span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs py-2 px-3 rounded-lg bg-surface-container-low/60 border border-surface-container/30">
+                <span class="text-on-surface-variant" th:text="${kh.tongSoChuong} + ' chương • ' + ${kh.tongSoBaiHoc} + ' bài giảng'"></span>
+                <span class="font-bold text-primary"
+                      th:text="${#numbers.formatDecimal(kh.giaKhuyenMai != null ? kh.giaKhuyenMai : kh.giaGoc, 0, 'POINT', 0, 'COMMA')} + ' đ'"></span>
+              </div>
+
+              <div class="flex items-center justify-between pt-2 border-t border-surface-container/40">
+                <a th:href="@{/khoa-hoc/{slug}(slug=${kh.duongDanSlug})}" target="_blank"
+                   class="text-xs text-secondary hover:underline flex items-center gap-1 font-medium">
+                  <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+                  <span>Xem trên sàn công khai</span>
+                </a>
+                <button type="button" th:onclick="'openCoursePreviewModal(' + ${kh.id} + ')'"
+                        class="px-3 py-1.5 rounded-lg border border-surface-container text-on-surface-variant hover:bg-surface-container text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer">
+                  <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                  <span>Xem chi tiết đề cương</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PANEL 3: BỊ TỪ CHỐI ==================== -->
+        <div id="tabPanel-tu_choi" class="tab-panel p-6 hidden flex flex-col gap-4">
+          <div th:if="${#lists.isEmpty(danhSachTuChoi)}" class="py-16 text-center text-xs text-on-surface-variant">
+            Không có khóa học nào bị từ chối.
+          </div>
+
+          <div th:if="${not #lists.isEmpty(danhSachTuChoi)}" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div th:each="kh : ${danhSachTuChoi}" class="bg-surface-card border border-error/30 rounded-xl p-5 flex flex-col gap-4">
+              <div class="flex items-start gap-4">
+                <div class="relative w-36 h-24 rounded-lg overflow-hidden bg-surface-container shrink-0 border border-surface-container">
+                  <img th:src="${kh.anhDaiDienKhoaHoc ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800'}" class="w-full h-full object-cover grayscale">
+                  <span class="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-error text-white text-[10px] font-bold">Từ chối</span>
+                </div>
+                <div class="flex flex-col flex-1 min-w-0">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary-fixed/50 text-secondary w-fit mb-1"
+                        th:text="${kh.tenDanhMuc ?: 'Chung'}"></span>
+                  <h3 class="text-sm font-bold text-on-surface line-clamp-2" th:text="${kh.tieuDe}"></h3>
+                  <span class="text-xs text-on-surface-variant mt-1" th:text="'Giảng viên: ' + ${kh.tenGiangVien}"></span>
+                </div>
+              </div>
+
+              <!-- Rejection Reason Alert -->
+              <div class="p-3 rounded-lg bg-error-container/30 border border-error/20 flex items-start gap-2 text-xs text-on-surface">
+                <span class="material-symbols-outlined text-[18px] text-error shrink-0 mt-0.5">warning</span>
+                <div>
+                  <span class="font-bold text-error">Lý do từ chối:</span>
+                  <p class="text-on-surface-variant mt-0.5" th:text="${kh.lyDoTuChoi}"></p>
+                </div>
+              </div>
+
+              <!-- Action buttons -->
+              <div class="flex items-center justify-between pt-2 border-t border-surface-container/40">
+                <button type="button" th:onclick="'openCoursePreviewModal(' + ${kh.id} + ')'"
+                        class="px-3 py-1.5 rounded-lg border border-surface-container text-on-surface-variant hover:bg-surface-container text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer">
+                  <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                  <span>Xem đề cương</span>
+                </button>
+
+                <form th:action="@{/admin/khoa-hoc/{id}/phe-duyet(id=${kh.id})}" method="post" onsubmit="return confirm('Duyệt lại khóa học này và chuyển sang trạng thái Đã Xuất Bản?')">
+                  <button type="submit" class="px-3 py-1.5 rounded-lg bg-status-success/10 text-status-success hover:bg-status-success hover:text-white text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer">
+                    <span class="material-symbols-outlined text-[16px]">refresh</span>
+                    <span>Duyệt lại</span>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==================== MODAL 1: PREVIEW ĐỀ CƯƠNG & VIDEO BÀI GIẢNG ==================== -->
+  <div id="coursePreviewModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-surface-card rounded-2xl shadow-2xl border border-surface-container max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-fade-in">
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-surface-container flex items-center justify-between bg-surface-container-low/70">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">fact_check</span>
+          </div>
+          <div>
+            <h2 id="modalCourseTitle" class="text-base font-bold text-on-surface">Chi Tiết Đề Cương Khóa Học</h2>
+            <span id="modalCourseCategory" class="text-xs text-on-surface-variant">Đang tải thông tin...</span>
+          </div>
+        </div>
+        <button type="button" onclick="closeCoursePreviewModal()" class="w-8 h-8 rounded-lg text-on-surface-variant hover:bg-surface-container flex items-center justify-center cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto flex-1 space-y-6">
+        <!-- Instructor & Course Quick Info -->
+        <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <img id="modalInstructorAvatar" src="" alt="Avatar" class="w-12 h-12 rounded-full object-cover bg-surface-container border border-surface-container">
+            <div>
+              <span class="text-xs text-on-surface-variant">Giảng viên phụ trách</span>
+              <h4 id="modalInstructorName" class="text-sm font-bold text-on-surface"></h4>
+              <span id="modalInstructorEmail" class="text-xs text-secondary"></span>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 text-xs">
+            <div>
+              <span class="text-on-surface-variant block">Giá niêm yết:</span>
+              <span id="modalCoursePrice" class="font-bold text-primary text-sm"></span>
+            </div>
+            <div>
+              <span class="text-on-surface-variant block">Quy mô đề cương:</span>
+              <span id="modalCurriculumStats" class="font-bold text-on-surface text-sm"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video Player Preview Container (Hidden by default, shown when clicking a lesson) -->
+        <div id="videoPreviewContainer" class="hidden flex flex-col gap-2 p-4 rounded-xl bg-black/90 text-white border border-surface-container">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px] text-tertiary">play_circle</span>
+              <span id="previewLessonTitle" class="text-xs font-semibold truncate max-w-md">Tiêu đề bài giảng</span>
+            </div>
+            <button type="button" onclick="closeVideoPlayer()" class="text-xs text-on-surface-variant hover:text-white flex items-center gap-1 cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">close</span>
+              Đóng video
+            </button>
+          </div>
+          <div class="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
+            <iframe id="videoPreviewIframe" class="w-full h-full" src="" title="Video preview" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <h4 class="text-xs font-bold text-on-surface uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px] text-primary">description</span>
+            Mô tả nội dung khóa học
+          </h4>
+          <p id="modalCourseDescription" class="text-xs text-on-surface-variant leading-relaxed p-3.5 rounded-lg bg-surface-container-low/40 border border-surface-container/30"></p>
+        </div>
+
+        <!-- Chapters & Lessons Accordion List -->
+        <div>
+          <h4 class="text-xs font-bold text-on-surface uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px] text-secondary">format_list_bulleted</span>
+            Đề cương chi tiết từng chương & bài học
+          </h4>
+          <div id="modalChaptersList" class="space-y-3">
+            <!-- Rendered dynamically by JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-4 border-t border-surface-container flex items-center justify-between bg-surface-container-low/50">
+        <button type="button" onclick="closeCoursePreviewModal()" class="px-4 py-2 rounded-lg border border-surface-container text-xs font-semibold text-on-surface-variant hover:bg-surface-container transition-all cursor-pointer">
+          Đóng
+        </button>
+
+        <div id="modalActionButtons" class="flex items-center gap-2">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: TỪ CHỐI KHÓA HỌC ==================== -->
+  <div id="courseRejectModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-surface-card rounded-2xl shadow-2xl border border-surface-container max-w-lg w-full p-6 animate-fade-in flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-error-container text-error flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">cancel</span>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-on-surface">Từ Chối Khóa Học</h3>
+            <span class="text-xs text-on-surface-variant">Gửi lý do phản hồi để giảng viên chỉnh sửa</span>
+          </div>
+        </div>
+        <button type="button" onclick="closeCourseRejectModal()" class="w-8 h-8 rounded-lg text-on-surface-variant hover:bg-surface-container flex items-center justify-center cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <p id="rejectModalCourseTitle" class="text-xs font-semibold text-on-surface p-2.5 rounded-lg bg-surface-container-low border border-surface-container truncate"></p>
+
+      <!-- Quick Template Reasons -->
+      <div>
+        <label class="text-xs font-semibold text-on-surface-variant mb-2 block">Chọn nhanh lý do mẫu:</label>
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" onclick="setRejectReason('Video bài giảng chất lượng mờ dưới 720p, không đảm bảo trải nghiệm học tập.')"
+                  class="px-2.5 py-1 rounded-full text-[11px] bg-surface-container hover:bg-tertiary/10 hover:text-tertiary transition-colors cursor-pointer">
+            Video mờ (&lt; 720p)
+          </button>
+          <button type="button" onclick="setRejectReason('Âm thanh micro bị rè hoặc có nhiều tiếng ồn xung quanh, cần thu âm lại.')"
+                  class="px-2.5 py-1 rounded-full text-[11px] bg-surface-container hover:bg-tertiary/10 hover:text-tertiary transition-colors cursor-pointer">
+            Âm thanh rè/ồn
+          </button>
+          <button type="button" onclick="setRejectReason('Đề cương sơ sài, thiếu bài học trọng tâm hoặc chưa hoàn thiện giáo trình.')"
+                  class="px-2.5 py-1 rounded-full text-[11px] bg-surface-container hover:bg-tertiary/10 hover:text-tertiary transition-colors cursor-pointer">
+            Đề cương chưa đủ
+          </button>
+          <button type="button" onclick="setRejectReason('Nội dung có dấu hiệu vi phạm bản quyền hoặc tái sử dụng tài liệu chưa được phép.')"
+                  class="px-2.5 py-1 rounded-full text-[11px] bg-surface-container hover:bg-error-container hover:text-error transition-colors cursor-pointer">
+            Vi phạm bản quyền
+          </button>
+        </div>
+      </div>
+
+      <!-- Form Submit -->
+      <form id="courseRejectForm" method="post" action="" class="flex flex-col gap-4">
+        <div>
+          <label for="rejectReasonInput" class="text-xs font-semibold text-on-surface-variant mb-1.5 block">
+            Nội dung chi tiết yêu cầu sửa đổi (*):
+          </label>
+          <textarea id="rejectReasonInput" name="lyDoTuChoi" rows="4" required
+                    placeholder="Nhập cụ thể các điểm cần giảng viên bổ sung hoặc sửa đổi..."
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-surface-container bg-surface-container-low text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-error/30 focus:border-error transition-all"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-surface-container">
+          <button type="button" onclick="closeCourseRejectModal()"
+                  class="px-4 py-2 rounded-lg border border-surface-container text-xs font-semibold text-on-surface-variant hover:bg-surface-container transition-all cursor-pointer">
+            Hủy bỏ
+          </button>
+          <button type="submit"
+                  class="px-4 py-2 rounded-lg bg-error text-white hover:bg-error/90 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">send</span>
+            Xác nhận từ chối
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript logic -->
+  <script th:inline="javascript">
+    // Switch tabs
+    function switchCourseTab(tabKey) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-tertiary', 'text-tertiary', 'font-bold');
+        btn.classList.add('border-transparent', 'text-on-surface-variant', 'font-semibold');
+      });
+
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.add('hidden');
+      });
+
+      const activeBtn = document.getElementById('tabBtn-' + tabKey);
+      const activePanel = document.getElementById('tabPanel-' + tabKey);
+
+      if (activeBtn && activePanel) {
+        activeBtn.classList.remove('border-transparent', 'text-on-surface-variant', 'font-semibold');
+        activeBtn.classList.add('border-tertiary', 'text-tertiary', 'font-bold');
+        activePanel.classList.remove('hidden');
+      }
+    }
+
+    // Modal Preview Detail
+    async function openCoursePreviewModal(courseId) {
+      const modal = document.getElementById('coursePreviewModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      document.getElementById('modalCourseTitle').textContent = 'Đang tải thông tin...';
+      document.getElementById('modalChaptersList').innerHTML = '<div class="py-8 text-center text-xs text-on-surface-variant">Đang tải đề cương bài giảng...</div>';
+      closeVideoPlayer();
+
+      try {
+        const res = await fetch('/api/admin/khoa-hoc/' + courseId + '/chi-tiet');
+        const json = await res.json();
+        if (json.status === 'SUCCESS' && json.data) {
+          renderCourseDetail(json.data);
+        } else {
+          document.getElementById('modalChaptersList').innerHTML = '<div class="text-error text-xs">Không thể nạp chi tiết khóa học.</div>';
+        }
+      } catch (err) {
+        document.getElementById('modalChaptersList').innerHTML = '<div class="text-error text-xs">Lỗi kết nối máy chủ.</div>';
+      }
+    }
+
+    function renderCourseDetail(kh) {
+      document.getElementById('modalCourseTitle').textContent = kh.tieuDe;
+      document.getElementById('modalCourseCategory').textContent = (kh.tenDanhMuc || 'Chung') + ' • Phân loại: ' + (kh.thePhanLoai || 'Mặc định');
+      document.getElementById('modalInstructorAvatar').src = kh.anhDaiDienGiangVien || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200';
+      document.getElementById('modalInstructorName').textContent = kh.tenGiangVien || 'Gia sư StudyWithMe';
+      document.getElementById('modalInstructorEmail').textContent = kh.emailGiangVien || '';
+      document.getElementById('modalCourseDescription').textContent = kh.moTaChiTiet || 'Chưa có mô tả chi tiết.';
+
+      const price = kh.giaKhuyenMai || kh.giaGoc || 0;
+      document.getElementById('modalCoursePrice').textContent = new Intl.NumberFormat('vi-VN').format(price) + ' đ';
+      document.getElementById('modalCurriculumStats').textContent = (kh.tongSoChuong || 0) + ' Chương • ' + (kh.tongSoBaiHoc || 0) + ' Bài học';
+
+      // Render chapters accordion
+      const chaptersContainer = document.getElementById('modalChaptersList');
+      if (!kh.danhSachChuongHoc || kh.danhSachChuongHoc.length === 0) {
+        chaptersContainer.innerHTML = '<div class="p-4 rounded-lg bg-surface-container-low text-xs text-on-surface-variant text-center">Khóa học chưa có chương hoặc bài học nào được tải lên.</div>';
+      } else {
+        let html = '';
+        kh.danhSachChuongHoc.forEach((c, idx) => {
+          html += `
+            <div class="rounded-xl border border-surface-container bg-surface-card overflow-hidden">
+              <div class="px-4 py-3 bg-surface-container-low/60 flex items-center justify-between font-bold text-xs text-on-surface border-b border-surface-container/30">
+                <span class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-md bg-primary/10 text-primary flex items-center justify-center text-[10px]">${idx + 1}</span>
+                  ${escapeHtml(c.tieuDeChuong)}
+                </span>
+                <span class="text-[11px] font-normal text-on-surface-variant">${(c.danhSachBaiHoc || []).length} bài</span>
+              </div>
+              <div class="divide-y divide-surface-container/30">
+          `;
+
+          if (!c.danhSachBaiHoc || c.danhSachBaiHoc.length === 0) {
+            html += `<div class="px-4 py-2.5 text-xs text-on-surface-variant italic">Chưa có bài học trong chương này.</div>`;
+          } else {
+            c.danhSachBaiHoc.forEach(b => {
+              const minutes = Math.round((b.thoiLuongGiay || 0) / 60);
+              const hasVideo = b.linkVideo && b.linkVideo.trim() !== '';
+              html += `
+                <div class="px-4 py-2.5 flex items-center justify-between text-xs hover:bg-surface-container-low transition-colors">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="material-symbols-outlined text-[16px] text-on-surface-variant">play_circle</span>
+                    <span class="font-medium text-on-surface truncate">${escapeHtml(b.tieuDeBaiHoc)}</span>
+                    ${b.choPhepHocThu ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-accent-coral-subtle text-tertiary shrink-0">Học thử</span>' : ''}
+                  </div>
+                  <div class="flex items-center gap-3 shrink-0">
+                    <span class="text-[11px] text-on-surface-variant">${minutes} phút</span>
+                    ${hasVideo ? `
+                      <button type="button" onclick="playLessonVideo('${escapeHtml(b.linkVideo)}', '${escapeHtml(b.tieuDeBaiHoc)}')"
+                              class="px-2 py-1 rounded bg-secondary/10 text-secondary hover:bg-secondary hover:text-white font-medium text-[11px] flex items-center gap-1 transition-colors cursor-pointer">
+                        <span class="material-symbols-outlined text-[14px]">smart_display</span>
+                        Xem video
+                      </button>
+                    ` : '<span class="text-[10px] text-error">Chưa có link video</span>'}
+                  </div>
+                </div>
+              `;
+            });
+          }
+
+          html += `</div></div>`;
+        });
+        chaptersContainer.innerHTML = html;
+      }
+
+      // Render Action Buttons
+      const actionsDiv = document.getElementById('modalActionButtons');
+      if (kh.trangThai === 'CHO_DUYET') {
+        actionsDiv.innerHTML = `
+          <button type="button" onclick="openCourseRejectModal(${kh.id}, '${escapeHtml(kh.tieuDe)}')"
+                  class="px-3.5 py-2 rounded-lg bg-error-container text-error hover:bg-error hover:text-white text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">cancel</span>
+            Từ chối khóa học
+          </button>
+          <form action="/admin/khoa-hoc/${kh.id}/phe-duyet" method="post" onsubmit="return confirm('Xác nhận phê duyệt và xuất bản khóa học này?')">
+            <button type="submit" class="px-4 py-2 rounded-lg bg-status-success text-white hover:bg-status-success/90 text-xs font-semibold flex items-center gap-1 transition-all shadow-sm cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">check_circle</span>
+              Phê duyệt xuất bản
+            </button>
+          </form>
+        `;
+      } else if (kh.trangThai === 'TU_CHOI') {
+        actionsDiv.innerHTML = `
+          <form action="/admin/khoa-hoc/${kh.id}/phe-duyet" method="post" onsubmit="return confirm('Duyệt lại khóa học này?')">
+            <button type="submit" class="px-4 py-2 rounded-lg bg-status-success text-white hover:bg-status-success/90 text-xs font-semibold flex items-center gap-1 transition-all shadow-sm cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">refresh</span>
+              Duyệt lại khóa học
+            </button>
+          </form>
+        `;
+      } else {
+        actionsDiv.innerHTML = `
+          <span class="text-xs text-status-success font-semibold flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">check_circle</span>
+            Khóa học đang hoạt động
+          </span>
+        `;
+      }
+    }
+
+    function closeCoursePreviewModal() {
+      const modal = document.getElementById('coursePreviewModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      closeVideoPlayer();
+    }
+
+    // Video Player inside Modal
+    function playLessonVideo(url, title) {
+      const container = document.getElementById('videoPreviewContainer');
+      const iframe = document.getElementById('videoPreviewIframe');
+      const titleEl = document.getElementById('previewLessonTitle');
+
+      titleEl.textContent = title;
+      iframe.src = formatEmbedUrl(url);
+      container.classList.remove('hidden');
+      container.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeVideoPlayer() {
+      const container = document.getElementById('videoPreviewContainer');
+      const iframe = document.getElementById('videoPreviewIframe');
+      container.classList.add('hidden');
+      iframe.src = '';
+    }
+
+    function formatEmbedUrl(url) {
+      if (!url) return '';
+      if (url.includes('youtube.com/watch?v=')) {
+        const id = url.split('v=')[1].split('&')[0];
+        return 'https://www.youtube.com/embed/' + id + '?autoplay=1';
+      }
+      if (url.includes('youtu.be/')) {
+        const id = url.split('youtu.be/')[1].split('?')[0];
+        return 'https://www.youtube.com/embed/' + id + '?autoplay=1';
+      }
+      return url;
+    }
+
+    // Modal Reject
+    function openCourseRejectModal(courseId, courseTitle) {
+      const modal = document.getElementById('courseRejectModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      document.getElementById('rejectModalCourseTitle').textContent = 'Khóa học: ' + courseTitle;
+      document.getElementById('courseRejectForm').action = '/admin/khoa-hoc/' + courseId + '/tu-choi';
+      document.getElementById('rejectReasonInput').value = '';
+    }
+
+    function closeCourseRejectModal() {
+      const modal = document.getElementById('courseRejectModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function setRejectReason(reason) {
+      document.getElementById('rejectReasonInput').value = reason;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+  </script>
+</body>
+</html>

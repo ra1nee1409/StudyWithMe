@@ -1,10 +1,14 @@
 package com.studywithme.controller.web;
 
 import com.studywithme.entity.DangKyLopHoc;
+import com.studywithme.entity.DanhSachYeuThich;
 import com.studywithme.entity.DonHang;
+import com.studywithme.entity.GhiDanhKhoaHoc;
 import com.studywithme.entity.NguoiDung;
 import com.studywithme.repository.DangKyLopHocRepository;
+import com.studywithme.repository.DanhSachYeuThichRepository;
 import com.studywithme.repository.DonHangRepository;
+import com.studywithme.repository.GhiDanhKhoaHocRepository;
 import com.studywithme.repository.NguoiDungRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -26,13 +30,19 @@ public class StudentWebController {
     private final NguoiDungRepository nguoiDungRepository;
     private final DangKyLopHocRepository dangKyLopHocRepository;
     private final DonHangRepository donHangRepository;
+    private final GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository;
+    private final DanhSachYeuThichRepository danhSachYeuThichRepository;
 
     public StudentWebController(NguoiDungRepository nguoiDungRepository,
-                               DangKyLopHocRepository dangKyLopHocRepository,
-                               DonHangRepository donHangRepository) {
+                                DangKyLopHocRepository dangKyLopHocRepository,
+                                DonHangRepository donHangRepository,
+                                GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository,
+                                DanhSachYeuThichRepository danhSachYeuThichRepository) {
         this.nguoiDungRepository = nguoiDungRepository;
         this.dangKyLopHocRepository = dangKyLopHocRepository;
         this.donHangRepository = donHangRepository;
+        this.ghiDanhKhoaHocRepository = ghiDanhKhoaHocRepository;
+        this.danhSachYeuThichRepository = danhSachYeuThichRepository;
     }
 
     private Optional<NguoiDung> getUserByPrincipal(Principal principal) {
@@ -45,6 +55,8 @@ public class StudentWebController {
         String studentName = "Học viên";
         String studentEmail = "";
         long soLopDangHoc = 0;
+        long soKhoaHocDangHoc = 0;
+        long soYeuThich = 0;
         NguoiDung currentUser = null;
 
         if (principal != null) {
@@ -56,6 +68,8 @@ public class StudentWebController {
                         : currentUser.getEmail();
                 studentEmail = currentUser.getEmail();
                 soLopDangHoc = dangKyLopHocRepository.countByHocVienId(currentUser.getId());
+                soKhoaHocDangHoc = ghiDanhKhoaHocRepository.countByNguoiDungId(currentUser.getId());
+                soYeuThich = danhSachYeuThichRepository.countByNguoiDungId(currentUser.getId());
             } else {
                 studentName = principal.getName();
                 studentEmail = principal.getName();
@@ -65,6 +79,8 @@ public class StudentWebController {
         model.addAttribute("studentName", studentName);
         model.addAttribute("studentEmail", studentEmail);
         model.addAttribute("soLopDangHoc", soLopDangHoc);
+        model.addAttribute("soKhoaHocDangHoc", soKhoaHocDangHoc);
+        model.addAttribute("soYeuThich", soYeuThich);
         model.addAttribute("currentUser", currentUser);
     }
 
@@ -74,9 +90,24 @@ public class StudentWebController {
         List<DangKyLopHoc> danhSachDangKy = userOpt
                 .map(user -> dangKyLopHocRepository.findByHocVienId(user.getId()))
                 .orElse(new ArrayList<>());
+        List<GhiDanhKhoaHoc> danhSachGhiDanh = userOpt
+                .map(user -> ghiDanhKhoaHocRepository.findByNguoiDungIdOrderByNgayGhiDanhDesc(user.getId()))
+                .orElse(new ArrayList<>());
 
         model.addAttribute("danhSachDangKy", danhSachDangKy);
+        model.addAttribute("danhSachGhiDanh", danhSachGhiDanh);
         return "student/dashboard";
+    }
+
+    @GetMapping({"/khoa-hoc", "/courses"})
+    public String courses(Model model, Principal principal) {
+        Optional<NguoiDung> userOpt = getUserByPrincipal(principal);
+        List<GhiDanhKhoaHoc> danhSachGhiDanh = userOpt
+                .map(user -> ghiDanhKhoaHocRepository.findByNguoiDungIdOrderByNgayGhiDanhDesc(user.getId()))
+                .orElse(new ArrayList<>());
+
+        model.addAttribute("danhSachGhiDanh", danhSachGhiDanh);
+        return "student/courses";
     }
 
     @GetMapping("/lop-hoc")
@@ -121,6 +152,17 @@ public class StudentWebController {
 
         model.addAttribute("danhSachDonHang", danhSachDonHang);
         return "student/orders";
+    }
+
+    @GetMapping("/yeu-thich")
+    public String wishlist(Model model, Principal principal) {
+        Optional<NguoiDung> userOpt = getUserByPrincipal(principal);
+        List<DanhSachYeuThich> danhSachYeuThich = userOpt
+                .map(user -> danhSachYeuThichRepository.findByNguoiDungId(user.getId()))
+                .orElse(new ArrayList<>());
+
+        model.addAttribute("danhSachYeuThich", danhSachYeuThich);
+        return "student/wishlist";
     }
 
     @GetMapping("/ho-so")

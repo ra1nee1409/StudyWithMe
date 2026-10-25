@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head(${title})}"></head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+
+  <!-- Header Navigation -->
+  <header th:replace="~{components/user/header :: main-header('courses')}"></header>
+
+  <main class="flex-1 pt-24 pb-16">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-xs text-on-surface-variant mb-6">
+        <a th:href="@{/}" class="hover:text-primary flex items-center gap-1 transition-colors">
+          <span class="material-symbols-outlined text-[16px]">home</span>
+          Trang chủ
+        </a>
+        <span>/</span>
+        <span class="text-primary font-semibold">Khám phá khóa học</span>
+      </nav>
+
+      <!-- Hero Header Section -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary via-primary-container to-secondary text-white p-8 sm:p-12 mb-10 shadow-lg">
+        <div class="absolute -right-10 -bottom-10 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 max-w-3xl">
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold uppercase tracking-wider mb-4">
+            <span class="material-symbols-outlined text-[16px]">school</span>
+            Thư Viện Khóa Học Bản Quyền
+          </span>
+          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 leading-tight">
+            Khám Phá Các Khóa Học Hàng Đầu Tại StudyWithMe
+          </h1>
+          <p class="text-base sm:text-lg text-white/90 leading-relaxed font-normal">
+            Học tập chủ động cùng các gia sư & thủ khoa xuất sắc. Chương trình bám sát kiến thức từ Lớp 1 đến Lớp 12 và luyện thi chứng chỉ quốc tế.
+          </p>
+
+          <!-- Quick Category Filters -->
+          <div class="flex flex-wrap items-center gap-2 pt-6">
+            <a th:href="@{/khoa-hoc}" 
+               th:classappend="${thePhanLoai == null or thePhanLoai == ''} ? 'bg-white text-primary font-bold shadow-md' : 'bg-white/15 text-white hover:bg-white/25'"
+               class="px-4 py-2 rounded-full text-xs font-medium transition-all">
+              Tất cả
+            </a>
+            <a th:href="@{/khoa-hoc(thePhanLoai='CAP_3')}" 
+               th:classappend="${thePhanLoai == 'CAP_3'} ? 'bg-white text-primary font-bold shadow-md' : 'bg-white/15 text-white hover:bg-white/25'"
+               class="px-4 py-2 rounded-full text-xs font-medium transition-all">
+              THPT (Lớp 10-12)
+            </a>
+            <a th:href="@{/khoa-hoc(thePhanLoai='CAP_2')}" 
+               th:classappend="${thePhanLoai == 'CAP_2'} ? 'bg-white text-primary font-bold shadow-md' : 'bg-white/15 text-white hover:bg-white/25'"
+               class="px-4 py-2 rounded-full text-xs font-medium transition-all">
+              THCS (Lớp 6-9)
+            </a>
+            <a th:href="@{/khoa-hoc(thePhanLoai='CAP_1')}" 
+               th:classappend="${thePhanLoai == 'CAP_1'} ? 'bg-white text-primary font-bold shadow-md' : 'bg-white/15 text-white hover:bg-white/25'"
+               class="px-4 py-2 rounded-full text-xs font-medium transition-all">
+              Tiểu học (Lớp 1-5)
+            </a>
+            <a th:href="@{/khoa-hoc(thePhanLoai='IELTS')}" 
+               th:classappend="${thePhanLoai == 'IELTS'} ? 'bg-white text-primary font-bold shadow-md' : 'bg-white/15 text-white hover:bg-white/25'"
+               class="px-4 py-2 rounded-full text-xs font-medium transition-all">
+              Luyện thi IELTS
+            </a>
+            <a th:href="@{/khoa-hoc(thePhanLoai='TOEIC')}" 
+               th:classappend="${thePhanLoai == 'TOEIC'} ? 'bg-white text-primary font-bold shadow-md' : 'bg-white/15 text-white hover:bg-white/25'"
+               class="px-4 py-2 rounded-full text-xs font-medium transition-all">
+              Chứng chỉ TOEIC
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Layout: Sidebar Filter & Course Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+
+        <!-- ==================== SIDEBAR FILTER ==================== -->
+        <aside class="lg:col-span-1 bg-surface-container-lowest border border-surface-container rounded-2xl p-6 shadow-sm sticky top-28">
+          <form id="filterForm" th:action="@{/khoa-hoc}" method="get" class="space-y-6">
+            
+            <!-- Filter Header & Reset Button -->
+            <div class="flex items-center justify-between pb-4 border-b border-surface-container">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[20px]">tune</span>
+                <h3 class="font-bold text-base text-on-surface">Bộ Lọc Tìm Kiếm</h3>
+              </div>
+              <a th:href="@{/khoa-hoc}" class="text-xs text-primary hover:underline font-semibold flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">refresh</span>
+                Xóa lọc
+              </a>
+            </div>
+
+            <!-- Keyword Hidden / Synced -->
+            <input type="hidden" name="keyword" th:value="${keyword}">
+            <input type="hidden" name="sort" th:value="${currentSort}">
+
+            <!-- 1. Cấp học & Chứng chỉ -->
+            <div class="space-y-3">
+              <label class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">Cấp học & Phân loại</label>
+              <div class="space-y-2">
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="thePhanLoai" value="" onchange="submitFilter()" 
+                         th:checked="${thePhanLoai == null or thePhanLoai == ''}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="group-hover:text-primary transition-colors text-on-surface">Tất cả cấp học</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="thePhanLoai" value="CAP_3" onchange="submitFilter()" 
+                         th:checked="${thePhanLoai == 'CAP_3'}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="group-hover:text-primary transition-colors text-on-surface">THPT (Lớp 10 - 12)</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="thePhanLoai" value="CAP_2" onchange="submitFilter()" 
+                         th:checked="${thePhanLoai == 'CAP_2'}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="group-hover:text-primary transition-colors text-on-surface">THCS (Lớp 6 - 9)</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="thePhanLoai" value="CAP_1" onchange="submitFilter()" 
+                         th:checked="${thePhanLoai == 'CAP_1'}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="group-hover:text-primary transition-colors text-on-surface">Tiểu học (Lớp 1 - 5)</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="thePhanLoai" value="IELTS" onchange="submitFilter()" 
+                         th:checked="${thePhanLoai == 'IELTS'}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="group-hover:text-primary transition-colors text-on-surface">Luyện thi IELTS</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="thePhanLoai" value="TOEIC" onchange="submitFilter()" 
+                         th:checked="${thePhanLoai == 'TOEIC'}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="group-hover:text-primary transition-colors text-on-surface">Chứng chỉ TOEIC</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- 2. Danh mục môn học -->
+            <div class="space-y-3 pt-4 border-t border-surface-container">
+              <label class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">Môn học & Danh mục</label>
+              <select name="danhMucId" onchange="submitFilter()" class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low border border-surface-container text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20">
+                <option value="">Tất cả môn học</option>
+                <th:block th:each="cat : ${rootCategories}">
+                  <option th:value="${cat.id}" th:text="${cat.tenDanhMuc}" th:selected="${danhMucId == cat.id}" class="font-bold"></option>
+                  <th:block th:each="child : ${cat.danhSachDanhMucCon}">
+                    <option th:value="${child.id}" th:text="'— ' + ${child.tenDanhMuc}" th:selected="${danhMucId == child.id}"></option>
+                  </th:block>
+                </th:block>
+              </select>
+            </div>
+
+            <!-- 3. Mức giá -->
+            <div class="space-y-3 pt-4 border-t border-surface-container">
+              <label class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">Khoảng giá học phí</label>
+              <div class="space-y-2">
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="khoangGia" value="" onchange="submitFilter()" 
+                         th:checked="${khoangGia == null or khoangGia == ''}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="group-hover:text-primary transition-colors text-on-surface">Tất cả mức giá</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="khoangGia" value="mien-phi" onchange="submitFilter()" 
+                         th:checked="${khoangGia == 'mien-phi'}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="group-hover:text-primary transition-colors text-on-surface">Khóa học Miễn phí</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="khoangGia" value="duoi-500k" onchange="submitFilter()" 
+                         th:checked="${khoangGia == 'duoi-500k'}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="group-hover:text-primary transition-colors text-on-surface">Dưới 500.000đ</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="khoangGia" value="500k-1tr" onchange="submitFilter()" 
+                         th:checked="${khoangGia == '500k-1tr'}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="group-hover:text-primary transition-colors text-on-surface">500.000đ — 1.000.000đ</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="khoangGia" value="tren-1tr" onchange="submitFilter()" 
+                         th:checked="${khoangGia == 'tren-1tr'}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="group-hover:text-primary transition-colors text-on-surface">Trên 1.000.000đ</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- 4. Đánh giá sao -->
+            <div class="space-y-3 pt-4 border-t border-surface-container">
+              <label class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">Đánh giá chất lượng</label>
+              <div class="space-y-2">
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="soSao" value="" onchange="submitFilter()" 
+                         th:checked="${soSao == null}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="group-hover:text-primary transition-colors text-on-surface">Tất cả đánh giá</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="soSao" value="4.5" onchange="submitFilter()" 
+                         th:checked="${soSao != null and soSao.doubleValue() == 4.5}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="flex items-center gap-1 text-on-surface group-hover:text-primary transition-colors">
+                    <span class="text-amber-500 flex">★★★★★</span>
+                    <span class="text-xs font-semibold">Từ 4.5 sao</span>
+                  </span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group text-sm">
+                  <input type="radio" name="soSao" value="4.0" onchange="submitFilter()" 
+                         th:checked="${soSao != null and soSao.doubleValue() == 4.0}"
+                         class="w-4 h-4 text-primary focus:ring-primary border-outline/40">
+                  <span class="flex items-center gap-1 text-on-surface group-hover:text-primary transition-colors">
+                    <span class="text-amber-500 flex">★★★★☆</span>
+                    <span class="text-xs font-semibold">Từ 4.0 sao</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+          </form>
+        </aside>
+
+        <!-- ==================== COURSE LIST & TOOLBAR ==================== -->
+        <section class="lg:col-span-3 space-y-6">
+
+          <!-- Top Toolbar: Search + Count + Sort Dropdown -->
+          <div class="bg-surface-container-lowest border border-surface-container rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            <!-- Quick Search Input -->
+            <form th:action="@{/khoa-hoc}" method="get" class="relative w-full sm:max-w-md">
+              <input type="hidden" name="thePhanLoai" th:value="${thePhanLoai}">
+              <input type="hidden" name="danhMucId" th:value="${danhMucId}">
+              <input type="hidden" name="khoangGia" th:value="${khoangGia}">
+              <input type="hidden" name="soSao" th:value="${soSao}">
+              <input type="hidden" name="sort" th:value="${currentSort}">
+              
+              <input type="text" name="keyword" th:value="${keyword}" 
+                     placeholder="Tìm kiếm theo tên khóa học hoặc nội dung..." 
+                     class="w-full pl-10 pr-24 py-2.5 rounded-xl bg-surface-container-low border border-surface-container text-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+              <span class="material-symbols-outlined text-outline absolute left-3 top-1/2 -translate-y-1/2 text-[20px]">search</span>
+              <button type="submit" class="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-colors">
+                Tìm kiếm
+              </button>
+            </form>
+
+            <!-- Results Count & Sort Dropdown -->
+            <div class="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
+              <span class="text-xs text-on-surface-variant font-medium whitespace-nowrap">
+                Tìm thấy <strong class="text-primary font-bold" th:text="${totalCourses}">0</strong> khóa học
+              </span>
+
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="text-xs text-on-surface-variant hidden md:inline-block">Sắp xếp:</span>
+                <select id="sortSelect" onchange="changeSort(this.value)" class="px-3 py-2 rounded-xl bg-surface-container-low border border-surface-container text-xs font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20">
+                  <option value="moi-nhat" th:selected="${currentSort == 'moi-nhat'}">Mới nhất</option>
+                  <option value="hoc-vien-nhieu" th:selected="${currentSort == 'hoc-vien-nhieu'}">Phổ biến nhất</option>
+                  <option value="danh-gia-cao" th:selected="${currentSort == 'danh-gia-cao'}">Đánh giá cao nhất</option>
+                  <option value="gia-tang" th:selected="${currentSort == 'gia-tang'}">Giá: Thấp đến cao</option>
+                  <option value="gia-giam" th:selected="${currentSort == 'gia-giam'}">Giá: Cao đến thấp</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Courses Grid -->
+          <div th:if="${not #lists.isEmpty(courses)}" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <article th:each="course : ${courses}" class="group bg-surface-container-lowest rounded-2xl overflow-hidden border border-surface-container hover:border-primary/30 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+              
+              <div>
+                <!-- Course Thumbnail -->
+                <div class="relative aspect-video overflow-hidden bg-surface-container">
+                  <img th:src="${course.anhDaiDienKhoaHoc ?: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800'}" 
+                       th:alt="${course.tieuDe}"
+                       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                  
+                  <!-- Badges overlay -->
+                  <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                    <span th:if="${course.thePhanLoai != null}" 
+                          class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-primary text-white shadow-xs"
+                          th:text="${course.thePhanLoai}">THPT</span>
+                    <span th:if="${course.giaKhuyenMai != null and course.giaKhuyenMai.compareTo(course.giaGoc) < 0 and course.giaGoc.compareTo(T(java.math.BigDecimal).ZERO) > 0}"
+                          class="px-2 py-1 rounded-md text-[10px] font-bold bg-error text-white shadow-xs"
+                          th:text="'-' + ${#numbers.formatDecimal((1 - course.giaKhuyenMai.doubleValue() / course.giaGoc.doubleValue()) * 100, 0, 0)} + '%'">
+                      -20%
+                    </span>
+                  </div>
+
+                  <!-- Free Trial Badge -->
+                  <div class="absolute bottom-3 right-3">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold bg-surface-container-lowest/90 backdrop-blur-md text-on-surface shadow-xs">
+                      <span class="material-symbols-outlined text-[14px] text-status-success">play_circle</span>
+                      Học thử miễn phí
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Course Content Info -->
+                <div class="p-5">
+                  <div class="flex items-center justify-between text-xs text-on-surface-variant mb-2">
+                    <span class="font-medium" th:text="${course.danhMuc != null ? course.danhMuc.tenDanhMuc : 'Môn học'}">Toán học</span>
+                    <span class="flex items-center gap-1 font-semibold text-amber-500">
+                      <span class="material-symbols-outlined text-[15px] fill-current text-amber-500">star</span>
+                      <span th:text="${course.diemDanhGiaTrungBinh != null ? course.diemDanhGiaTrungBinh : '5.0'}">5.0</span>
+                      <span class="text-on-surface-variant/70 font-normal" th:text="'(' + ${course.tongSoDanhGia ?: 0} + ')'">(0)</span>
+                    </span>
+                  </div>
+
+                  <h3 class="font-bold text-base text-on-surface group-hover:text-primary transition-colors line-clamp-2 mb-3">
+                    <a th:href="@{'/khoa-hoc/' + ${course.duongDanSlug}}" th:text="${course.tieuDe}">
+                      Tên khóa học hoàn chỉnh
+                    </a>
+                  </h3>
+
+                  <!-- Instructor Info -->
+                  <div class="flex items-center gap-2 mb-4">
+                    <img th:src="${course.giangVien != null and course.giangVien.nguoiDung != null and course.giangVien.nguoiDung.anhDaiDien != null ? course.giangVien.nguoiDung.anhDaiDien : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}" 
+                         alt="Giảng viên" 
+                         class="w-6 h-6 rounded-full object-cover">
+                    <span class="text-xs text-on-surface-variant font-medium truncate" 
+                          th:text="${course.giangVien != null and course.giangVien.nguoiDung != null ? course.giangVien.nguoiDung.hoTen : 'Gia sư StudyWithMe'}">
+                      Thầy Nguyễn Văn An
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Course Footer Pricing & Action -->
+              <div class="p-5 pt-0 border-t border-surface-container/60 mt-auto flex items-center justify-between gap-3">
+                <div class="flex flex-col">
+                  <!-- Original price if discounted -->
+                  <span th:if="${course.giaKhuyenMai != null and course.giaKhuyenMai.compareTo(course.giaGoc) < 0}" 
+                        class="text-[11px] text-outline line-through" 
+                        th:text="${#numbers.formatDecimal(course.giaGoc, 0, 'POINT', 0, 'COMMA')} + ' đ'">
+                    899.000 đ
+                  </span>
+                  <!-- Current price -->
+                  <span class="text-base font-extrabold text-primary" 
+                        th:if="${course.giaKhuyenMai != null}" 
+                        th:text="${#numbers.formatDecimal(course.giaKhuyenMai, 0, 'POINT', 0, 'COMMA')} + ' đ'">
+                    699.000 đ
+                  </span>
+                  <span class="text-base font-extrabold text-primary" 
+                        th:if="${course.giaKhuyenMai == null and course.giaGoc.compareTo(T(java.math.BigDecimal).ZERO) > 0}" 
+                        th:text="${#numbers.formatDecimal(course.giaGoc, 0, 'POINT', 0, 'COMMA')} + ' đ'">
+                    699.000 đ
+                  </span>
+                  <span class="text-base font-extrabold text-status-success" 
+                        th:if="${course.giaGoc.compareTo(T(java.math.BigDecimal).ZERO) == 0}">
+                    Miễn phí
+                  </span>
+                </div>
+
+                <a th:href="@{'/khoa-hoc/' + ${course.duongDanSlug}}" 
+                   class="px-4 py-2 rounded-xl bg-surface-container-low group-hover:bg-primary text-on-surface group-hover:text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1">
+                  <span>Học ngay</span>
+                  <span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+                </a>
+              </div>
+
+            </article>
+          </div>
+
+          <!-- Empty State (No Courses Found) -->
+          <div th:if="${#lists.isEmpty(courses)}" class="bg-surface-container-lowest border border-surface-container rounded-2xl p-12 text-center">
+            <div class="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center mx-auto mb-4 text-outline">
+              <span class="material-symbols-outlined text-[36px]">search_off</span>
+            </div>
+            <h3 class="font-bold text-lg text-on-surface mb-2">Không tìm thấy khóa học nào phù hợp</h3>
+            <p class="text-sm text-on-surface-variant max-w-md mx-auto mb-6">
+              Vui lòng thử tìm kiếm với từ khóa khác, hoặc làm mới các tiêu chí bộ lọc (cấp học, môn học, mức giá).
+            </p>
+            <a th:href="@{/khoa-hoc}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-bold text-sm hover:bg-primary/90 transition-colors shadow-xs">
+              <span class="material-symbols-outlined text-[18px]">refresh</span>
+              Xóa tất cả bộ lọc
+            </a>
+          </div>
+
+          <!-- Pagination Component -->
+          <div th:if="${totalPages > 1}" class="flex items-center justify-center gap-2 pt-8">
+            <!-- Prev Button -->
+            <a th:if="${currentPage > 0}" 
+               th:href="@{/khoa-hoc(page=${currentPage - 1}, keyword=${keyword}, thePhanLoai=${thePhanLoai}, danhMucId=${danhMucId}, khoangGia=${khoangGia}, soSao=${soSao}, sort=${currentSort})}"
+               class="w-10 h-10 rounded-xl bg-surface-container-lowest border border-surface-container flex items-center justify-center text-on-surface hover:border-primary hover:text-primary transition-colors shadow-xs">
+              <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+            </a>
+
+            <!-- Page Numbers -->
+            <th:block th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}">
+              <a th:href="@{/khoa-hoc(page=${pageNum}, keyword=${keyword}, thePhanLoai=${thePhanLoai}, danhMucId=${danhMucId}, khoangGia=${khoangGia}, soSao=${soSao}, sort=${currentSort})}"
+                 th:text="${pageNum + 1}"
+                 th:classappend="${pageNum == currentPage} ? 'bg-primary text-white font-bold shadow-md' : 'bg-surface-container-lowest border border-surface-container text-on-surface hover:border-primary hover:text-primary'"
+                 class="w-10 h-10 rounded-xl flex items-center justify-center text-sm transition-all shadow-xs">
+                1
+              </a>
+            </th:block>
+
+            <!-- Next Button -->
+            <a th:if="${currentPage < totalPages - 1}" 
+               th:href="@{/khoa-hoc(page=${currentPage + 1}, keyword=${keyword}, thePhanLoai=${thePhanLoai}, danhMucId=${danhMucId}, khoangGia=${khoangGia}, soSao=${soSao}, sort=${currentSort})}"
+               class="w-10 h-10 rounded-xl bg-surface-container-lowest border border-surface-container flex items-center justify-center text-on-surface hover:border-primary hover:text-primary transition-colors shadow-xs">
+              <span class="material-symbols-outlined text-[20px]">chevron_right</span>
+            </a>
+          </div>
+
+        </section>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer th:replace="~{components/user/footer :: main-footer}"></footer>
+
+  <!-- Filter & Sort Script -->
+  <script>
+    function submitFilter() {
+      document.getElementById('filterForm').submit();
+    }
+
+    function changeSort(sortVal) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('sort', sortVal);
+      url.searchParams.set('page', '0');
+      window.location.href = url.toString();
+    }
+  </script>
+
+</body>
+</html>

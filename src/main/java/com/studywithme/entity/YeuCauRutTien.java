@@ -55,4 +55,84 @@ public class YeuCauRutTien {
 
     @Column(name = "ngay_xu_ly")
     private LocalDateTime ngayXuLy;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public HoSoGiangVien getGiangVien() {
+        return giangVien;
+    }
+
+    public void setGiangVien(HoSoGiangVien giangVien) {
+        this.giangVien = giangVien;
+    }
+
+    public BigDecimal getSoTienRut() {
+        return soTienRut;
+    }
+
+    public void setSoTienRut(BigDecimal soTienRut) {
+        this.soTienRut = soTienRut;
+    }
+
+    public String getTenNganHang() {
+        return tenNganHang;
+    }
+
+    public void setTenNganHang(String tenNganHang) {
+        this.tenNganHang = tenNganHang;
+    }
+
+    public String getSoTaiKhoan() {
+        return soTaiKhoan;
+    }
+
+    public void setSoTaiKhoan(String soTaiKhoan) {
+        this.soTaiKhoan = soTaiKhoan;
+    }
+
+    public String getTenChuTaiKhoan() {
+        return tenChuTaiKhoan;
+    }
+
+    public void setTenChuTaiKhoan(String tenChuTaiKhoan) {
+        this.tenChuTaiKhoan = tenChuTaiKhoan;
+    }
+
+    public TrangThaiRutTien getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(TrangThaiRutTien trangThai) {
+        this.trangThai = trangThai;
+    }
+
+    public String getGhiChuAdmin() {
+        return ghiChuAdmin;
+    }
+
+    public void setGhiChuAdmin(String ghiChuAdmin) {
+        this.ghiChuAdmin = ghiChuAdmin;
+    }
+
+    public LocalDateTime getNgayTao() {
+        return ngayTao;
+    }
+
+    public void setNgayTao(LocalDateTime ngayTao) {
+        this.ngayTao = ngayTao;
+    }
+
+    public LocalDateTime getNgayXuLy() {
+        return ngayXuLy;
+    }
+
+    public void setNgayXuLy(LocalDateTime ngayXuLy) {
+        this.ngayXuLy = ngayXuLy;
+    }
 }

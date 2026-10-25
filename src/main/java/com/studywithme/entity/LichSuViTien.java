@@ -52,4 +52,76 @@ public class LichSuViTien {
     @CreationTimestamp
     @Column(name = "ngay_tao", nullable = false, updatable = false)
     private LocalDateTime ngayTao;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public HoSoGiangVien getGiangVien() {
+        return giangVien;
+    }
+
+    public void setGiangVien(HoSoGiangVien giangVien) {
+        this.giangVien = giangVien;
+    }
+
+    public BigDecimal getSoTienBienDong() {
+        return soTienBienDong;
+    }
+
+    public void setSoTienBienDong(BigDecimal soTienBienDong) {
+        this.soTienBienDong = soTienBienDong;
+    }
+
+    public BigDecimal getSoDuTruoc() {
+        return soDuTruoc;
+    }
+
+    public void setSoDuTruoc(BigDecimal soDuTruoc) {
+        this.soDuTruoc = soDuTruoc;
+    }
+
+    public BigDecimal getSoDuSau() {
+        return soDuSau;
+    }
+
+    public void setSoDuSau(BigDecimal soDuSau) {
+        this.soDuSau = soDuSau;
+    }
+
+    public LoaiGiaoDichVi getLoaiGiaoDich() {
+        return loaiGiaoDich;
+    }
+
+    public void setLoaiGiaoDich(LoaiGiaoDichVi loaiGiaoDich) {
+        this.loaiGiaoDich = loaiGiaoDich;
+    }
+
+    public Long getMaThamChieu() {
+        return maThamChieu;
+    }
+
+    public void setMaThamChieu(Long maThamChieu) {
+        this.maThamChieu = maThamChieu;
+    }
+
+    public String getMoTaGiaoDich() {
+        return moTaGiaoDich;
+    }
+
+    public void setMoTaGiaoDich(String moTaGiaoDich) {
+        this.moTaGiaoDich = moTaGiaoDich;
+    }
+
+    public LocalDateTime getNgayTao() {
+        return ngayTao;
+    }
+
+    public void setNgayTao(LocalDateTime ngayTao) {
+        this.ngayTao = ngayTao;
+    }
 }

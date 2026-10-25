@@ -14,11 +14,14 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class VnPayServiceImpl implements VnPayService {
 
     private final VnpayConfig vnpayConfig;
+
+    public VnPayServiceImpl(VnpayConfig vnpayConfig) {
+        this.vnpayConfig = vnpayConfig;
+    }
 
     @Override
     public String createPaymentUrl(DonHang donHang, String clientIp) {

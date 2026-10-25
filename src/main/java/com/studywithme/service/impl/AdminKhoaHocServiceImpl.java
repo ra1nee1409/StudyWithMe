@@ -19,11 +19,14 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AdminKhoaHocServiceImpl implements AdminKhoaHocService {
 
     private final KhoaHocRepository khoaHocRepository;
+
+    public AdminKhoaHocServiceImpl(KhoaHocRepository khoaHocRepository) {
+        this.khoaHocRepository = khoaHocRepository;
+    }
 
     @Override
     public List<KhoaHocKiemDuyetResponse> layDanhSachKhoaHoc(TrangThaiKhoaHoc trangThai) {

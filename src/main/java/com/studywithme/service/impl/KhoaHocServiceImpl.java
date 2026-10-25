@@ -20,11 +20,14 @@ import java.util.List;
  * Service xử lý logic tìm kiếm, xem chi tiết và gợi ý khóa học cho học viên.
  */
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class KhoaHocServiceImpl implements KhoaHocService {
 
     private final KhoaHocRepository khoaHocRepository;
+
+    public KhoaHocServiceImpl(KhoaHocRepository khoaHocRepository) {
+        this.khoaHocRepository = khoaHocRepository;
+    }
 
     @Override
     public Page<KhoaHoc> locKhoaHoc(String keyword, 

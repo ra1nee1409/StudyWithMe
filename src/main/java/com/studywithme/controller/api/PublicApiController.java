@@ -35,7 +35,6 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/public")
-@RequiredArgsConstructor
 public class PublicApiController {
 
     private final BannerService bannerService;
@@ -43,6 +42,18 @@ public class PublicApiController {
     private final DanhMucService danhMucService;
     private final KhoaHocService khoaHocService;
     private final GiaSuService giaSuService;
+
+    public PublicApiController(BannerService bannerService,
+                               HoSoGiangVienRepository hoSoGiangVienRepository,
+                               DanhMucService danhMucService,
+                               KhoaHocService khoaHocService,
+                               GiaSuService giaSuService) {
+        this.bannerService = bannerService;
+        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
+        this.danhMucService = danhMucService;
+        this.khoaHocService = khoaHocService;
+        this.giaSuService = giaSuService;
+    }
 
     /**
      * 1. Lấy danh sách banner quảng cáo đang kích hoạt

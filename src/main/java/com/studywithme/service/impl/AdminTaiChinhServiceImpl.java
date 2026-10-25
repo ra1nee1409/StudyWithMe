@@ -12,7 +12,6 @@ import com.studywithme.repository.HoSoGiangVienRepository;
 import com.studywithme.repository.LichSuViTienRepository;
 import com.studywithme.repository.YeuCauRutTienRepository;
 import com.studywithme.service.AdminTaiChinhService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,12 +20,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class AdminTaiChinhServiceImpl implements AdminTaiChinhService {
 
     private final YeuCauRutTienRepository yeuCauRutTienRepository;
     private final HoSoGiangVienRepository hoSoGiangVienRepository;
     private final LichSuViTienRepository lichSuViTienRepository;
+
+    public AdminTaiChinhServiceImpl(YeuCauRutTienRepository yeuCauRutTienRepository,
+                                    HoSoGiangVienRepository hoSoGiangVienRepository,
+                                    LichSuViTienRepository lichSuViTienRepository) {
+        this.yeuCauRutTienRepository = yeuCauRutTienRepository;
+        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
+        this.lichSuViTienRepository = lichSuViTienRepository;
+    }
 
     @Override
     @Transactional(readOnly = true)

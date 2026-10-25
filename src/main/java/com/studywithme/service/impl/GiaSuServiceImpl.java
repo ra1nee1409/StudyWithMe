@@ -24,13 +24,20 @@ import java.util.List;
  * Service xử lý logic tìm kiếm, xem hồ sơ và lớp dạy kèm của gia sư.
  */
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GiaSuServiceImpl implements GiaSuService {
 
     private final HoSoGiangVienRepository hoSoGiangVienRepository;
     private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
     private final KhoaHocRepository khoaHocRepository;
+
+    public GiaSuServiceImpl(HoSoGiangVienRepository hoSoGiangVienRepository,
+                            LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
+                            KhoaHocRepository khoaHocRepository) {
+        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
+        this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
+        this.khoaHocRepository = khoaHocRepository;
+    }
 
     @Override
     public Page<HoSoGiangVien> locGiaSu(String keyword, String loaiChungChiStr, Pageable pageable) {

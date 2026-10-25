@@ -78,4 +78,124 @@ public class HoSoGiangVien {
     @UpdateTimestamp
     @Column(name = "ngay_cap_nhat", nullable = false)
     private LocalDateTime ngayCapNhat;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public NguoiDung getNguoiDung() {
+        return nguoiDung;
+    }
+
+    public void setNguoiDung(NguoiDung nguoiDung) {
+        this.nguoiDung = nguoiDung;
+    }
+
+    public String getTieuDeChuyenMon() {
+        return tieuDeChuyenMon;
+    }
+
+    public void setTieuDeChuyenMon(String tieuDeChuyenMon) {
+        this.tieuDeChuyenMon = tieuDeChuyenMon;
+    }
+
+    public String getGioiThieuBanThan() {
+        return gioiThieuBanThan;
+    }
+
+    public void setGioiThieuBanThan(String gioiThieuBanThan) {
+        this.gioiThieuBanThan = gioiThieuBanThan;
+    }
+
+    public String getLinkVideoDayThu() {
+        return linkVideoDayThu;
+    }
+
+    public void setLinkVideoDayThu(String linkVideoDayThu) {
+        this.linkVideoDayThu = linkVideoDayThu;
+    }
+
+    public TrangThaiGiangVien getTrangThaiDuyet() {
+        return trangThaiDuyet;
+    }
+
+    public void setTrangThaiDuyet(TrangThaiGiangVien trangThaiDuyet) {
+        this.trangThaiDuyet = trangThaiDuyet;
+    }
+
+    public String getLyDoTuChoi() {
+        return lyDoTuChoi;
+    }
+
+    public void setLyDoTuChoi(String lyDoTuChoi) {
+        this.lyDoTuChoi = lyDoTuChoi;
+    }
+
+    public BigDecimal getSoDuVi() {
+        return soDuVi;
+    }
+
+    public void setSoDuVi(BigDecimal soDuVi) {
+        this.soDuVi = soDuVi;
+    }
+
+    public String getTenNganHang() {
+        return tenNganHang;
+    }
+
+    public void setTenNganHang(String tenNganHang) {
+        this.tenNganHang = tenNganHang;
+    }
+
+    public String getSoTaiKhoanNganHang() {
+        return soTaiKhoanNganHang;
+    }
+
+    public void setSoTaiKhoanNganHang(String soTaiKhoanNganHang) {
+        this.soTaiKhoanNganHang = soTaiKhoanNganHang;
+    }
+
+    public String getTenChuTaiKhoan() {
+        return tenChuTaiKhoan;
+    }
+
+    public void setTenChuTaiKhoan(String tenChuTaiKhoan) {
+        this.tenChuTaiKhoan = tenChuTaiKhoan;
+    }
+
+    public List<ChungChiGiangVien> getDanhSachChungChi() {
+        return danhSachChungChi;
+    }
+
+    public void setDanhSachChungChi(List<ChungChiGiangVien> danhSachChungChi) {
+        this.danhSachChungChi = danhSachChungChi;
+    }
+
+    public List<LichSuViTien> getLichSuGiaoDichVi() {
+        return lichSuGiaoDichVi;
+    }
+
+    public void setLichSuGiaoDichVi(List<LichSuViTien> lichSuGiaoDichVi) {
+        this.lichSuGiaoDichVi = lichSuGiaoDichVi;
+    }
+
+    public LocalDateTime getNgayTao() {
+        return ngayTao;
+    }
+
+    public void setNgayTao(LocalDateTime ngayTao) {
+        this.ngayTao = ngayTao;
+    }
+
+    public LocalDateTime getNgayCapNhat() {
+        return ngayCapNhat;
+    }
+
+    public void setNgayCapNhat(LocalDateTime ngayCapNhat) {
+        this.ngayCapNhat = ngayCapNhat;
+    }
 }

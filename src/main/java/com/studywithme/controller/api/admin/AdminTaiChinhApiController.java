@@ -18,10 +18,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/tai-chinh")
 @PreAuthorize("hasAuthority('ROLE_QUAN_TRI')")
-@RequiredArgsConstructor
 public class AdminTaiChinhApiController {
 
     private final AdminTaiChinhService adminTaiChinhService;
+
+    public AdminTaiChinhApiController(AdminTaiChinhService adminTaiChinhService) {
+        this.adminTaiChinhService = adminTaiChinhService;
+    }
 
     /**
      * 1. Lấy danh sách các lệnh rút tiền (lọc theo CHO_XU_LY, DA_CHUYEN_TIEN, TU_CHOI hoặc null để lấy tất cả)

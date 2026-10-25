@@ -17,10 +17,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/khoa-hoc")
 @PreAuthorize("hasAuthority('ROLE_QUAN_TRI')")
-@RequiredArgsConstructor
 public class AdminKhoaHocApiController {
 
     private final AdminKhoaHocService adminKhoaHocService;
+
+    public AdminKhoaHocApiController(AdminKhoaHocService adminKhoaHocService) {
+        this.adminKhoaHocService = adminKhoaHocService;
+    }
 
     /**
      * 1. Lấy danh sách khóa học theo trạng thái (CHO_DUYET, DA_XUAT_BAN, TU_CHOI hoặc null để lấy tất cả)

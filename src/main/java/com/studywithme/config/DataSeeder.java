@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -88,6 +89,31 @@ public class DataSeeder implements CommandLineRunner {
 
             nguoiDungRepository.save(admin);
             logger.info(">>> Đã khởi tạo tài khoản Quản trị viên mặc định: {} / Admin@123456", adminEmail);
+        }
+
+        // 2.1 Khởi tạo tài khoản Admin admin@admin.com / 123456 theo yêu cầu
+        String adminCustomEmail = "admin@admin.com";
+        if (!nguoiDungRepository.existsByEmail(adminCustomEmail)) {
+            NguoiDung adminCustom = NguoiDung.builder()
+                    .email(adminCustomEmail)
+                    .matKhau(passwordEncoder.encode("123456"))
+                    .hoTen("Quản Trị Viên")
+                    .soDienThoai("0912345678")
+                    .trangThai(TrangThaiNguoiDung.HOAT_DONG)
+                    .danhSachVaiTro(new HashSet<>(Set.of(roleQuanTri)))
+                    .build();
+
+            nguoiDungRepository.save(adminCustom);
+            logger.info(">>> Đã khởi tạo tài khoản Quản trị viên: {} / 123456", adminCustomEmail);
+        } else {
+            nguoiDungRepository.findByEmail(adminCustomEmail).ifPresent(u -> {
+                u.setMatKhau(passwordEncoder.encode("123456"));
+                Set<VaiTro> vts = u.getDanhSachVaiTro() != null ? new HashSet<>(u.getDanhSachVaiTro()) : new HashSet<>();
+                vts.add(roleQuanTri);
+                u.setDanhSachVaiTro(vts);
+                u.setTrangThai(TrangThaiNguoiDung.HOAT_DONG);
+                nguoiDungRepository.save(u);
+            });
         }
 
         // 3. Khởi tạo tài khoản Giảng viên mẫu

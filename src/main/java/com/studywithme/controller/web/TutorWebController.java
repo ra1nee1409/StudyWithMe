@@ -109,7 +109,7 @@ public class TutorWebController {
         return "tutor/dashboard";
     }
 
-    @GetMapping("/lop-hoc")
+    @GetMapping({"/lop-hoc", "/classes"})
     public String classes(Model model, Principal principal) {
         Optional<HoSoGiangVien> hoSoOpt = getHoSoByPrincipal(principal);
         List<LopHocTrucTuyen> danhSachLop = hoSoOpt
@@ -120,7 +120,7 @@ public class TutorWebController {
         return "tutor/classes";
     }
 
-    @GetMapping("/lich-day")
+    @GetMapping({"/lich-day", "/schedule"})
     public String schedule(Model model, Principal principal) {
         Optional<HoSoGiangVien> hoSoOpt = getHoSoByPrincipal(principal);
         List<LopHocTrucTuyen> danhSachLop = hoSoOpt
@@ -131,7 +131,7 @@ public class TutorWebController {
         return "tutor/schedule";
     }
 
-    @GetMapping("/hoc-vien")
+    @GetMapping({"/hoc-vien", "/students"})
     public String students(Model model, Principal principal) {
         Optional<HoSoGiangVien> hoSoOpt = getHoSoByPrincipal(principal);
         List<DangKyLopHoc> danhSachHocVien = hoSoOpt
@@ -142,7 +142,7 @@ public class TutorWebController {
         return "tutor/students";
     }
 
-    @GetMapping("/vi-tien")
+    @GetMapping({"/vi-tien", "/wallet"})
     public String wallet(Model model, Principal principal) {
         Optional<HoSoGiangVien> hoSoOpt = getHoSoByPrincipal(principal);
         List<LichSuViTien> danhSachGiaoDich = hoSoOpt
@@ -160,7 +160,7 @@ public class TutorWebController {
         return "tutor/wallet";
     }
 
-    @GetMapping("/ho-so")
+    @GetMapping({"/ho-so", "/profile"})
     public String profile(Model model, Principal principal) {
         Optional<HoSoGiangVien> hoSoOpt = getHoSoByPrincipal(principal);
         List<ChungChiGiangVien> danhSachChungChi = new ArrayList<>();

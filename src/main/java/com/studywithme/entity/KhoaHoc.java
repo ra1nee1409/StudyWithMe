@@ -43,7 +43,7 @@ public class KhoaHoc {
     @Column(name = "duong_dan_slug", nullable = false, unique = true, length = 255)
     private String duongDanSlug;
 
-    @Column(name = "mo_ta_chi_tiet", columnDefinition = "LONGTEXT")
+    @Column(name = "mo_ta_chi_tiet", columnDefinition = "NVARCHAR(MAX)")
     private String moTaChiTiet;
 
     @Column(name = "anh_dai_dien_khoa_hoc", length = 500)
@@ -69,7 +69,7 @@ public class KhoaHoc {
     @Builder.Default
     private TrangThaiKhoaHoc trangThai = TrangThaiKhoaHoc.BAN_NHAP;
 
-    @Column(name = "ly_do_tu_choi", columnDefinition = "TEXT")
+    @Column(name = "ly_do_tu_choi", columnDefinition = "NVARCHAR(MAX)")
     private String lyDoTuChoi;
 
     @Column(name = "diem_danh_gia_tb", nullable = false, precision = 3, scale = 2)

@@ -35,7 +35,7 @@ public class HoSoGiangVien {
     @Column(name = "tieu_de_chuyen_mon", length = 255)
     private String tieuDeChuyenMon;
 
-    @Column(name = "gioi_thieu_ban_than", columnDefinition = "TEXT")
+    @Column(name = "gioi_thieu_ban_than", columnDefinition = "NVARCHAR(MAX)")
     private String gioiThieuBanThan;
 
     @Column(name = "link_video_day_thu", length = 500)
@@ -46,7 +46,7 @@ public class HoSoGiangVien {
     @Builder.Default
     private TrangThaiGiangVien trangThaiDuyet = TrangThaiGiangVien.CHO_DUYET;
 
-    @Column(name = "ly_do_tu_choi", columnDefinition = "TEXT")
+    @Column(name = "ly_do_tu_choi", columnDefinition = "NVARCHAR(MAX)")
     private String lyDoTuChoi;
 
     @Column(name = "so_du_vi", nullable = false, precision = 15, scale = 2)

@@ -46,7 +46,7 @@ public class YeuCauRutTien {
     @Builder.Default
     private TrangThaiRutTien trangThai = TrangThaiRutTien.CHO_XU_LY;
 
-    @Column(name = "ghi_chu_admin", columnDefinition = "TEXT")
+    @Column(name = "ghi_chu_admin", columnDefinition = "NVARCHAR(MAX)")
     private String ghiChuAdmin;
 
     @CreationTimestamp

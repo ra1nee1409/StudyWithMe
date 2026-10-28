@@ -46,3 +46,21 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Temporary / Scratch ###
+scratch/
+
+# Python scripts & caches
+*.py
+__pycache__/
+*.pyc
+*.pyo
+
+# Office documents & temporary lock files
+*.docx
+*.doc
+~$*
+
+# Diagrams generated
+diagrams_ch2/
+diagrams/

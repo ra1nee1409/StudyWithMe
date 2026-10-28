@@ -56,7 +56,7 @@ public class ChungChiGiangVien {
     @Builder.Default
     private TrangThaiXacThuc trangThaiXacThuc = TrangThaiXacThuc.CHO_XAC_THUC;
 
-    @Column(name = "ly_do_tu_choi", columnDefinition = "TEXT")
+    @Column(name = "ly_do_tu_choi", columnDefinition = "NVARCHAR(MAX)")
     private String lyDoTuChoi;
 
     @CreationTimestamp

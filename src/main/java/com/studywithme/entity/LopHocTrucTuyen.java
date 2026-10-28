@@ -39,7 +39,7 @@ public class LopHocTrucTuyen {
     @Column(name = "tieu_de_lop", nullable = false, length = 255)
     private String tieuDeLop;
 
-    @Column(name = "mo_ta_lop", columnDefinition = "TEXT")
+    @Column(name = "mo_ta_lop", columnDefinition = "NVARCHAR(MAX)")
     private String moTaLop;
 
     @Column(name = "si_so_toi_da", nullable = false)

@@ -38,7 +38,7 @@ public class DanhGiaNhanXet {
     @Column(name = "so_sao_danh_gia", nullable = false, columnDefinition = "TINYINT")
     private Integer soSaoDanhGia;
 
-    @Column(name = "noi_dung_nhan_xet", columnDefinition = "TEXT")
+    @Column(name = "noi_dung_nhan_xet", columnDefinition = "NVARCHAR(MAX)")
     private String noiDungNhanXet;
 
     @Column(name = "duoc_hien_thi", nullable = false)

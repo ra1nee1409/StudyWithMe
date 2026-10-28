@@ -110,7 +110,7 @@ public class StudentWebController {
         return "student/courses";
     }
 
-    @GetMapping("/lop-hoc")
+    @GetMapping({"/lop-hoc", "/classes"})
     public String classes(Model model, Principal principal) {
         Optional<NguoiDung> userOpt = getUserByPrincipal(principal);
         List<DangKyLopHoc> danhSachDangKy = userOpt
@@ -121,7 +121,7 @@ public class StudentWebController {
         return "student/classes";
     }
 
-    @GetMapping("/lich-hoc")
+    @GetMapping({"/lich-hoc", "/schedule"})
     public String schedule(Model model, Principal principal) {
         Optional<NguoiDung> userOpt = getUserByPrincipal(principal);
         List<DangKyLopHoc> danhSachDangKy = userOpt
@@ -132,7 +132,7 @@ public class StudentWebController {
         return "student/schedule";
     }
 
-    @GetMapping("/gia-su")
+    @GetMapping({"/gia-su", "/tutors"})
     public String tutors(Model model, Principal principal) {
         Optional<NguoiDung> userOpt = getUserByPrincipal(principal);
         List<DangKyLopHoc> danhSachDangKy = userOpt
@@ -143,7 +143,7 @@ public class StudentWebController {
         return "student/tutors";
     }
 
-    @GetMapping("/don-hang")
+    @GetMapping({"/don-hang", "/orders"})
     public String orders(Model model, Principal principal) {
         Optional<NguoiDung> userOpt = getUserByPrincipal(principal);
         List<DonHang> danhSachDonHang = userOpt
@@ -154,7 +154,7 @@ public class StudentWebController {
         return "student/orders";
     }
 
-    @GetMapping("/yeu-thich")
+    @GetMapping({"/yeu-thich", "/wishlist"})
     public String wishlist(Model model, Principal principal) {
         Optional<NguoiDung> userOpt = getUserByPrincipal(principal);
         List<DanhSachYeuThich> danhSachYeuThich = userOpt
@@ -165,7 +165,7 @@ public class StudentWebController {
         return "student/wishlist";
     }
 
-    @GetMapping("/ho-so")
+    @GetMapping({"/ho-so", "/profile"})
     public String profile(Model model, Principal principal) {
         return "student/profile";
     }

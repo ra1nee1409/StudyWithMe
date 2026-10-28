@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <body>
-  <header th:fragment="main-header(activePage)" class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(28,105,154,0.06)]">
-    <div class="h-20 w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+  <header th:fragment="main-header(activePage)" class="fixed top-0 left-0 w-full z-50 bg-white/95 shadow-[0_1px_8px_rgba(28,105,154,0.08)]">
+    <div class="h-16 sm:h-20 w-full max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
       <!-- Logo -->
-      <div class="flex items-center gap-space-md shrink-0">
-        <a class="flex items-center gap-2.5 group" th:href="@{/}">
-          <img th:src="@{/images/logo-icon.png}" src="/images/logo-icon.png" alt="StudyWithMe Logo" class="h-10 w-10 object-contain transition-transform group-hover:scale-105">
-          <img th:src="@{/images/logo-text.png}" src="/images/logo-text.png" alt="StudyWithMe" class="h-7 object-contain hidden sm:inline-block transition-opacity group-hover:opacity-90">
+      <div class="flex items-center gap-2 sm:gap-space-md shrink-0">
+        <a class="flex items-center gap-2 group" th:href="@{/}">
+          <img th:src="@{/images/logo-icon.png}" src="/images/logo-icon.png" alt="StudyWithMe Logo" class="h-8 w-8 sm:h-10 sm:w-10 object-contain transition-transform group-hover:scale-105">
+          <img th:src="@{/images/logo-text.png}" src="/images/logo-text.png" alt="StudyWithMe" class="h-6 sm:h-7 object-contain hidden sm:inline-block transition-opacity group-hover:opacity-90">
         </a>
       </div>
 
@@ -17,7 +17,7 @@
         <span class="material-symbols-outlined text-outline absolute left-3 top-1/2 -translate-y-1/2 text-[18px]">search</span>
       </div>
 
-      <!-- Main Navigation -->
+      <!-- Main Navigation (Desktop) -->
       <nav class="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0">
         <a class="px-3.5 py-2 rounded-lg font-label-lg text-label-lg whitespace-nowrap transition-colors"
            th:classappend="${activePage == 'courses'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
@@ -35,112 +35,306 @@
       </nav>
 
       <!-- Auth & Actions -->
-      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
         <!-- Cart Icon Button -->
         <a th:href="@{/cart}" class="relative p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors" title="Giỏ hàng khóa học">
-          <span class="material-symbols-outlined text-[22px]">shopping_cart</span>
+          <span class="material-symbols-outlined text-[20px] sm:text-[22px]">shopping_cart</span>
           <span id="cart-badge-count" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center hidden">
             0
           </span>
         </a>
 
         <!-- Guest State (Shown when not logged in) -->
-        <div id="nav-auth-guest" class="flex items-center gap-1 sm:gap-2 shrink-0">
+        <div id="nav-auth-guest" class="hidden sm:flex items-center gap-1 sm:gap-2 shrink-0">
           <a class="px-3.5 py-2 rounded-full font-label-lg text-label-lg whitespace-nowrap transition-colors"
              th:classappend="${activePage == 'login'} ? 'bg-accent-cyan-subtle text-primary font-bold' : 'text-secondary hover:text-on-primary-container hover:bg-accent-cyan-subtle'"
              th:href="@{/login}">Đăng nhập</a>
-          <a class="hidden sm:inline-flex px-3.5 py-2 rounded-full font-label-lg text-label-lg whitespace-nowrap transition-colors"
+          <a class="hidden md:inline-flex px-3.5 py-2 rounded-full font-label-lg text-label-lg whitespace-nowrap transition-colors"
              th:classappend="${activePage == 'register'} ? 'bg-accent-cyan-subtle text-primary font-bold' : 'text-secondary hover:text-on-primary-container hover:bg-accent-cyan-subtle'"
              th:href="@{/register}">Đăng ký</a>
         </div>
 
-        <!-- Authenticated State (Shown dynamically when user session exists) -->
-        <div id="nav-auth-user" class="hidden items-center gap-2 sm:gap-3 shrink-0">
-          <!-- Admin Panel Button -->
-          <a id="nav-admin-link" th:href="@{/admin}" class="hidden items-center gap-1.5 px-3.5 py-2 rounded-full bg-primary-container text-on-primary font-bold text-xs hover:opacity-90 shadow-xs whitespace-nowrap transition-all">
+        <!-- Authenticated State (Desktop: Full pills / Mobile: Compact avatar) -->
+        <div id="nav-auth-user" class="hidden items-center gap-1.5 sm:gap-2.5 shrink-0">
+          <!-- Admin Panel Button (chỉ hiện desktop lg) -->
+          <a id="nav-admin-link" th:href="@{/admin}" class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-container text-on-primary font-bold text-xs hover:opacity-90 shadow-xs whitespace-nowrap transition-all">
             <span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
             <span>Quản Trị</span>
           </a>
-          <!-- Tutor Panel Button -->
-          <a id="nav-tutor-link" th:href="@{/tutor/dashboard}" class="hidden items-center gap-1.5 px-3.5 py-2 rounded-full bg-tertiary-container text-white font-bold text-xs hover:opacity-90 shadow-xs whitespace-nowrap transition-all">
+          <!-- Tutor Panel Button (chỉ hiện desktop lg) -->
+          <a id="nav-tutor-link" th:href="@{/tutor/dashboard}" class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-tertiary-container text-white font-bold text-xs hover:opacity-90 shadow-xs whitespace-nowrap transition-all">
             <span class="material-symbols-outlined text-[16px]">school</span>
             <span>Cổng Giảng Viên</span>
           </a>
-          <!-- Student Panel Button -->
-          <a id="nav-student-link" th:href="@{/student/dashboard}" class="hidden items-center gap-1.5 px-3.5 py-2 rounded-full bg-primary text-white font-bold text-xs hover:opacity-90 shadow-xs whitespace-nowrap transition-all">
+          <!-- Student Panel Button (chỉ hiện desktop lg) -->
+          <a id="nav-student-link" th:href="@{/student/dashboard}" class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-white font-bold text-xs hover:opacity-90 shadow-xs whitespace-nowrap transition-all">
             <span class="material-symbols-outlined text-[16px]">space_dashboard</span>
             <span>Bàn Học Của Tôi</span>
           </a>
-          <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low border border-surface-container shrink-0">
-            <div id="nav-user-avatar" class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs">
+
+          <!-- User Avatar Pill -->
+          <div class="flex items-center gap-1.5 px-2 sm:px-3 py-1 rounded-full bg-surface-container-low border border-surface-container shrink-0">
+            <div id="nav-user-avatar" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
               U
             </div>
-            <span id="nav-user-name" class="font-bold text-xs text-on-surface max-w-[130px] truncate hidden sm:inline-block">
+            <span id="nav-user-name" class="font-bold text-xs text-on-surface max-w-[100px] truncate hidden md:inline-block">
               Người dùng
             </span>
           </div>
-          <button onclick="handleUserLogout()" type="button" title="Đăng xuất" class="w-8 h-8 rounded-full flex items-center justify-center text-error hover:bg-error-container/40 transition-colors shrink-0">
+
+          <!-- Desktop Logout Button -->
+          <button onclick="handleUserLogout()" type="button" title="Đăng xuất" class="hidden sm:flex w-7 h-7 sm:w-8 sm:h-8 rounded-full items-center justify-center text-error hover:bg-error-container/40 transition-colors shrink-0">
             <span class="material-symbols-outlined text-[18px]">logout</span>
           </button>
+        </div>
+
+        <!-- Mobile Hamburger Menu Button (chỉ hiện màn hình < lg) -->
+        <button type="button" onclick="openMobileDrawer()" aria-label="Mở menu di động" class="lg:hidden p-2 rounded-xl text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors flex items-center justify-center">
+          <span class="material-symbols-outlined text-[24px]">menu</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== MOBILE SLIDE-OVER DRAWER ==================== -->
+    <div id="mobile-drawer" class="fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 opacity-0">
+      <!-- Backdrop -->
+      <div id="mobile-drawer-backdrop" onclick="closeMobileDrawer()" class="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-300"></div>
+
+      <!-- Drawer Content Panel -->
+      <div id="mobile-drawer-panel" class="absolute top-0 right-0 w-[85%] max-w-sm h-full bg-white shadow-2xl p-6 flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out overflow-y-auto pointer-events-auto" style="background-color: #ffffff !important;">
+        <!-- Top Drawer Header -->
+        <div>
+          <div class="flex items-center justify-between pb-4 border-b border-surface-container">
+            <div class="flex items-center gap-2">
+              <img th:src="@{/images/logo-icon.png}" src="/images/logo-icon.png" alt="Logo" class="h-8 w-8 object-contain">
+              <span class="font-bold text-base text-primary">StudyWithMe</span>
+            </div>
+            <button onclick="closeMobileDrawer()" class="p-1 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low">
+              <span class="material-symbols-outlined text-[22px]">close</span>
+            </button>
+          </div>
+
+          <!-- User Card in Drawer (Dynamic) -->
+          <div id="drawer-user-info" class="hidden my-4 p-3.5 rounded-2xl bg-surface-container-low border border-surface-container">
+            <div class="flex items-center gap-3">
+              <div id="drawer-user-avatar" class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-base shadow-xs">
+                U
+              </div>
+              <div class="min-w-0 flex-1">
+                <div id="drawer-user-name" class="font-bold text-sm text-on-surface truncate">Học viên</div>
+                <div id="drawer-user-role" class="text-[11px] font-semibold text-primary">Thành viên</div>
+              </div>
+            </div>
+            <!-- Quick Actions in Drawer -->
+            <div class="grid grid-cols-1 gap-2 mt-3 pt-3 border-t border-surface-container/60">
+              <a id="drawer-student-link" th:href="@{/student/dashboard}" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-xs">
+                <span class="material-symbols-outlined text-[18px]">space_dashboard</span>
+                <span>Vào Bàn Học Của Tôi</span>
+              </a>
+              <a id="drawer-tutor-link" th:href="@{/tutor/dashboard}" class="hidden items-center gap-2 px-3 py-2 rounded-xl bg-tertiary-container text-white text-xs font-bold shadow-xs">
+                <span class="material-symbols-outlined text-[18px]">school</span>
+                <span>Cổng Giảng Viên</span>
+              </a>
+              <a id="drawer-admin-link" th:href="@{/admin}" class="hidden items-center gap-2 px-3 py-2 rounded-xl bg-primary-container text-on-primary text-xs font-bold shadow-xs">
+                <span class="material-symbols-outlined text-[18px]">admin_panel_settings</span>
+                <span>Quản Trị Hệ Thống</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Navigation Links -->
+          <div class="py-4 space-y-1">
+            <a th:href="@{/khoa-hoc}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
+              <span class="material-symbols-outlined text-primary text-[20px]">menu_book</span>
+              <span>Khám Phá Khóa Học</span>
+            </a>
+            <a th:href="@{/gia-su}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
+              <span class="material-symbols-outlined text-primary text-[20px]">person_search</span>
+              <span>Tìm Gia Sư Trực Tuyến</span>
+            </a>
+            <a th:href="@{/#lop-1-kem-1}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
+              <span class="material-symbols-outlined text-primary text-[20px]">school</span>
+              <span>Các Cấp Lớp (1 - 12)</span>
+            </a>
+            <a th:href="@{/#gia-su}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
+              <span class="material-symbols-outlined text-primary text-[20px]">star</span>
+              <span>Gia Sư Tiêu Biểu</span>
+            </a>
+            <a th:href="@{/cart}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
+              <span class="material-symbols-outlined text-primary text-[20px]">shopping_cart</span>
+              <span>Giỏ Hàng Của Bạn</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Bottom Drawer Actions -->
+        <div class="pt-4 border-t border-surface-container">
+          <!-- Guest state in drawer -->
+          <div id="drawer-guest-actions" class="space-y-2">
+            <a th:href="@{/login}" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-primary text-white font-bold text-xs shadow-xs">
+              <span class="material-symbols-outlined text-[18px]">login</span>
+              <span>Đăng nhập</span>
+            </a>
+            <a th:href="@{/register}" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-outline-variant text-on-surface font-bold text-xs hover:bg-surface-container-low">
+              <span class="material-symbols-outlined text-[18px]">person_add</span>
+              <span>Đăng ký tài khoản</span>
+            </a>
+          </div>
+
+          <!-- Logged in state in drawer -->
+          <div id="drawer-user-actions" class="hidden">
+            <button onclick="handleUserLogout()" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-error/10 text-error font-bold text-xs hover:bg-error/20 transition-colors">
+              <span class="material-symbols-outlined text-[18px]">logout</span>
+              <span>Đăng xuất tài khoản</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Client-side Auth State Manager -->
     <script>
+      function openMobileDrawer() {
+        const drawer = document.getElementById('mobile-drawer');
+        const panel = document.getElementById('mobile-drawer-panel');
+        drawer.classList.remove('pointer-events-none', 'opacity-0');
+        drawer.classList.add('opacity-100');
+        panel.classList.remove('translate-x-full');
+        panel.classList.add('translate-x-0');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMobileDrawer() {
+        const drawer = document.getElementById('mobile-drawer');
+        const panel = document.getElementById('mobile-drawer-panel');
+        drawer.classList.remove('opacity-100');
+        drawer.classList.add('opacity-0', 'pointer-events-none');
+        panel.classList.remove('translate-x-0');
+        panel.classList.add('translate-x-full');
+        document.body.style.overflow = '';
+      }
+
       (function checkUserAuthState() {
+        const guestBox = document.getElementById('nav-auth-guest');
+        const userBox = document.getElementById('nav-auth-user');
+        const nameEl = document.getElementById('nav-user-name');
+        const avatarEl = document.getElementById('nav-user-avatar');
+        const adminLink = document.getElementById('nav-admin-link');
+        const tutorLink = document.getElementById('nav-tutor-link');
+        const studentLink = document.getElementById('nav-student-link');
+
+        // Drawer elements
+        const drawerUserInfo = document.getElementById('drawer-user-info');
+        const drawerUserName = document.getElementById('drawer-user-name');
+        const drawerUserRole = document.getElementById('drawer-user-role');
+        const drawerUserAvatar = document.getElementById('drawer-user-avatar');
+        const drawerAdminLink = document.getElementById('drawer-admin-link');
+        const drawerTutorLink = document.getElementById('drawer-tutor-link');
+        const drawerStudentLink = document.getElementById('drawer-student-link');
+        const drawerGuestActions = document.getElementById('drawer-guest-actions');
+        const drawerUserActions = document.getElementById('drawer-user-actions');
+
+        function setGuestUI() {
+          if (guestBox) guestBox.classList.remove('hidden');
+          if (userBox) {
+            userBox.classList.add('hidden');
+            userBox.classList.remove('flex');
+          }
+          if (drawerUserInfo) drawerUserInfo.classList.add('hidden');
+          if (drawerGuestActions) drawerGuestActions.classList.remove('hidden');
+          if (drawerUserActions) drawerUserActions.classList.add('hidden');
+          if (adminLink) adminLink.classList.add('hidden');
+          if (tutorLink) tutorLink.classList.add('hidden');
+          if (studentLink) studentLink.classList.add('hidden');
+        }
+
         try {
           const userStr = localStorage.getItem('studywithme_user');
           const token = localStorage.getItem('studywithme_token');
+
           if (userStr && token) {
-            const user = JSON.parse(userStr);
-            const guestBox = document.getElementById('nav-auth-guest');
-            const userBox = document.getElementById('nav-auth-user');
-            const nameEl = document.getElementById('nav-user-name');
-            const avatarEl = document.getElementById('nav-user-avatar');
-            const adminLink = document.getElementById('nav-admin-link');
-            const tutorLink = document.getElementById('nav-tutor-link');
-            const studentLink = document.getElementById('nav-student-link');
-
-            if (guestBox && userBox) {
-              guestBox.classList.add('hidden');
-              userBox.classList.remove('hidden');
-              userBox.classList.add('flex');
-
-              if (user.hoTen) {
-                if (nameEl) nameEl.textContent = user.hoTen;
-                if (avatarEl) {
-                  const firstLetter = user.hoTen.trim().charAt(0).toUpperCase();
-                  avatarEl.textContent = firstLetter;
+            // Kiểm tra hạn JWT (exp)
+            let isExpired = false;
+            try {
+              const base64Url = token.split('.')[1];
+              if (base64Url) {
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                  return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                const decoded = JSON.parse(jsonPayload);
+                if (decoded.exp && Date.now() >= decoded.exp * 1000) {
+                  isExpired = true;
                 }
               }
+            } catch (jwtErr) {
+              isExpired = true;
+            }
 
-              const roles = user.roles || [];
-              const hasRole = (roleTarget) => Array.isArray(roles) && roles.some(r => {
-                const roleName = typeof r === 'string' ? r : (r.tenVaiTro || '');
-                return roleName === roleTarget;
-              });
+            if (isExpired) {
+              localStorage.removeItem('studywithme_token');
+              localStorage.removeItem('studywithme_user');
+              document.cookie = "studywithme_token=; path=/; max-age=0";
+              setGuestUI();
+            } else {
+              const user = JSON.parse(userStr);
 
-              const isAdmin = hasRole('ROLE_QUAN_TRI');
-              const isTutor = hasRole('ROLE_GIANG_VIEN');
+              if (guestBox && userBox) {
+                guestBox.classList.add('hidden');
+                userBox.classList.remove('hidden');
+                userBox.classList.add('flex');
 
-              if (adminLink && isAdmin) {
-                adminLink.classList.remove('hidden');
-                adminLink.classList.add('inline-flex');
-              }
-              if (tutorLink && isTutor) {
-                tutorLink.classList.remove('hidden');
-                tutorLink.classList.add('inline-flex');
-              }
-              // Student link shows for any authenticated user
-              if (studentLink) {
-                studentLink.classList.remove('hidden');
-                studentLink.classList.add('inline-flex');
+                if (drawerUserInfo) drawerUserInfo.classList.remove('hidden');
+                if (drawerGuestActions) drawerGuestActions.classList.add('hidden');
+                if (drawerUserActions) drawerUserActions.classList.remove('hidden');
+
+                if (user.hoTen) {
+                  if (nameEl) nameEl.textContent = user.hoTen;
+                  if (drawerUserName) drawerUserName.textContent = user.hoTen;
+                  const firstLetter = user.hoTen.trim().charAt(0).toUpperCase();
+                  if (avatarEl) avatarEl.textContent = firstLetter;
+                  if (drawerUserAvatar) drawerUserAvatar.textContent = firstLetter;
+                }
+
+                const roles = user.roles || [];
+                const hasRole = (roleTarget) => Array.isArray(roles) && roles.some(r => {
+                  const roleName = typeof r === 'string' ? r : (r.tenVaiTro || '');
+                  return roleName === roleTarget;
+                });
+
+                const isAdmin = hasRole('ROLE_QUAN_TRI');
+                const isTutor = hasRole('ROLE_GIANG_VIEN');
+
+                if (isAdmin) {
+                  if (adminLink) {
+                    adminLink.classList.remove('hidden');
+                    adminLink.classList.add('lg:inline-flex');
+                  }
+                  if (drawerAdminLink) drawerAdminLink.classList.remove('hidden');
+                  if (drawerUserRole) drawerUserRole.textContent = "Quản trị viên hệ thống";
+                } else if (isTutor) {
+                  if (tutorLink) {
+                    tutorLink.classList.remove('hidden');
+                    tutorLink.classList.add('lg:inline-flex');
+                  }
+                  if (drawerTutorLink) drawerTutorLink.classList.remove('hidden');
+                  if (drawerUserRole) drawerUserRole.textContent = "Gia sư / Giảng viên";
+                } else {
+                  if (drawerUserRole) drawerUserRole.textContent = "Học viên";
+                }
+
+                if (studentLink) {
+                  studentLink.classList.remove('hidden');
+                  studentLink.classList.add('lg:inline-flex');
+                }
               }
             }
+          } else {
+            setGuestUI();
           }
         } catch (err) {
           console.warn('Không thể đọc phiên người dùng:', err);
+          setGuestUI();
         }
 
         // Cập nhật số lượng giỏ hàng
@@ -168,7 +362,7 @@
         localStorage.removeItem('studywithme_token');
         localStorage.removeItem('studywithme_user');
         document.cookie = "studywithme_token=; path=/; max-age=0";
-        window.location.href = '/login';
+        window.location.href = '/';
       }
     </script>
   </header>

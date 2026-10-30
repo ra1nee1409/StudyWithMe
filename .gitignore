@@ -64,3 +64,5 @@ __pycache__/
 # Diagrams generated
 diagrams_ch2/
 diagrams/
+uml/
+/*.png

@@ -42,6 +42,10 @@ dependencies {
 	testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs.addAll(['-Xlint:all', '-Xlint:-processing'])
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 	classpath = files(classpath.files.collect { File f ->

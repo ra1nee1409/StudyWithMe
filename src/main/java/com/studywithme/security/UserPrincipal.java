@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 @Getter
 public class UserPrincipal implements UserDetails {
 
+    private static final long serialVersionUID = 1L;
+
     private final Long id;
     private final String email;
     private final String hoTen;
@@ -23,6 +25,8 @@ public class UserPrincipal implements UserDetails {
     private final String matKhau;
 
     private final TrangThaiNguoiDung trangThai;
+
+    @SuppressWarnings("serial")
     private final Collection<? extends GrantedAuthority> authorities;
 
     public UserPrincipal(Long id, String email, String hoTen, String matKhau,

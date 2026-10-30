@@ -1,5 +1,6 @@
 package com.studywithme.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.studywithme.entity.enums.admin.LoaiGiaoDichVi;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public class LichSuViTien {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "giang_vien_id", nullable = false)
     private HoSoGiangVien giangVien;
@@ -52,116 +53,4 @@ public class LichSuViTien {
     @CreationTimestamp
     @Column(name = "ngay_tao", nullable = false, updatable = false)
     private LocalDateTime ngayTao;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public HoSoGiangVien getGiangVien() {
-        return giangVien;
-    }
-
-    public void setGiangVien(HoSoGiangVien giangVien) {
-        this.giangVien = giangVien;
-    }
-
-    public BigDecimal getSoTienBienDong() {
-        return soTienBienDong;
-    }
-
-    public void setSoTienBienDong(BigDecimal soTienBienDong) {
-        this.soTienBienDong = soTienBienDong;
-    }
-
-    public BigDecimal getSoDuTruoc() {
-        return soDuTruoc;
-    }
-
-    public void setSoDuTruoc(BigDecimal soDuTruoc) {
-        this.soDuTruoc = soDuTruoc;
-    }
-
-    public BigDecimal getSoDuSau() {
-        return soDuSau;
-    }
-
-    public void setSoDuSau(BigDecimal soDuSau) {
-        this.soDuSau = soDuSau;
-    }
-
-    public LoaiGiaoDichVi getLoaiGiaoDich() {
-        return loaiGiaoDich;
-    }
-
-    public void setLoaiGiaoDich(LoaiGiaoDichVi loaiGiaoDich) {
-        this.loaiGiaoDich = loaiGiaoDich;
-    }
-
-    public Long getMaThamChieu() {
-        return maThamChieu;
-    }
-
-    public void setMaThamChieu(Long maThamChieu) {
-        this.maThamChieu = maThamChieu;
-    }
-
-    public String getMoTaGiaoDich() {
-        return moTaGiaoDich;
-    }
-
-    public void setMoTaGiaoDich(String moTaGiaoDich) {
-        this.moTaGiaoDich = moTaGiaoDich;
-    }
-
-    public LocalDateTime getNgayTao() {
-        return ngayTao;
-    }
-
-    public void setNgayTao(LocalDateTime ngayTao) {
-        this.ngayTao = ngayTao;
-    }
-
-    public static LichSuViTienBuilder builder() {
-        return new LichSuViTienBuilder();
-    }
-
-    public static class LichSuViTienBuilder {
-        private Long id;
-        private HoSoGiangVien giangVien;
-        private BigDecimal soTienBienDong;
-        private BigDecimal soDuTruoc;
-        private BigDecimal soDuSau;
-        private LoaiGiaoDichVi loaiGiaoDich;
-        private Long maThamChieu;
-        private String moTaGiaoDich;
-        private LocalDateTime ngayTao;
-
-        public LichSuViTienBuilder id(Long id) { this.id = id; return this; }
-        public LichSuViTienBuilder giangVien(HoSoGiangVien giangVien) { this.giangVien = giangVien; return this; }
-        public LichSuViTienBuilder soTienBienDong(BigDecimal soTienBienDong) { this.soTienBienDong = soTienBienDong; return this; }
-        public LichSuViTienBuilder soDuTruoc(BigDecimal soDuTruoc) { this.soDuTruoc = soDuTruoc; return this; }
-        public LichSuViTienBuilder soDuSau(BigDecimal soDuSau) { this.soDuSau = soDuSau; return this; }
-        public LichSuViTienBuilder loaiGiaoDich(LoaiGiaoDichVi loaiGiaoDich) { this.loaiGiaoDich = loaiGiaoDich; return this; }
-        public LichSuViTienBuilder maThamChieu(Long maThamChieu) { this.maThamChieu = maThamChieu; return this; }
-        public LichSuViTienBuilder moTaGiaoDich(String moTaGiaoDich) { this.moTaGiaoDich = moTaGiaoDich; return this; }
-        public LichSuViTienBuilder ngayTao(LocalDateTime ngayTao) { this.ngayTao = ngayTao; return this; }
-
-        public LichSuViTien build() {
-            LichSuViTien l = new LichSuViTien();
-            l.setId(id);
-            l.setGiangVien(giangVien);
-            l.setSoTienBienDong(soTienBienDong);
-            l.setSoDuTruoc(soDuTruoc);
-            l.setSoDuSau(soDuSau);
-            l.setLoaiGiaoDich(loaiGiaoDich);
-            l.setMaThamChieu(maThamChieu);
-            l.setMoTaGiaoDich(moTaGiaoDich);
-            l.setNgayTao(ngayTao);
-            return l;
-        }
-    }
 }

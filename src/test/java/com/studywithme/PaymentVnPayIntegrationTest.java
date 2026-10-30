@@ -194,7 +194,7 @@ class PaymentVnPayIntegrationTest {
 
         // Sinh chữ ký bảo mật hợp lệ cho callback test
         String rawHash = buildRawHash(queryParams);
-        String secureHash = this.vnpayConfig.hmacSHA512(this.vnpayConfig.getVnpHashSecret(), rawHash);
+        String secureHash = VnpayConfig.hmacSHA512(this.vnpayConfig.getVnpHashSecret(), rawHash);
         queryParams.put("vnp_SecureHash", secureHash);
 
         // Gọi xử lý callback
@@ -251,7 +251,7 @@ class PaymentVnPayIntegrationTest {
         queryParams.put("vnp_TxnRef", maDonHang);
 
         String rawHash = buildRawHash(queryParams);
-        String secureHash = this.vnpayConfig.hmacSHA512(this.vnpayConfig.getVnpHashSecret(), rawHash);
+        String secureHash = VnpayConfig.hmacSHA512(this.vnpayConfig.getVnpHashSecret(), rawHash);
         queryParams.put("vnp_SecureHash", secureHash);
 
         PaymentResultDto callbackResult = this.paymentService.xuLyVnPayCallback(queryParams);

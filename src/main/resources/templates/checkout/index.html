@@ -18,17 +18,17 @@
         <span>/</span>
         <a th:href="@{/cart}" class="hover:text-primary transition-colors">Giỏ hàng</a>
         <span>/</span>
-        <span class="text-primary font-semibold">Thanh toán VNPAY</span>
+        <span class="text-primary font-semibold">Thanh toán VietQR payOS</span>
       </nav>
 
       <!-- Page Header -->
       <div class="mb-8">
         <h1 class="text-2xl sm:text-3xl font-extrabold text-on-surface flex items-center gap-2.5">
-          <span class="material-symbols-outlined text-primary text-[32px]">credit_card</span>
+          <span class="material-symbols-outlined text-primary text-[32px]">qr_code_scanner</span>
           Thanh Toán Đơn Hàng
         </h1>
         <p class="text-sm text-on-surface-variant mt-1">
-          Hoàn tất thanh toán để kích hoạt ngay quyền truy cập bài học và bàn học trực tuyến.
+          Quét mã VietQR tiện lợi, xác thực tự động và kích hoạt ngay quyền truy cập bài học trong vài giây.
         </p>
       </div>
 
@@ -37,7 +37,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          <!-- LEFT COLUMN: Customer Info, Payment Methods & Sandbox Test Box (2 cols) -->
+          <!-- LEFT COLUMN: Customer Info, Payment Method & Flow Instructions (2 cols) -->
           <div class="lg:col-span-2 space-y-6">
 
             <!-- 1. Customer Information Box -->
@@ -101,51 +101,30 @@
                 </span>
               </div>
 
-              <div class="space-y-3">
-                <!-- payOS VietQR Option (Default & Recommended) -->
-                <label id="labelPayOs" class="relative flex items-center justify-between p-4 sm:p-5 rounded-2xl border-2 border-primary bg-primary/5 cursor-pointer transition-all">
-                  <div class="flex items-center gap-4">
-                    <input type="radio" name="paymentMethod" value="PAYOS" checked onchange="switchPaymentMethod('PAYOS')" class="w-4 h-4 text-primary focus:ring-primary">
-                    <div>
-                      <div class="flex items-center gap-2">
-                        <span class="font-bold text-sm text-on-surface">Cổng Thanh Toán Tự Động VietQR payOS</span>
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary text-white">Khuyên dùng</span>
-                      </div>
-                      <p class="text-xs text-on-surface-variant mt-0.5">
-                        Quét mã QR tự động bằng 40+ app ngân hàng (VCB, MB, Techcombank...) & MoMo, kích hoạt khóa học tức thì trong 1-3 giây.
-                      </p>
+              <!-- payOS VietQR Option (Official & Exclusive Gateway) -->
+              <div class="relative flex items-center justify-between p-4 sm:p-5 rounded-2xl border-2 border-primary bg-primary/5 transition-all">
+                <div class="flex items-center gap-4">
+                  <input type="radio" name="paymentMethod" value="PAYOS" checked class="w-4 h-4 text-primary focus:ring-primary">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="font-bold text-sm text-on-surface">Cổng Thanh Toán Tự Động VietQR payOS</span>
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary text-white">Chính thức</span>
                     </div>
+                    <p class="text-xs text-on-surface-variant mt-0.5">
+                      Quét mã QR tự động bằng 40+ app ngân hàng (VCB, MB, Techcombank, VietinBank...) & MoMo, kích hoạt khóa học tức thì trong 1-3 giây.
+                    </p>
                   </div>
-                  <div class="hidden sm:flex items-center gap-1.5 shrink-0 pl-2">
-                    <span class="px-2 py-1 rounded bg-white text-[11px] font-black text-emerald-600 border border-slate-200">Viet<span class="text-blue-600">QR</span></span>
-                    <span class="px-2 py-1 rounded bg-white text-[10px] font-bold text-slate-700 border border-slate-200">payOS</span>
-                    <span class="px-2 py-1 rounded bg-white text-[10px] font-bold text-slate-700 border border-slate-200">24/7</span>
-                  </div>
-                </label>
-
-                <!-- VNPAY Option -->
-                <label id="labelVnPay" class="relative flex items-center justify-between p-4 sm:p-5 rounded-2xl border border-surface-container hover:border-primary/50 bg-surface-container-low/40 cursor-pointer transition-all">
-                  <div class="flex items-center gap-4">
-                    <input type="radio" name="paymentMethod" value="VNPAY" onchange="switchPaymentMethod('VNPAY')" class="w-4 h-4 text-primary focus:ring-primary">
-                    <div>
-                      <div class="flex items-center gap-2">
-                        <span class="font-bold text-sm text-on-surface">Cổng Thanh Toán Quốc Gia VNPAY</span>
-                      </div>
-                      <p class="text-xs text-on-surface-variant mt-0.5">
-                        Thanh toán qua quét mã VNPAY-QR, Thẻ ATM nội địa, Thẻ quốc tế Visa / MasterCard.
-                      </p>
-                    </div>
-                  </div>
-                  <div class="hidden sm:flex items-center gap-1.5 shrink-0 pl-2">
-                    <span class="px-2 py-1 rounded bg-white text-[11px] font-black text-blue-600 border border-slate-200">VN<span class="text-red-600">PAY</span></span>
-                    <span class="px-2 py-1 rounded bg-white text-[10px] font-bold text-slate-700 border border-slate-200">ATM</span>
-                  </div>
-                </label>
+                </div>
+                <div class="hidden sm:flex items-center gap-1.5 shrink-0 pl-2">
+                  <span class="px-2 py-1 rounded bg-white text-[11px] font-black text-emerald-600 border border-slate-200">Viet<span class="text-blue-600">QR</span></span>
+                  <span class="px-2 py-1 rounded bg-white text-[10px] font-bold text-slate-700 border border-slate-200">payOS</span>
+                  <span class="px-2 py-1 rounded bg-white text-[10px] font-bold text-slate-700 border border-slate-200">24/7</span>
+                </div>
               </div>
             </div>
 
             <!-- 3. PAYOS VIETQR INSTRUCTIONS BOX -->
-            <div id="boxPayOsInfo" class="bg-gradient-to-br from-emerald-500/10 via-surface-container-low to-teal-500/10 border-2 border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-md space-y-3">
+            <div class="bg-gradient-to-br from-emerald-500/10 via-surface-container-low to-teal-500/10 border-2 border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-md space-y-3">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
                   <span class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center">
@@ -163,7 +142,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
                 <div class="p-3 bg-surface-container-lowest/80 rounded-xl border border-surface-container">
                   <span class="font-bold text-primary block">Bước 1</span>
-                  <span class="text-on-surface-variant mt-0.5 block">Bấm nút xác nhận thanh toán để mở mã VietQR động</span>
+                  <span class="text-on-surface-variant mt-0.5 block">Bấm nút thanh toán bên dưới để mở giao diện mã VietQR động</span>
                 </div>
                 <div class="p-3 bg-surface-container-lowest/80 rounded-xl border border-surface-container">
                   <span class="font-bold text-primary block">Bước 2</span>
@@ -171,81 +150,8 @@
                 </div>
                 <div class="p-3 bg-surface-container-lowest/80 rounded-xl border border-surface-container">
                   <span class="font-bold text-status-success block">Bước 3</span>
-                  <span class="text-on-surface-variant mt-0.5 block">Webhook xác nhận tức thì, kích hoạt khóa học trong 1-3s</span>
+                  <span class="text-on-surface-variant mt-0.5 block">Webhook xác nhận tức thì, kích hoạt bài học trong 1-3 giây</span>
                 </div>
-              </div>
-            </div>
-
-            <!-- 4. SANDBOX TEST CREDENTIALS BOX (Fallback for VNPAY) -->
-            <div id="boxVnPaySandbox" class="hidden bg-gradient-to-br from-primary/10 via-surface-container-low to-primary-container/10 border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-md space-y-4">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <span class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[18px]">developer_mode</span>
-                  </span>
-                  <div>
-                    <h2 class="text-sm sm:text-base font-bold text-on-surface">Môi Trường Thử Nghiệm VNPAY Sandbox</h2>
-                    <span class="text-xs text-on-surface-variant">Thông tin thẻ thanh toán giả lập dành cho giám khảo chấm đồ án & test tính năng</span>
-                  </div>
-                </div>
-                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-primary/20 text-primary border border-primary/30">
-                  TEST 100% AN TOÀN
-                </span>
-              </div>
-                    <span class="text-xs text-on-surface-variant">Thông tin thẻ thanh toán giả lập dành cho giám khảo chấm đồ án & test tính năng</span>
-                  </div>
-                </div>
-                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-primary/20 text-primary border border-primary/30">
-                  TEST 100% AN TOÀN
-                </span>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2 text-xs">
-                <!-- Bank -->
-                <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-3.5 rounded-2xl border border-surface-container">
-                  <span class="text-on-surface-variant block font-medium">Ngân hàng thử nghiệm:</span>
-                  <span class="font-bold text-sm text-primary" th:text="${vnpayCardBank}">NCB</span>
-                </div>
-
-                <!-- Card Number with Copy Button -->
-                <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-3.5 rounded-2xl border border-surface-container relative">
-                  <span class="text-on-surface-variant block font-medium">Số thẻ test:</span>
-                  <div class="flex items-center justify-between mt-0.5">
-                    <span id="cardNumberVal" class="font-mono font-bold text-sm text-on-surface" th:text="${vnpayCardNumber}">9704198526191432198</span>
-                    <button type="button" onclick="copyCardNumber()" title="Sao chép số thẻ" class="text-primary hover:opacity-80 p-1">
-                      <span class="material-symbols-outlined text-[16px]">content_copy</span>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Card Holder -->
-                <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-3.5 rounded-2xl border border-surface-container">
-                  <span class="text-on-surface-variant block font-medium">Tên chủ thẻ:</span>
-                  <span class="font-bold text-sm text-on-surface" th:text="${vnpayCardHolder}">NGUYEN VAN A</span>
-                </div>
-
-                <!-- Expiry Date -->
-                <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-3.5 rounded-2xl border border-surface-container">
-                  <span class="text-on-surface-variant block font-medium">Ngày phát hành:</span>
-                  <span class="font-mono font-bold text-sm text-on-surface" th:text="${vnpayCardDate}">07/15</span>
-                </div>
-
-                <!-- OTP -->
-                <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-3.5 rounded-2xl border border-surface-container">
-                  <span class="text-on-surface-variant block font-medium">Mật khẩu OTP xác nhận:</span>
-                  <span class="font-mono font-bold text-sm text-status-success" th:text="${vnpayCardOtp}">123456</span>
-                </div>
-
-                <!-- Terminal ID -->
-                <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-3.5 rounded-2xl border border-surface-container">
-                  <span class="text-on-surface-variant block font-medium">Mã Website (TmnCode):</span>
-                  <span class="font-mono font-bold text-sm text-on-surface" th:text="${vnpayTmnCode}">8QVUIHRL</span>
-                </div>
-              </div>
-
-              <div class="p-3 rounded-xl bg-primary/10 text-primary text-[11px] leading-relaxed flex items-center gap-2">
-                <span class="material-symbols-outlined text-[16px] shrink-0">help</span>
-                <span>Hướng dẫn: Sau khi bấm nút thanh toán bên dưới, bạn sẽ được chuyển đến trang của VNPAY. Chọn ngân hàng <strong>NCB</strong> và dán số thẻ ở trên để thanh toán thử nghiệm.</span>
               </div>
             </div>
 
@@ -295,7 +201,7 @@
               <div class="pt-4 border-t border-surface-container flex justify-between items-baseline">
                 <div>
                   <span class="text-xs text-on-surface-variant block uppercase font-bold">Tổng Thanh Toán:</span>
-                  <span class="text-[10px] text-outline">Thanh toán qua VNPAY Gateway</span>
+                  <span class="text-[10px] text-outline">Cổng thanh toán tự động VietQR payOS</span>
                 </div>
                 <span id="txtFinalTotal" class="text-2xl font-black text-primary" 
                       th:text="${tongTien != null ? #numbers.formatDecimal(tongTien, 0, 'POINT', 0, 'COMMA') + ' đ' : '0 đ'}">
@@ -328,42 +234,8 @@
   <!-- Footer -->
   <footer th:replace="~{components/user/footer :: main-footer}"></footer>
 
-  <!-- Script for Copy & LocalStorage Fallback & Payment Switch -->
+  <!-- Script for LocalStorage Fallback -->
   <script>
-    function switchPaymentMethod(method) {
-      const form = document.getElementById('checkoutForm');
-      const btnText = document.getElementById('btnSubmitText');
-      const boxPayOs = document.getElementById('boxPayOsInfo');
-      const boxVnPay = document.getElementById('boxVnPaySandbox');
-      const labelPayOs = document.getElementById('labelPayOs');
-      const labelVnPay = document.getElementById('labelVnPay');
-
-      if (method === 'PAYOS') {
-        if (form) form.action = '/checkout/payos';
-        if (btnText) btnText.innerText = 'Quét Mã VietQR payOS';
-        if (boxPayOs) boxPayOs.classList.remove('hidden');
-        if (boxVnPay) boxVnPay.classList.add('hidden');
-        if (labelPayOs) labelPayOs.className = 'relative flex items-center justify-between p-4 sm:p-5 rounded-2xl border-2 border-primary bg-primary/5 cursor-pointer transition-all';
-        if (labelVnPay) labelVnPay.className = 'relative flex items-center justify-between p-4 sm:p-5 rounded-2xl border border-surface-container hover:border-primary/50 bg-surface-container-low/40 cursor-pointer transition-all';
-      } else {
-        if (form) form.action = '/checkout/vnpay';
-        if (btnText) btnText.innerText = 'Thanh Toán Qua VNPAY';
-        if (boxPayOs) boxPayOs.classList.add('hidden');
-        if (boxVnPay) boxVnPay.classList.remove('hidden');
-        if (labelPayOs) labelPayOs.className = 'relative flex items-center justify-between p-4 sm:p-5 rounded-2xl border border-surface-container hover:border-primary/50 bg-surface-container-low/40 cursor-pointer transition-all';
-        if (labelVnPay) labelVnPay.className = 'relative flex items-center justify-between p-4 sm:p-5 rounded-2xl border-2 border-primary bg-primary/5 cursor-pointer transition-all';
-      }
-    }
-
-    function copyCardNumber() {
-      const text = document.getElementById('cardNumberVal').innerText.trim();
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Đã sao chép số thẻ test: ' + text);
-      }).catch(err => {
-        console.error('Không thể sao chép:', err);
-      });
-    }
-
     // Client-side fallback check
     document.addEventListener('DOMContentLoaded', () => {
       const serverInputs = document.querySelectorAll('input[name="courseIds"]');

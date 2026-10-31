@@ -190,7 +190,7 @@ public class DataSeeder implements CommandLineRunner {
                             .maDonHang("DH-" + currentYear + String.format("%02d", month) + "-001")
                             .nguoiDung(student)
                             .tongTienThanhToan(amount)
-                            .phuongThucThanhToan(com.studywithme.entity.enums.shared.PhuongThucThanhToan.VNPAY)
+                            .phuongThucThanhToan(com.studywithme.entity.enums.shared.PhuongThucThanhToan.PAYOS)
                             .trangThaiThanhToan(com.studywithme.entity.enums.shared.TrangThaiThanhToan.DA_THANH_TOAN)
                             .ngayThanhToan(createdDate)
                             .ngayTaoDon(createdDate)

@@ -21,3 +21,14 @@ spring.data.mongodb.uri=mongodb://localhost:27017/studywithme_chat
 # Cấu hình Upload File
 spring.servlet.multipart.max-file-size=100MB
 spring.servlet.multipart.max-request-size=100MB
+
+# ==============================================================================
+# CẤU HÌNH CỔNG THANH TOÁN TỰ ĐỘNG VIETQR PAYOS
+# Đăng ký và lấy thông tin tại https://my.payos.vn
+# ==============================================================================
+payos.client-id=your-client-id-here
+payos.api-key=your-api-key-here
+payos.checksum-key=your-checksum-key-here
+payos.return-url=http://localhost:8080/payment/payos-callback
+payos.cancel-url=http://localhost:8080/checkout?cancel=true
+

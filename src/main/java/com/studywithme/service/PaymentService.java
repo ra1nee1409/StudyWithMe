@@ -10,33 +10,23 @@ import java.util.Map;
 public interface PaymentService {
 
     /**
-     * Tạo đơn hàng mới và sinh đường dẫn thanh toán VNPAY Sandbox đã ký bảo mật SHA512.
+     * Tạo đơn hàng mới và sinh đường dẫn thanh toán VietQR payOS.
      * @param request Thông tin giỏ hàng hoặc khóa học cần mua
      * @param nguoiDung Học viên thực hiện mua hàng
-     * @param clientIp Địa chỉ IP máy khách
-     * @return Map chứa thông tin đơn hàng và URL chuyển hướng VNPAY
-     */
-    Map<String, String> taoDonHangVaLayUrlVnPay(CheckoutRequest request, NguoiDung nguoiDung, String clientIp);
-
-    /**
-     * Xử lý callback do VNPAY Sandbox chuyển hướng về sau khi học viên thanh toán.
-     * @param queryParams Toàn bộ query params từ VNPAY
-     * @return Kết quả thanh toán chi tiết (thành công / thất bại)
-     */
-    PaymentResultDto xuLyVnPayCallback(Map<String, String> queryParams);
-
-    /**
-     * Lấy thông tin đơn hàng theo mã đơn
-     */
-    DonHang layDonHangTheoMa(String maDonHang);
-
-    /**
-     * Tạo đơn hàng mới và sinh đường dẫn thanh toán VietQR payOS.
+     * @param baseUrl URL gốc của server để sinh redirect URL
+     * @return Map chứa thông tin đơn hàng và paymentUrl từ payOS
      */
     Map<String, String> taoDonHangVaLayUrlPayOs(CheckoutRequest request, NguoiDung nguoiDung, String baseUrl);
 
     /**
      * Xử lý kết quả trả về khi người dùng hoàn tất chuyển khoản payOS và quay lại web.
+     * @param orderCode Mã đơn hàng dạng số của payOS
+     * @return Kết quả thanh toán chi tiết
      */
     PaymentResultDto xuLyPayOsCallback(Long orderCode);
+
+    /**
+     * Lấy thông tin đơn hàng theo mã đơn
+     */
+    DonHang layDonHangTheoMa(String maDonHang);
 }

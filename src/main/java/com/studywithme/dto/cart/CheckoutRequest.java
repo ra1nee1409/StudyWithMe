@@ -23,7 +23,7 @@ public class CheckoutRequest {
     private List<Long> classIds = new ArrayList<>();
 
     @Builder.Default
-    private String paymentMethod = "VNPAY";
+    private String paymentMethod = "PAYOS";
 
     private String ghiChu;
 

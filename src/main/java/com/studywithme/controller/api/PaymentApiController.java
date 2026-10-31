@@ -39,7 +39,7 @@ public class PaymentApiController {
     }
 
     /**
-     * API Tạo đơn hàng và lấy URL VNPAY Sandbox
+     * API Tạo đơn hàng và sinh link thanh toán VietQR payOS
      */
     @PostMapping("/tao-don-hang")
     public ResponseEntity<ApiResponse<Map<String, String>>> taoDonHang(
@@ -54,37 +54,26 @@ public class PaymentApiController {
         NguoiDung user = nguoiDungRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thông tin tài khoản người dùng."));
 
-        String clientIp = getClientIp(httpServletRequest);
-        Map<String, String> paymentData = paymentService.taoDonHangVaLayUrlVnPay(request, user, clientIp);
+        String baseUrl = getBaseUrl(httpServletRequest);
+        Map<String, String> paymentData = paymentService.taoDonHangVaLayUrlPayOs(request, user, baseUrl);
 
-        return ResponseEntity.ok(ApiResponse.success("Khởi tạo đơn hàng thành công.", paymentData));
+        return ResponseEntity.ok(ApiResponse.success("Khởi tạo đơn hàng thanh toán VietQR payOS thành công.", paymentData));
     }
 
     /**
-     * API Tạo đơn hàng và lấy URL thanh toán VietQR payOS
+     * Alias endpoint: POST /api/payment/payos/tao-don-hang
      */
     @PostMapping("/payos/tao-don-hang")
     public ResponseEntity<ApiResponse<Map<String, String>>> taoDonHangPayOs(
             @Valid @RequestBody CheckoutRequest request,
             Principal principal,
             HttpServletRequest httpServletRequest) {
-
-        if (principal == null) {
-            return ResponseEntity.status(401).body(ApiResponse.error("Vui lòng đăng nhập để thanh toán đơn hàng."));
-        }
-
-        NguoiDung user = nguoiDungRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thông tin tài khoản người dùng."));
-
-        String baseUrl = getBaseUrl(httpServletRequest);
-        Map<String, String> paymentData = paymentService.taoDonHangVaLayUrlPayOs(request, user, baseUrl);
-
-        return ResponseEntity.ok(ApiResponse.success("Khởi tạo đơn hàng payOS thành công.", paymentData));
+        return taoDonHang(request, principal, httpServletRequest);
     }
 
     /**
      * Endpoint Webhook chính thức nhận thông báo chuyển khoản thành công từ payOS
-     * Hỗ trợ tự động xác thực URL khi bấm nút 'Xác nhận Webhook' trên Dashboard payOS
+     * Hỗ trợ tự động xác thực URL khi bấm nút 'Xác nhận Webhook' trên Dashboard my.payos.vn
      * Tài liệu chuẩn: https://payos.vn/docs/du-lieu-tra-ve/webhook/
      */
     @PostMapping("/payos_transfer_handler")
@@ -128,11 +117,11 @@ public class PaymentApiController {
     }
 
     /**
-     * API kiểm tra kết quả callback / webhook
+     * API kiểm tra trạng thái đơn hàng payOS theo orderCode
      */
-    @GetMapping("/vnpay-callback")
-    public ResponseEntity<ApiResponse<PaymentResultDto>> xuLyCallback(@RequestParam Map<String, String> queryParams) {
-        PaymentResultDto result = paymentService.xuLyVnPayCallback(queryParams);
+    @GetMapping("/kiem-tra/{orderCode}")
+    public ResponseEntity<ApiResponse<PaymentResultDto>> kiemTraDonHang(@PathVariable Long orderCode) {
+        PaymentResultDto result = paymentService.xuLyPayOsCallback(orderCode);
         if (result.isThanhCong()) {
             return ResponseEntity.ok(ApiResponse.success("Thanh toán thành công.", result));
         } else {
@@ -148,22 +137,5 @@ public class PaymentApiController {
             return scheme + "://" + serverName;
         }
         return scheme + "://" + serverName + ":" + serverPort;
-    }
-
-    private String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        if (ip != null && ip.contains(",")) {
-            ip = ip.split(",")[0].trim();
-        }
-        return (ip != null) ? ip : "127.0.0.1";
     }
 }

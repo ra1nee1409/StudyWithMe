@@ -42,7 +42,7 @@ public class DonHang {
     @Enumerated(EnumType.STRING)
     @Column(name = "phuong_thuc_thanh_toan", nullable = false, length = 30)
     @Builder.Default
-    private PhuongThucThanhToan phuongThucThanhToan = PhuongThucThanhToan.VNPAY;
+    private PhuongThucThanhToan phuongThucThanhToan = PhuongThucThanhToan.PAYOS;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "trang_thai_thanh_toan", nullable = false, length = 30)

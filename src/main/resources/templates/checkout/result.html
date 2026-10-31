@@ -34,14 +34,14 @@
             <span class="font-mono font-bold text-on-surface" th:text="${result.maDonHang}">#SWM-12345</span>
           </div>
 
-          <div class="flex justify-between items-center border-b border-surface-container pb-2" th:if="${result.maGiaoDichVnpay != null}">
-            <span class="text-on-surface-variant font-medium">Mã giao dịch VNPAY:</span>
-            <span class="font-mono font-semibold text-primary" th:text="${result.maGiaoDichVnpay}">14568923</span>
+          <div class="flex justify-between items-center border-b border-surface-container pb-2" th:if="${result.maGiaoDich != null}">
+            <span class="text-on-surface-variant font-medium">Mã giao dịch VietQR payOS:</span>
+            <span class="font-mono font-semibold text-primary" th:text="${result.maGiaoDich}">14568923</span>
           </div>
 
           <div class="flex justify-between items-center border-b border-surface-container pb-2" th:if="${result.nganHang != null}">
             <span class="text-on-surface-variant font-medium">Ngân hàng thanh toán:</span>
-            <span class="font-semibold text-on-surface" th:text="${result.nganHang}">NCB</span>
+            <span class="font-semibold text-on-surface" th:text="${result.nganHang}">VietQR / payOS</span>
           </div>
 
           <div class="flex justify-between items-center border-b border-surface-container pb-2" th:if="${result.thoiGianThanhToan != null}">
@@ -102,7 +102,7 @@
           </span>
           <h1 class="text-2xl sm:text-3xl font-black text-on-surface mt-2">Thanh Toán Thất Bại</h1>
           <p class="text-xs sm:text-sm text-error font-medium mt-1" th:text="${result.thongDiep}">
-            Bạn đã hủy giao dịch trên cổng thanh toán VNPAY.
+            Bạn đã hủy giao dịch trên cổng thanh toán VietQR payOS hoặc chưa hoàn tất chuyển khoản.
           </p>
         </div>
 
@@ -113,8 +113,8 @@
             <span class="font-mono font-bold text-on-surface" th:text="${result.maDonHang}">#SWM-12345</span>
           </div>
           <div class="flex justify-between items-center" th:if="${result.maLoi != null}">
-            <span class="text-on-surface-variant">Mã phản hồi từ VNPAY:</span>
-            <span class="font-mono font-bold text-error" th:text="${result.maLoi}">24</span>
+            <span class="text-on-surface-variant">Mã phản hồi lỗi:</span>
+            <span class="font-mono font-bold text-error" th:text="${result.maLoi}">PENDING</span>
           </div>
         </div>
 

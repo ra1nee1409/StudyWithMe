@@ -226,7 +226,10 @@
                   </form>
 
                   <!-- Button Open Reject Modal -->
-                  <button type="button" th:onclick="'openCourseRejectModal(' + ${kh.id} + ', \'' + ${#strings.escapeJavaScript(kh.tieuDe)} + '\')'"
+                  <button type="button"
+                          th:data-id="${kh.id}"
+                          th:data-title="${kh.tieuDe}"
+                          onclick="openCourseRejectModal(this.getAttribute('data-id'), this.getAttribute('data-title'))"
                           class="px-3 py-1.5 rounded-lg bg-error-container text-error hover:bg-error hover:text-white text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer">
                     <span class="material-symbols-outlined text-[16px]">cancel</span>
                     <span>Từ chối</span>

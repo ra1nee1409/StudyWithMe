@@ -23,6 +23,9 @@ public interface DonHangRepository extends JpaRepository<DonHang, Long> {
     @EntityGraph(attributePaths = {"danhSachChiTiet"})
     List<DonHang> findByNguoiDungIdOrderByNgayTaoDonDesc(Long nguoiDungId);
 
+    @EntityGraph(attributePaths = {"danhSachChiTiet", "nguoiDung"})
+    List<DonHang> findAllByOrderByNgayTaoDonDesc();
+
     Page<DonHang> findByTrangThaiThanhToan(TrangThaiThanhToan trangThaiThanhToan, Pageable pageable);
 
     @org.springframework.data.jpa.repository.Query("SELECT COALESCE(SUM(d.tongTienThanhToan), 0) FROM DonHang d WHERE d.trangThaiThanhToan = :trangThai")

@@ -67,3 +67,6 @@ diagrams_ch2/
 diagrams/
 uml/
 /*.png
+
+# User uploads
+uploads/

@@ -79,4 +79,25 @@ public class AdminTaiChinhApiController {
         YeuCauRutTienResponse data = adminTaiChinhService.tuChoiRutTien(id, request.getLyDoTuChoi());
         return ResponseEntity.ok(ApiResponse.success("Đã từ chối lệnh rút tiền và hoàn tiền về ví giảng viên thành công", data));
     }
+
+    /**
+     * 6. Lấy danh sách dòng tiền giao dịch toàn hệ thống (Tiền vào, Tiền ra)
+     */
+    @GetMapping("/dong-tien")
+    public ResponseEntity<ApiResponse<List<com.studywithme.dto.response.DongTienGiaoDichDto>>> layDanhSachDongTien(
+            @RequestParam(required = false) String loai,
+            @RequestParam(required = false) String phanLoai,
+            @RequestParam(required = false) String keyword) {
+        var data = adminTaiChinhService.layDanhSachDongTien(loai, phanLoai, keyword);
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách dòng tiền hệ thống thành công", data));
+    }
+
+    /**
+     * 7. Lấy số liệu thống kê dòng tiền tổng thể (Tổng vào, Tổng ra, Phí sàn 20%, Số dư ví GV)
+     */
+    @GetMapping("/dong-tien/thong-ke")
+    public ResponseEntity<ApiResponse<com.studywithme.dto.response.ThongKeDongTienResponse>> layThongKeDongTien() {
+        var stats = adminTaiChinhService.layThongKeDongTien();
+        return ResponseEntity.ok(ApiResponse.success("Lấy thống kê dòng tiền thành công", stats));
+    }
 }

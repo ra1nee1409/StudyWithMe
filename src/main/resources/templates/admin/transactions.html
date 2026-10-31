@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Quản Lý Dòng Tiền & Giao Dịch - Quản trị StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== SIDEBAR COMPONENT ==================== -->
+  <aside th:replace="~{components/admin/sidebar :: admin-sidebar('transactions')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar Component -->
+    <header th:replace="~{components/admin/header :: admin-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Header Banner -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-secondary text-xs font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              Quản Trị Tài Chính • Sổ Cái Dòng Tiền
+            </span>
+            <span class="text-outline-variant">•</span>
+            <span class="text-xs text-on-surface-variant">Đối soát tiền vào - tiền ra toàn hệ thống</span>
+          </div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-primary text-[28px]">swap_vert</span>
+            Dòng Tiền & Giao Dịch Toàn Hệ Thống
+          </h1>
+          <p class="text-xs text-on-surface-variant">
+            Giám sát toàn bộ luồng tiền học viên nộp mua khóa học, đăng ký gia sư (tiền vào) và các khoản giải ngân rút tiền về ngân hàng của giảng viên (tiền ra).
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a th:href="@{/admin/tai-chinh/rut-tien}" class="px-4 py-2 rounded-xl bg-surface-container text-xs font-semibold text-on-surface hover:bg-surface-container-high transition-colors flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">payments</span>
+            <span>Duyệt Lệnh Rút Tiền</span>
+          </a>
+          <a th:href="@{/admin/dashboard}" class="px-4 py-2 rounded-xl border border-surface-container text-xs font-semibold text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">dashboard</span>
+            <span>Dashboard</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- 4 Financial KPIs Cards -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1: Tổng Tiền Vào -->
+        <div class="bg-surface-card p-5 rounded-2xl shadow-sm border border-surface-container/40 flex items-center justify-between">
+          <div class="space-y-1">
+            <span class="text-xs font-semibold text-on-surface-variant block uppercase tracking-wider">Tổng Tiền Vào (Doanh Thu)</span>
+            <span class="text-xl sm:text-2xl font-black text-status-success block" 
+                  th:text="${thongKeDongTien != null and thongKeDongTien.tongTienVao != null ? #numbers.formatDecimal(thongKeDongTien.tongTienVao, 0, 'POINT', 0, 'COMMA') + ' đ' : '0 đ'}">
+              0 đ
+            </span>
+            <span class="text-[11px] text-on-surface-variant" th:text="${thongKeDongTien.soDonHangThanhCong} + ' đơn hàng đã thanh toán'">0 đơn hàng</span>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-status-success/10 text-status-success flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[26px]">arrow_downward</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Tổng Tiền Ra -->
+        <div class="bg-surface-card p-5 rounded-2xl shadow-sm border border-surface-container/40 flex items-center justify-between">
+          <div class="space-y-1">
+            <span class="text-xs font-semibold text-on-surface-variant block uppercase tracking-wider">Tổng Tiền Ra (Giải Ngân)</span>
+            <span class="text-xl sm:text-2xl font-black text-error block" 
+                  th:text="${thongKeDongTien != null and thongKeDongTien.tongTienRa != null ? #numbers.formatDecimal(thongKeDongTien.tongTienRa, 0, 'POINT', 0, 'COMMA') + ' đ' : '0 đ'}">
+              0 đ
+            </span>
+            <span class="text-[11px] text-on-surface-variant" th:text="${thongKeDongTien.soLenhRutThanhCong} + ' lệnh rút đã chuyển khoản'">0 lệnh rút</span>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-error/10 text-error flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[26px]">arrow_upward</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Phí Sàn Thu Nhập (20%) -->
+        <div class="bg-surface-card p-5 rounded-2xl shadow-sm border border-surface-container/40 flex items-center justify-between">
+          <div class="space-y-1">
+            <span class="text-xs font-semibold text-on-surface-variant block uppercase tracking-wider">Phí Sàn Giữ Lại (20%)</span>
+            <span class="text-xl sm:text-2xl font-black text-primary block" 
+                  th:text="${thongKeDongTien != null and thongKeDongTien.loiNhuanSan != null ? #numbers.formatDecimal(thongKeDongTien.loiNhuanSan, 0, 'POINT', 0, 'COMMA') + ' đ' : '0 đ'}">
+              0 đ
+            </span>
+            <span class="text-[11px] text-on-surface-variant">Lợi nhuận gộp StudyWithMe</span>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[26px]">account_balance</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Tổng Số Dư Ví Giảng Viên -->
+        <div class="bg-surface-card p-5 rounded-2xl shadow-sm border border-surface-container/40 flex items-center justify-between">
+          <div class="space-y-1">
+            <span class="text-xs font-semibold text-on-surface-variant block uppercase tracking-wider">Số Dư Ví Giảng Viên</span>
+            <span class="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 block" 
+                  th:text="${thongKeDongTien != null and thongKeDongTien.tongSoDuViGiangVien != null ? #numbers.formatDecimal(thongKeDongTien.tongSoDuViGiangVien, 0, 'POINT', 0, 'COMMA') + ' đ' : '0 đ'}">
+              0 đ
+            </span>
+            <span class="text-[11px] text-on-surface-variant">Khả dụng chờ giảng viên rút</span>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[26px]">wallet</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Ledger Table Box -->
+      <section class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 overflow-hidden flex flex-col">
+        
+        <!-- Table Control Toolbar -->
+        <div class="p-5 border-b border-surface-container/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <!-- Search input -->
+          <form th:action="@{/admin/tai-chinh/dong-tien}" method="get" class="flex items-center gap-2 flex-1 max-w-md">
+            <input type="hidden" name="loai" th:value="${currentLoai}">
+            <input type="hidden" name="phanLoai" th:value="${currentPhanLoai}">
+            <div class="relative w-full">
+              <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+              <input type="text" name="keyword" th:value="${keyword}" placeholder="Tìm theo mã GD, tên người dùng, email, dịch vụ..." class="w-full pl-10 pr-4 py-2 rounded-xl bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30">
+            </div>
+            <button type="submit" class="px-3.5 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-colors">
+              Tìm
+            </button>
+            <a th:if="${keyword != null and !keyword.isBlank()}" th:href="@{/admin/tai-chinh/dong-tien(loai=${currentLoai}, phanLoai=${currentPhanLoai})}" class="px-2.5 py-2 rounded-xl border border-surface-container text-xs text-on-surface-variant hover:text-primary transition-colors">
+              Xóa
+            </a>
+          </form>
+
+          <!-- Type filter tabs -->
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <a th:href="@{/admin/tai-chinh/dong-tien(loai='TAT_CA', phanLoai=${currentPhanLoai}, keyword=${keyword})}"
+               th:classappend="${currentLoai == 'TAT_CA'} ? 'bg-primary text-white font-bold' : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+               class="px-3 py-1.5 rounded-lg text-xs transition-colors">
+              Tất Cả
+            </a>
+            <a th:href="@{/admin/tai-chinh/dong-tien(loai='TIEN_VAO', phanLoai=${currentPhanLoai}, keyword=${keyword})}"
+               th:classappend="${currentLoai == 'TIEN_VAO'} ? 'bg-status-success text-white font-bold' : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+               class="px-3 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-status-success inline-block"></span>
+              Tiền Vào (+)
+            </a>
+            <a th:href="@{/admin/tai-chinh/dong-tien(loai='TIEN_RA', phanLoai=${currentPhanLoai}, keyword=${keyword})}"
+               th:classappend="${currentLoai == 'TIEN_RA'} ? 'bg-error text-white font-bold' : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+               class="px-3 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-error inline-block"></span>
+              Tiền Ra (-)
+            </a>
+
+            <span class="text-outline-variant mx-1">|</span>
+
+            <!-- Service filter chips -->
+            <a th:href="@{/admin/tai-chinh/dong-tien(loai=${currentLoai}, phanLoai='KHOA_HOC', keyword=${keyword})}"
+               th:classappend="${currentPhanLoai == 'KHOA_HOC'} ? 'border-primary text-primary font-bold bg-primary/5' : 'border-surface-container text-on-surface-variant hover:border-primary/40'"
+               class="px-2.5 py-1.5 rounded-lg text-[11px] border transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">play_lesson</span>
+              Khóa Học
+            </a>
+            <a th:href="@{/admin/tai-chinh/dong-tien(loai=${currentLoai}, phanLoai='GIA_SU', keyword=${keyword})}"
+               th:classappend="${currentPhanLoai == 'GIA_SU'} ? 'border-primary text-primary font-bold bg-primary/5' : 'border-surface-container text-on-surface-variant hover:border-primary/40'"
+               class="px-2.5 py-1.5 rounded-lg text-[11px] border transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">school</span>
+              Gia Sư
+            </a>
+            <a th:href="@{/admin/tai-chinh/dong-tien(loai=${currentLoai}, phanLoai='RUT_TIEN', keyword=${keyword})}"
+               th:classappend="${currentPhanLoai == 'RUT_TIEN'} ? 'border-primary text-primary font-bold bg-primary/5' : 'border-surface-container text-on-surface-variant hover:border-primary/40'"
+               class="px-2.5 py-1.5 rounded-lg text-[11px] border transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">account_balance</span>
+              Rút Tiền
+            </a>
+          </div>
+        </div>
+
+        <!-- Table View -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-surface-container-low/80 text-on-surface-variant uppercase text-[11px] font-bold border-b border-surface-container/40">
+              <tr>
+                <th class="py-3.5 px-5">Mã Giao Dịch</th>
+                <th class="py-3.5 px-5">Loại Dòng Tiền</th>
+                <th class="py-3.5 px-5">Người Thực Hiện</th>
+                <th class="py-3.5 px-5">Dịch Vụ / Nội Dung</th>
+                <th class="py-3.5 px-5 text-right">Số Tiền</th>
+                <th class="py-3.5 px-5 text-right">Phân Chia (Sàn/GV)</th>
+                <th class="py-3.5 px-5">Cổng Thanh Toán</th>
+                <th class="py-3.5 px-5">Thời Gian</th>
+                <th class="py-3.5 px-5 text-center">Trạng Thái</th>
+                <th class="py-3.5 px-4 text-center">Biên Lai</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-container/30">
+              <!-- Empty state -->
+              <tr th:if="${#lists.isEmpty(danhSachDongTien)}">
+                <td colspan="10" class="py-12 text-center text-on-surface-variant bg-surface-container-low/20">
+                  <span class="material-symbols-outlined text-4xl text-outline mb-2">receipt_long</span>
+                  <p class="text-sm font-bold text-on-surface">Không tìm thấy giao dịch tài chính nào</p>
+                  <p class="text-xs text-on-surface-variant mt-1">Các giao dịch nạp tiền mua khóa học hoặc rút tiền sẽ hiển thị tại đây.</p>
+                </td>
+              </tr>
+
+              <!-- Transaction Row -->
+              <tr th:each="tx : ${danhSachDongTien}" class="hover:bg-surface-container-low/50 transition-colors">
+                <!-- Mã GD -->
+                <td class="py-3.5 px-5 font-mono font-bold text-primary" th:text="${tx.maGiaoDich}">
+                  SWM-123456
+                </td>
+
+                <!-- Loại dòng tiền -->
+                <td class="py-3.5 px-5">
+                  <span th:if="${tx.loaiDongTien == 'TIEN_VAO'}" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-status-success/15 text-status-success border border-status-success/30">
+                    <span class="material-symbols-outlined text-[14px]">arrow_downward</span>
+                    Tiền Vào (+)
+                  </span>
+                  <span th:unless="${tx.loaiDongTien == 'TIEN_VAO'}" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-error/15 text-error border border-error/30">
+                    <span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+                    Tiền Ra (-)
+                  </span>
+                </td>
+
+                <!-- Người thực hiện -->
+                <td class="py-3.5 px-5">
+                  <div class="flex flex-col">
+                    <span class="font-bold text-on-surface truncate max-w-[180px]" th:text="${tx.nguoiThucHien}">Nguyễn Văn A</span>
+                    <span class="text-[11px] text-on-surface-variant truncate max-w-[180px]" th:text="${tx.emailNguoiThucHien}">student@gmail.com</span>
+                    <span th:if="${tx.vaiTro == 'HOC_VIEN'}" class="text-[10px] text-primary font-semibold mt-0.5">🎓 Học viên</span>
+                    <span th:unless="${tx.vaiTro == 'HOC_VIEN'}" class="text-[10px] text-secondary font-semibold mt-0.5">👨‍🏫 Giảng viên</span>
+                  </div>
+                </td>
+
+                <!-- Dịch vụ / Nội dung -->
+                <td class="py-3.5 px-5">
+                  <div class="flex items-start gap-2">
+                    <span th:if="${tx.phanLoaiDichVu == 'KHOA_HOC'}" class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">play_circle</span>
+                    <span th:if="${tx.phanLoaiDichVu == 'GIA_SU'}" class="material-symbols-outlined text-secondary text-[18px] shrink-0 mt-0.5">school</span>
+                    <span th:if="${tx.phanLoaiDichVu == 'RUT_TIEN'}" class="material-symbols-outlined text-amber-600 text-[18px] shrink-0 mt-0.5">account_balance</span>
+                    <span class="font-medium text-on-surface line-clamp-2 max-w-[240px]" th:text="${tx.tenDichVu}">Tên khóa học</span>
+                  </div>
+                </td>
+
+                <!-- Số tiền -->
+                <td class="py-3.5 px-5 text-right">
+                  <span th:if="${tx.loaiDongTien == 'TIEN_VAO'}" class="font-black text-sm text-status-success font-mono" 
+                        th:text="'+' + ${#numbers.formatDecimal(tx.tongTien, 0, 'POINT', 0, 'COMMA')} + ' đ'">
+                    +500.000 đ
+                  </span>
+                  <span th:unless="${tx.loaiDongTien == 'TIEN_VAO'}" class="font-black text-sm text-error font-mono" 
+                        th:text="'-' + ${#numbers.formatDecimal(tx.tongTien, 0, 'POINT', 0, 'COMMA')} + ' đ'">
+                    -500.000 đ
+                  </span>
+                </td>
+
+                <!-- Phân chia Sàn / Giảng viên -->
+                <td class="py-3.5 px-5 text-right">
+                  <div th:if="${tx.loaiDongTien == 'TIEN_VAO'}" class="flex flex-col text-[11px] font-mono">
+                    <span class="text-primary font-semibold" th:text="'Sàn 20%: ' + ${#numbers.formatDecimal(tx.phiSan, 0, 'POINT', 0, 'COMMA')} + ' đ'">Sàn: 100.000 đ</span>
+                    <span class="text-on-surface-variant" th:text="'GV 80%: ' + ${#numbers.formatDecimal(tx.tienGiangVien, 0, 'POINT', 0, 'COMMA')} + ' đ'">GV: 400.000 đ</span>
+                  </div>
+                  <span th:unless="${tx.loaiDongTien == 'TIEN_VAO'}" class="text-[11px] text-on-surface-variant font-mono">
+                    100% về GV
+                  </span>
+                </td>
+
+                <!-- Cổng thanh toán -->
+                <td class="py-3.5 px-5">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider"
+                        th:classappend="${tx.phuongThuc == 'PAYOS'} ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-surface-container text-on-surface-variant'"
+                        th:text="${tx.phuongThuc}">
+                    PAYOS
+                  </span>
+                </td>
+
+                <!-- Thời gian -->
+                <td class="py-3.5 px-5 text-[11px] text-on-surface-variant" th:text="${tx.thoiGian != null ? #temporals.format(tx.thoiGian, 'dd/MM/yyyy HH:mm') : 'N/A'}">
+                  25/10/2026 15:30
+                </td>
+
+                <!-- Trạng thái -->
+                <td class="py-3.5 px-5 text-center">
+                  <span th:if="${tx.trangThai == 'DA_THANH_TOAN' or tx.trangThai == 'DA_CHUYEN_TIEN'}" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-status-success/10 text-status-success border border-status-success/20">
+                    Thành công
+                  </span>
+                  <span th:if="${tx.trangThai == 'CHO_THANH_TOAN' or tx.trangThai == 'CHO_XU_LY'}" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-status-warning/10 text-status-warning border border-status-warning/20">
+                    Chờ xử lý
+                  </span>
+                  <span th:if="${tx.trangThai == 'THAT_BAI' or tx.trangThai == 'DA_HUY' or tx.trangThai == 'TU_CHOI'}" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-error/10 text-error border border-error/20">
+                    Thất bại
+                  </span>
+                </td>
+
+                <!-- Action Button -->
+                <td class="py-3.5 px-4 text-center">
+                  <button type="button" 
+                          th:data-magd="${tx.maGiaoDich}"
+                          th:data-loai="${tx.loaiDongTien}"
+                          th:data-dichvu="${tx.tenDichVu}"
+                          th:data-nguoi="${tx.nguoiThucHien}"
+                          th:data-email="${tx.emailNguoiThucHien}"
+                          th:data-sotien="${#numbers.formatDecimal(tx.tongTien, 0, 'POINT', 0, 'COMMA')} + ' đ'"
+                          th:data-phisan="${#numbers.formatDecimal(tx.phiSan, 0, 'POINT', 0, 'COMMA')} + ' đ'"
+                          th:data-tiengv="${#numbers.formatDecimal(tx.tienGiangVien, 0, 'POINT', 0, 'COMMA')} + ' đ'"
+                          th:data-phuongthuc="${tx.phuongThuc}"
+                          th:data-thoigian="${tx.thoiGian != null ? #temporals.format(tx.thoiGian, 'dd/MM/yyyy HH:mm:ss') : 'N/A'}"
+                          th:data-mota="${tx.moTa}"
+                          onclick="openReceiptModal(this)"
+                          title="Xem biên lai chi tiết"
+                          class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors cursor-pointer">
+                    <span class="material-symbols-outlined text-[18px]">receipt</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer / Count -->
+        <div class="p-4 border-t border-surface-container/40 flex items-center justify-between text-xs text-on-surface-variant bg-surface-container-low/40">
+          <span>Tổng số lượt giao dịch hiển thị: <strong class="text-on-surface" th:text="${#lists.size(danhSachDongTien)}">0</strong></span>
+          <span class="text-[11px]">Dữ liệu được cập nhật thời gian thực</span>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Receipt Detail Modal -->
+  <div id="receiptModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+    <div class="bg-surface-card border border-surface-container rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-5">
+      <div class="flex items-center justify-between border-b border-surface-container pb-4">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+          </span>
+          <h2 class="text-base font-bold text-on-surface">Chi Tiết Biên Lai Giao Dịch</h2>
+        </div>
+        <button type="button" onclick="closeReceiptModal()" class="text-on-surface-variant hover:text-on-surface p-1">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="p-3.5 rounded-2xl bg-surface-container-low border border-surface-container/60 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-on-surface-variant">Mã Giao Dịch:</span>
+            <span id="modalMaGd" class="font-mono font-bold text-primary">SWM-12345</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-on-surface-variant">Thời gian:</span>
+            <span id="modalThoiGian" class="font-medium text-on-surface">25/10/2026 15:30:00</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-on-surface-variant">Cổng thanh toán:</span>
+            <span id="modalPhuongThuc" class="font-bold uppercase text-on-surface">PAYOS</span>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-1">
+          <div class="flex justify-between">
+            <span class="text-on-surface-variant">Người thực hiện:</span>
+            <span id="modalNguoi" class="font-bold text-on-surface text-right">Nguyễn Văn A</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-on-surface-variant">Email liên hệ:</span>
+            <span id="modalEmail" class="font-medium text-on-surface text-right">student@gmail.com</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-on-surface-variant">Sản phẩm / Dịch vụ:</span>
+            <span id="modalDichVu" class="font-semibold text-on-surface text-right max-w-[280px]">Khóa học Toán 12</span>
+          </div>
+        </div>
+
+        <div class="border-t border-surface-container pt-3 space-y-2">
+          <div class="flex justify-between items-baseline">
+            <span class="text-on-surface-variant font-bold uppercase text-[11px]">Tổng giá trị giao dịch:</span>
+            <span id="modalSoTien" class="text-lg font-black text-status-success font-mono">500.000 đ</span>
+          </div>
+          <div class="flex justify-between text-[11px]">
+            <span class="text-on-surface-variant">Phí sàn StudyWithMe (20%):</span>
+            <span id="modalPhiSan" class="font-mono font-semibold text-primary">100.000 đ</span>
+          </div>
+          <div class="flex justify-between text-[11px]">
+            <span class="text-on-surface-variant">Doanh thu Giảng viên (80%):</span>
+            <span id="modalTienGv" class="font-mono font-semibold text-on-surface">400.000 đ</span>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-surface-container-low text-[11px] text-on-surface-variant" id="modalMoTa">
+          Diễn giải: Học viên nộp tiền mua khóa học qua VietQR payOS.
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button type="button" onclick="closeReceiptModal()" class="px-5 py-2.5 rounded-xl bg-surface-container text-xs font-semibold text-on-surface hover:bg-surface-container-high transition-colors cursor-pointer">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openReceiptModal(btn) {
+      document.getElementById('modalMaGd').textContent = btn.dataset.magd || '';
+      document.getElementById('modalThoiGian').textContent = btn.dataset.thoigian || '';
+      document.getElementById('modalPhuongThuc').textContent = btn.dataset.phuongthuc || '';
+      document.getElementById('modalNguoi').textContent = btn.dataset.nguoi || '';
+      document.getElementById('modalEmail').textContent = btn.dataset.email || '';
+      document.getElementById('modalDichVu').textContent = btn.dataset.dichvu || '';
+      document.getElementById('modalSoTien').textContent = btn.dataset.sotien || '';
+      document.getElementById('modalPhiSan').textContent = btn.dataset.phisan || '';
+      document.getElementById('modalTienGv').textContent = btn.dataset.tiengv || '';
+      document.getElementById('modalMoTa').textContent = btn.dataset.mota || '';
+
+      const loai = btn.dataset.loai;
+      const soTienEl = document.getElementById('modalSoTien');
+      if (loai === 'TIEN_VAO') {
+        soTienEl.className = 'text-lg font-black text-status-success font-mono';
+      } else {
+        soTienEl.className = 'text-lg font-black text-error font-mono';
+      }
+
+      document.getElementById('receiptModal').classList.remove('hidden');
+    }
+
+    function closeReceiptModal() {
+      document.getElementById('receiptModal').classList.add('hidden');
+    }
+  </script>
+
+</body>
+</html>
+

@@ -253,6 +253,23 @@ public class AdminWebController {
         redirectAttributes.addFlashAttribute("message", "Đã từ chối lệnh rút tiền và hoàn tiền về ví giảng viên thành công!");
         return "redirect:/admin/tai-chinh/rut-tien";
     }
+
+    // ==========================================
+    // 9. QUẢN LÝ DÒNG TIỀN & GIAO DỊCH (TIỀN RA / TIỀN VÀO)
+    // ==========================================
+    @GetMapping({"/tai-chinh/dong-tien", "/dong-tien", "/transactions", "/cash-flow"})
+    public String dongTienPage(@RequestParam(name = "loai", required = false) String loai,
+                               @RequestParam(name = "phanLoai", required = false) String phanLoai,
+                               @RequestParam(name = "keyword", required = false) String keyword,
+                               Model model) {
+        model.addAttribute("thongKeDongTien", adminTaiChinhService.layThongKeDongTien());
+        model.addAttribute("danhSachDongTien", adminTaiChinhService.layDanhSachDongTien(loai, phanLoai, keyword));
+        model.addAttribute("currentLoai", loai != null ? loai : "TAT_CA");
+        model.addAttribute("currentPhanLoai", phanLoai != null ? phanLoai : "TAT_CA");
+        model.addAttribute("keyword", keyword != null ? keyword : "");
+        model.addAttribute("activeTab", "transactions");
+        return "admin/transactions";
+    }
 }
 
 

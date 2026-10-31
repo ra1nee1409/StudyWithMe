@@ -342,44 +342,95 @@ Trước khi dựng giao diện cho Admin hay Trang chủ, Backend cần có s�
   - Kiểm thử tích hợp: [StudentLearningIntegrationTest.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/test/java/com/studywithme/StudentLearningIntegrationTest.java) (PASS 100%).
 * **Trang S4: Lớp học trực tuyến của tôi (My Live Classes) - ✅ HOÀN THÀNH 100%**: Danh sách lớp gia sư kèm trực tiếp, lịch học tuần, nút click mở phòng học ([classes.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/student/classes.html)).
 * **Trang S5: Danh sách yêu thích (Wishlist) - ✅ HOÀN THÀNH 100%**: Quản lý các khóa học và gia sư đã thả tim để theo dõi ([wishlist.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/student/wishlist.html)).
-* **Trang S6: Viết đánh giá & Nhận xét**: Chấm điểm sao và gửi nhận xét sau khi hoàn thành khóa học.
+* **Trang S6: Đánh giá & Chấm sao khóa học (Course Rating & Review ⭐) - 🚀 KẾ HOẠCH TRIỂN KHAI**:
+  - **Mục đích:** Cho phép học viên sau khi đã ghi danh khóa học gửi đánh giá 1-5 sao kèm nhận xét; tự động tính lại điểm trung bình và cập nhật số sao hiển thị trên toàn sàn.
+  - **Giao diện người dùng:**
+    - Khối Đánh giá trên trang Chi tiết Khóa học (`/khoa-hoc/{slug}`): Thống kê tổng điểm (VD: 4.9/5 ⭐), thanh tỷ lệ số lượng sao (5 sao, 4 sao, 3 sao...), danh sách nhận xét của các học viên trước đó.
+    - Form gửi đánh giá tương tác (Interactive Rating Form): Hiển thị 5 ngôi sao vàng hiệu ứng hover đổi màu, ô nhập nội dung nhận xét chi tiết, nút "Gửi đánh giá". Chỉ hiển thị form này nếu học viên đã đăng nhập và đã ghi danh khóa học (`GhiDanhKhoaHoc`).
+    - Modal đánh giá nhanh ngay trong phòng học LMS (`/student/learning/{slug}`).
+  - **Cơ chế Backend & APIs:**
+    - `POST /api/hoc-vien/khoa-hoc/{khoaHocId}/danh-gia`: Gửi đánh giá mới (Validation: Bắt buộc đã mua khóa học, số sao 1-5, chống spam đánh giá lặp lại - nếu đã đánh giá thì cập nhật nội dung cũ).
+    - `GET /api/public/khoa-hoc/{khoaHocId}/danh-gia`: Lấy danh sách đánh giá công khai có phân trang.
+    - Tự động cập nhật `diemDanhGiaTrungBinh` và `tongSoDanhGia` trong thực thể `KhoaHoc`.
+  - **Thực thể liên quan:** `DanhGiaNhanXet.java`, `KhoaHoc.java`, `NguoiDung.java`.
 
 ---
 
 ## 👨‍🏫 GIAI ĐOẠN 5: PHÂN HỆ GIẢNG VIÊN (TEACHER STUDIO)
-*(Đang triển khai)*
+*(Đang triển khai nâng cấp toàn diện)*
 
 * **Trang T1: Nộp hồ sơ xét duyệt giảng viên (Teacher KYC Application)**: Tải ảnh bằng cấp, chứng chỉ ngoại ngữ, upload video tự giới thiệu.
-* **Trang T2: Studio Quản lý Khóa học (Course Management)**: Tạo khóa học mới, thiết lập giáo trình Chương/Bài học, upload video bài giảng, gửi khóa học chờ Admin duyệt.
+* **Trang T2: Studio Quản lý & Soạn Giáo Trình Khóa Học (Course Studio & Curriculum Management) - 🚀 KẾ HOẠCH TRIỂN KHAI**:
+  - **Mục đích:** Nơi gia sư/giảng viên tự tay quản lý các khóa học video của mình, tự thiết kế giáo trình Chương học / Bài học video, và gửi duyệt lên Admin.
+  - **Giao diện Frontend (`/tutor/courses` hoặc `/tutor/khoa-hoc`):**
+    - 4 Thẻ KPI: Tổng khóa học đã tạo, Đã xuất bản (`DA_XUAT_BAN`), Đang chờ duyệt (`CHO_DUYET`), Khóa học bị từ chối (`TU_CHOI`).
+    - Nút "Thêm khóa học mới" mở Modal/Trang tạo: Tiêu đề, Slug URL tự sinh, Cấp học, Danh mục môn học, Giá gốc, Giá khuyến mãi, Trình độ, Ảnh bìa khóa học, Mô tả chi tiết.
+    - Bảng/Lưới danh sách khóa học: Hiển thị trạng thái bằng badge màu (Xanh lá = Đã xuất bản, Vàng = Đang chờ duyệt, Đỏ = Bị từ chối kèm tooltip xem lý do Admin từ chối để chỉnh sửa lại).
+    - Nút "Soạn giáo trình" (Curriculum Editor):
+      - Thêm/Sửa/Xóa Chương học (Tiêu đề chương, thứ tự sắp xếp).
+      - Thêm/Sửa/Xóa Bài học video trong chương: Tên bài học, link video YouTube / HTML5, thời lượng phút, checkbox "Cho phép học thử miễn phí".
+    - Nút "Gửi kiểm duyệt": Chuyển trạng thái khóa học sang `CHO_DUYET` để Admin xem xét trên trang `/admin/course-moderation`.
+  - **APIs Backend:**
+    - `GET /api/giang-vien/khoa-hoc`: Lấy danh sách khóa học của giảng viên đang đăng nhập.
+    - `POST /api/giang-vien/khoa-hoc`: Tạo mới khóa học (trạng thái `NHAP` hoặc `CHO_DUYET`).
+    - `PUT /api/giang-vien/khoa-hoc/{id}`: Cập nhật thông tin cơ bản khóa học.
+    - `POST /api/giang-vien/khoa-hoc/{id}/gui-duyet`: Gửi yêu cầu kiểm duyệt lên Admin.
+    - `POST /api/giang-vien/khoa-hoc/{id}/chuong-hoc`: Thêm chương học mới.
+    - `POST /api/giang-vien/chuong-hoc/{chuongId}/bai-hoc`: Thêm bài học mới vào chương.
+    - `DELETE /api/giang-vien/khoa-hoc/{id}`: Xóa khóa học nháp chưa phát hành.
 * **Trang T3: Quản lý Lớp gia sư dạy kèm (Live Class Management)**: Mở lớp gia sư, thiết lập sĩ số tối đa, thời khóa biểu và học phí.
-* **Trang T4: Thống kê Thu nhập & Ví tiền Giảng viên (Wallet & Earnings) - 🎨 ĐÃ HOÀN THIỆN GIAO DIỆN UI**:
+* **Trang T4: Thống kê Thu nhập & Ví tiền Giảng viên (Wallet & Earnings) - ✅ ĐÃ HOÀN THIỆN 100%**:
   - Giao diện ví tiền chuyên nghiệp ([tutor/wallet.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/tutor/wallet.html)): 3 thẻ KPI (Số dư khả dụng, Doanh thu tích lũy, Lệnh rút chờ duyệt).
   - Modal "Yêu cầu rút tiền về ngân hàng": Chọn trong 10 ngân hàng TMCP lớn tại Việt Nam, chip chọn nhanh số tiền rút (+500k, +1M, +2M, Rút toàn bộ), tính toán realtime số dư ví còn lại sau rút.
   - Bảng lịch sử giao dịch kèm hệ thống Tab bộ lọc trực quan (Tất cả, Doanh thu +80%, Rút tiền, Hoàn tiền) và thanh tìm kiếm trực tiếp trên client.
-  - Chuẩn bị kết nối API chi hộ / rút tiền tự động hoặc giải ngân thủ công qua đối soát.
 
 ---
 
-## 💬 GIAI ĐOẠN 6: CHAT REAL-TIME, BẢO VỆ ĐỒ ÁN & TỐI ƯU
+## 💬 GIAI ĐOẠN 6: CHAT REAL-TIME, CHUÔNG THÔNG BÁO & TỐI ƯU HỆ THỐNG
+*(Phân hệ nâng cao giúp nâng tầm đồ án đạt điểm tối đa 10/10)*
 
-* **Hộp thoại Chat 1-1 (WebSocket STOMP)**: Khung nhắn tin trực tiếp giữa học viên và gia sư để trao đổi bài học.
-* **Hệ thống Chuông thông báo (Real-time Notification)**: Báo khi đơn hàng thành công, khi có bài giảng mới, khi hồ sơ được duyệt.
-* **Tối ưu hiệu năng**: Tối ưu chỉ mục (Index) trên SQL Server, giải quyết N+1 query trong JPA.
-* **Chuẩn bị bảo vệ Đồ án**: Xuất tài liệu Swagger API, vẽ đầy đủ biểu đồ UML (Use Case, Sequence, Class, ERD), slide báo cáo.
+* **Tính năng C1: Khung Chat Real-time 1-kèm-1 (WebSocket STOMP over SockJS) - 🚀 KẾ HOẠCH TRIỂN KHAI**:
+  - **Mục đích:** Học viên và Gia sư có thể nhắn tin trao đổi bài tập, hỏi bài và xếp lịch học trực tiếp trong thời gian thực mà không cần tải lại trang.
+  - **Kiến trúc Công nghệ:**
+    - Kích hoạt `spring-boot-starter-websocket` với chuẩn **STOMP Broker**.
+    - Endpoint kết nối WebSocket: `/ws-studywithme` (sử dụng SockJS fallback cho trình duyệt).
+    - Cấu hình Message Broker:
+      - Prefix gửi tin từ Client: `/app` (Ví dụ: `/app/chat.guiTinNhan`)
+      - Prefix nhận tin cá nhân: `/user/queue/tin-nhan`
+    - Cơ chế bắt cặp hội thoại (One-on-One Chat Session) giữa 2 `userId`.
+  - **Lưu trữ CSDL (Message Persistence):**
+    - Bảng `tin_nhan` (SQL Server / MongoDB): `id`, `nguoi_gui_id`, `nguoi_nhan_id`, `noi_dung`, `thoi_gian_gui`, `da_xem`.
+  - **Giao diện Người dùng (UI):**
+    - Widget Floating Chat Bubble ở góc phải màn hình toàn sàn (bấm mở cửa sổ chat thu nhỏ).
+    - Trang hội thoại đầy đủ (`/chat` hoặc `/student/chat`, `/tutor/chat`): Cột bên trái hiển thị danh sách người đã chat gần đây kèm avatar và tin nhắn mới nhất; Cột bên phải là khung hội thoại bong bóng chat thời gian thực, có âm thanh thông báo "ting" khi có tin nhắn mới.
+  - **APIs & WebSocket Endpoints:**
+    - `GET /api/chat/hoi-thoai`: Lấy danh sách các cuộc trò chuyện gần nhất của người dùng.
+    - `GET /api/chat/lich-su/{partnerId}`: Lấy lịch sử tin nhắn với đối phương.
+    - `@MessageMapping("/chat.guiTinNhan")`: Nhận tin nhắn từ người gửi, lưu DB và chuyển tiếp tức thời qua `SimpMessagingTemplate` đến người nhận.
+
+* **Tính năng C2: Chuông Thông Báo Thời Gian Thực (Real-time Notification Bell 🔔) - 🚀 KẾ HOẠCH TRIỂN KHAI**:
+  - **Mục đích:** Hiển thị icon chiếc chuông ở Header Navbar trên cả 3 phân hệ (Admin, Tutor, Student), tự động nhảy số đếm đỏ và hiển thị popup thông báo khi có sự kiện quan trọng.
+  - **Các kịch bản tự động bắn thông báo:**
+    1. *Khi Học viên thanh toán VietQR PayOS thành công:* Bắn thông báo cho Học viên ("Đơn hàng #SWM... thành công! Bạn đã được ghi danh khóa học...").
+    2. *Khi Giảng viên được cộng tiền:* Bắn thông báo cho Giảng viên ("Học viên ... vừa mua khóa học của bạn! Ví tiền được cộng +...đ (80%)").
+    3. *Khi Admin duyệt/từ chối khóa học:* Bắn thông báo cho Giảng viên ("Khóa học ... đã được xuất bản thành công!").
+    4. *Khi có yêu cầu rút tiền mới hoặc khóa học mới:* Bắn thông báo cho Quản trị viên để vào duyệt ngay.
+  - **Cơ chế kỹ thuật:**
+    - Bảng `thong_bao`: `id`, `nguoi_dung_id`, `tieu_de`, `noi_dung`, `link_dieu_huong`, `loai_thong_bao`, `da_doc` (true/false), `ngay_tao`.
+    - Đẩy realtime qua WebSocket kênh cá nhân: `/user/queue/thong-bao`.
+    - Dropdown Notification Box trên Header: Hiển thị 5-10 thông báo gần nhất, nút "Đánh dấu tất cả đã đọc", click vào thông báo tự động chuyển đến trang liên quan.
+  - **APIs Backend:**
+    - `GET /api/thong-bao`: Lấy danh sách thông báo của người dùng hiện tại kèm số lượng chưa đọc.
+    - `PATCH /api/thong-bao/{id}/da-doc`: Đánh dấu một thông báo đã đọc.
+    - `PATCH /api/thong-bao/doc-tat-ca`: Đánh dấu toàn bộ thông báo đã đọc.
 
 ---
 
-## 🎯 BẢNG TỔNG HỢP THỨ TỰ BẮT TAY VÀO CODE NGAY
+## 🎯 BẢNG TỔNG HỢP THỨ TỰ BẮT TAY VÀO CODE NÂNG CAO
 
-| Bước | Phân hệ | Trang / Công việc cụ thể | File Code / API trọng tâm |
-| :---: | :---: | :--- | :--- |
-| **1** | Hạ tầng | Tạo 18 Spring Data JPA Repositories | `com.studywithme.repository.*` |
-| **2** | Bảo mật | Cấu hình Security, JWT Provider & Filter | `SecurityConfig`, `JwtTokenProvider`, `JwtFilter` |
-| **3** | Xác thực | API Đăng nhập, Đăng ký trả JWT token | `AuthController`, `AuthService`, `NguoiDung` |
-| **4** | **Admin** | **Trang A2: Quản lý Banner Trang chủ** | `BannerQuangCaoRepository`, `AdminBannerController` |
-| **5** | **Admin** | **Trang A3: Quản lý Cây Danh mục môn học** | `DanhMucRepository`, `AdminDanhMucApiController` (Đã hoàn thành 100%) |
-| **6** | **Trang chủ** | **Trang H1: Trang chủ (Home Page)** | `HomeWebController`, `PublicApiController` (Đã hoàn thành 100%) |
-| **7** | **Trang chủ** | **Trang H2: Danh mục & Tìm kiếm khóa học** | `PublicKhoaHocController` (Lọc đa tiêu chí & Phân trang) |
-| **8** | **Trang chủ** | **Trang H3: Chi tiết Khóa học & Đề cương** | `PublicKhoaHocController` (Chi tiết, Bài học thử) |
-| **9** | **Admin** | **Trang A4 & A5: Duyệt Hồ sơ Gia sư & Khóa học** | `AdminGiangVienController`, `AdminKhoaHocController` |
-| **10** | **Admin** | **Trang A1: Admin Dashboard (Thống kê)** | `AdminThongKeController` |
+| Bước | Phân hệ | Tính năng / Công việc cụ thể | File Code / Component trọng tâm | Trạng thái |
+| :---: | :---: | :--- | :--- | :---: |
+| **1** | **Gia sư** | **Studio Quản lý Khóa học (`/tutor/courses`)**: Tạo khóa học, soạn chương/bài học video, gửi duyệt | `TutorWebController`, `TutorKhoaHocApiController`, `tutor/courses.html` | 🟡 Chuẩn bị làm |
+| **2** | **Học viên** | **Đánh giá & Chấm sao khóa học (Rating ⭐)**: Đánh giá 1-5 sao, viết nhận xét, tính lại điểm trung bình | `DanhGiaNhanXetRepository`, `DanhGiaApiController`, `courses/detail.html` | 🟡 Chuẩn bị làm |
+| **3** | **Toàn sàn** | **Chuông thông báo thời gian thực (Notification Bell 🔔)**: WebSocket push, dropdown header, unread badge | `ThongBao`, `ThongBaoRepository`, `NotificationService`, Header components | 🟡 Chuẩn bị làm |
+| **4** | **Toàn sàn** | **Khung Chat Real-time 1-kèm-1 (WebSocket STOMP)**: Nhắn tin trực tiếp giữa học viên & gia sư | `WebSocketConfig`, `ChatController`, `TinNhanRepository`, UI chat box | 🟡 Chuẩn bị làm |

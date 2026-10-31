@@ -1,25 +1,15 @@
 package com.studywithme.service.impl;
 
 import com.studywithme.config.PayOSConfig;
-import com.studywithme.entity.ChiTietDonHang;
-import com.studywithme.entity.DonHang;
-import com.studywithme.entity.GhiDanhKhoaHoc;
-import com.studywithme.entity.HoSoGiangVien;
-import com.studywithme.entity.KhoaHoc;
-import com.studywithme.entity.LichSuViTien;
-import com.studywithme.entity.NguoiDung;
+import com.studywithme.entity.*;
 import com.studywithme.entity.enums.admin.LoaiGiaoDichVi;
+import com.studywithme.entity.enums.hocvien.TrangThaiThamGiaLop;
 import com.studywithme.entity.enums.shared.LoaiSanPhamDonHang;
 import com.studywithme.entity.enums.shared.TrangThaiThanhToan;
-import com.studywithme.repository.ChiTietDonHangRepository;
-import com.studywithme.repository.DonHangRepository;
-import com.studywithme.repository.GhiDanhKhoaHocRepository;
-import com.studywithme.repository.HoSoGiangVienRepository;
-import com.studywithme.repository.KhoaHocRepository;
-import com.studywithme.repository.LichSuViTienRepository;
+import com.studywithme.repository.*;
 import com.studywithme.service.PayOsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.payos.PayOS;
@@ -37,9 +27,9 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class PayOsServiceImpl implements PayOsService {
-
-    private static final Logger log = LoggerFactory.getLogger(PayOsServiceImpl.class);
 
     private final PayOS payOS;
     private final PayOSConfig payOSConfig;
@@ -47,26 +37,10 @@ public class PayOsServiceImpl implements PayOsService {
     private final ChiTietDonHangRepository chiTietDonHangRepository;
     private final KhoaHocRepository khoaHocRepository;
     private final GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository;
+    private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
+    private final DangKyLopHocRepository dangKyLopHocRepository;
     private final HoSoGiangVienRepository hoSoGiangVienRepository;
     private final LichSuViTienRepository lichSuViTienRepository;
-
-    public PayOsServiceImpl(PayOS payOS,
-                            PayOSConfig payOSConfig,
-                            DonHangRepository donHangRepository,
-                            ChiTietDonHangRepository chiTietDonHangRepository,
-                            KhoaHocRepository khoaHocRepository,
-                            GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository,
-                            HoSoGiangVienRepository hoSoGiangVienRepository,
-                            LichSuViTienRepository lichSuViTienRepository) {
-        this.payOS = payOS;
-        this.payOSConfig = payOSConfig;
-        this.donHangRepository = donHangRepository;
-        this.chiTietDonHangRepository = chiTietDonHangRepository;
-        this.khoaHocRepository = khoaHocRepository;
-        this.ghiDanhKhoaHocRepository = ghiDanhKhoaHocRepository;
-        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
-        this.lichSuViTienRepository = lichSuViTienRepository;
-    }
 
     @Override
     @Transactional
@@ -87,11 +61,16 @@ public class PayOsServiceImpl implements PayOsService {
         }
 
         for (ChiTietDonHang ct : danhSachChiTiet) {
-            String tenSp = "Khoa hoc #" + ct.getSanPhamId();
+            String tenSp = "Sản phẩm #" + ct.getSanPhamId();
             if (ct.getLoaiSanPham() == LoaiSanPhamDonHang.KHOA_HOC_VIDEO) {
                 KhoaHoc kh = khoaHocRepository.findById(ct.getSanPhamId()).orElse(null);
                 if (kh != null && kh.getTieuDe() != null) {
                     tenSp = kh.getTieuDe();
+                }
+            } else if (ct.getLoaiSanPham() == LoaiSanPhamDonHang.LOP_HOC_GIA_SU) {
+                LopHocTrucTuyen lh = lopHocTrucTuyenRepository.findById(ct.getSanPhamId()).orElse(null);
+                if (lh != null && lh.getTieuDeLop() != null) {
+                    tenSp = lh.getTieuDeLop();
                 }
             }
             if (tenSp.length() > 50) {
@@ -233,10 +212,46 @@ public class PayOsServiceImpl implements PayOsService {
                         lichSuViTienRepository.save(ls);
                     }
                 }
+            } else if (ct.getLoaiSanPham() == LoaiSanPhamDonHang.LOP_HOC_GIA_SU) {
+                LopHocTrucTuyen lh = lopHocTrucTuyenRepository.findById(ct.getSanPhamId()).orElse(null);
+                if (lh != null) {
+                    // Đăng ký lớp nếu chưa có
+                    if (!dangKyLopHocRepository.existsByHocVienIdAndLopHocId(hocVien.getId(), lh.getId())) {
+                        DangKyLopHoc dangKy = DangKyLopHoc.builder()
+                                .hocVien(hocVien)
+                                .lopHoc(lh)
+                                .donHang(donHang)
+                                .trangThaiThamGia(TrangThaiThamGiaLop.DA_XAC_NHAN)
+                                .build();
+                        dangKyLopHocRepository.save(dangKy);
+                    }
+
+                    // Cộng doanh thu 80% cho Gia sư của lớp
+                    HoSoGiangVien gv = lh.getGiangVien();
+                    if (gv != null) {
+                        BigDecimal tienGiangVien = ct.getDonGia().multiply(BigDecimal.valueOf(0.80));
+                        BigDecimal soDuTruoc = gv.getSoDuVi() != null ? gv.getSoDuVi() : BigDecimal.ZERO;
+                        BigDecimal soDuSau = soDuTruoc.add(tienGiangVien);
+
+                        gv.setSoDuVi(soDuSau);
+                        hoSoGiangVienRepository.save(gv);
+
+                        LichSuViTien ls = LichSuViTien.builder()
+                                .giangVien(gv)
+                                .soTienBienDong(tienGiangVien)
+                                .soDuTruoc(soDuTruoc)
+                                .soDuSau(soDuSau)
+                                .loaiGiaoDich(LoaiGiaoDichVi.TIEN_BAN_LOP_HOC)
+                                .maThamChieu(donHang.getId())
+                                .moTaGiaoDich("Thu nhập 80% lớp học gia sư (payOS): " + lh.getTieuDeLop() + " (Đơn #" + donHang.getMaDonHang() + ")")
+                                .build();
+                        lichSuViTienRepository.save(ls);
+                    }
+                }
             }
         }
 
-        log.info("Đã kích hoạt bản quyền khóa học và cộng ví giảng viên thành công cho đơn #{}", donHang.getMaDonHang());
+        log.info("Đã kích hoạt dịch vụ và cộng ví giảng viên thành công cho đơn #{}", donHang.getMaDonHang());
         return true;
     }
 

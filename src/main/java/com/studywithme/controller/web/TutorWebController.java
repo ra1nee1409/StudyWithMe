@@ -15,6 +15,7 @@ import com.studywithme.repository.LichSuViTienRepository;
 import com.studywithme.repository.LopHocTrucTuyenRepository;
 import com.studywithme.repository.NguoiDungRepository;
 import com.studywithme.service.ProfileService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,6 +36,7 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/tutor")
 @PreAuthorize("hasAnyAuthority('ROLE_GIANG_VIEN', 'ROLE_QUAN_TRI')")
+@RequiredArgsConstructor
 public class TutorWebController {
 
     private final NguoiDungRepository nguoiDungRepository;
@@ -44,22 +46,6 @@ public class TutorWebController {
     private final LichSuViTienRepository lichSuViTienRepository;
     private final ChungChiGiangVienRepository chungChiGiangVienRepository;
     private final ProfileService profileService;
-
-    public TutorWebController(NguoiDungRepository nguoiDungRepository,
-                              HoSoGiangVienRepository hoSoGiangVienRepository,
-                              LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
-                              DangKyLopHocRepository dangKyLopHocRepository,
-                              LichSuViTienRepository lichSuViTienRepository,
-                              ChungChiGiangVienRepository chungChiGiangVienRepository,
-                              ProfileService profileService) {
-        this.nguoiDungRepository = nguoiDungRepository;
-        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
-        this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
-        this.dangKyLopHocRepository = dangKyLopHocRepository;
-        this.lichSuViTienRepository = lichSuViTienRepository;
-        this.chungChiGiangVienRepository = chungChiGiangVienRepository;
-        this.profileService = profileService;
-    }
 
     private Optional<HoSoGiangVien> getHoSoByPrincipal(Principal principal) {
         if (principal == null) return Optional.empty();

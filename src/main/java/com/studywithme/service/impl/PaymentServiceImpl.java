@@ -10,6 +10,7 @@ import com.studywithme.exception.ResourceNotFoundException;
 import com.studywithme.repository.*;
 import com.studywithme.service.PayOsService;
 import com.studywithme.service.PaymentService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,23 +21,15 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class PaymentServiceImpl implements PaymentService {
 
     private final DonHangRepository donHangRepository;
     private final ChiTietDonHangRepository chiTietDonHangRepository;
     private final KhoaHocRepository khoaHocRepository;
+    private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
     private final PayOsService payOsService;
-
-    public PaymentServiceImpl(DonHangRepository donHangRepository,
-                              ChiTietDonHangRepository chiTietDonHangRepository,
-                              KhoaHocRepository khoaHocRepository,
-                              PayOsService payOsService) {
-        this.donHangRepository = donHangRepository;
-        this.chiTietDonHangRepository = chiTietDonHangRepository;
-        this.khoaHocRepository = khoaHocRepository;
-        this.payOsService = payOsService;
-    }
 
     @Override
     @Transactional
@@ -139,6 +132,8 @@ public class PaymentServiceImpl implements PaymentService {
             for (ChiTietDonHang ct : danhSachChiTiet) {
                 if (ct.getLoaiSanPham() == LoaiSanPhamDonHang.KHOA_HOC_VIDEO) {
                     khoaHocRepository.findById(ct.getSanPhamId()).ifPresent(kh -> tenKhoaHocs.add(kh.getTieuDe()));
+                } else if (ct.getLoaiSanPham() == LoaiSanPhamDonHang.LOP_HOC_GIA_SU) {
+                    lopHocTrucTuyenRepository.findById(ct.getSanPhamId()).ifPresent(lh -> tenKhoaHocs.add(lh.getTieuDeLop()));
                 }
             }
         }

@@ -12,8 +12,8 @@ import com.studywithme.service.PayOsService;
 import com.studywithme.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.payos.model.webhooks.Webhook;
@@ -24,24 +24,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payment")
+@RequiredArgsConstructor
+@Slf4j
 public class PaymentApiController {
-
-    private static final Logger log = LoggerFactory.getLogger(PaymentApiController.class);
 
     private final PaymentService paymentService;
     private final PayOsService payOsService;
     private final NguoiDungRepository nguoiDungRepository;
     private final DonHangRepository donHangRepository;
-
-    public PaymentApiController(PaymentService paymentService,
-                                PayOsService payOsService,
-                                NguoiDungRepository nguoiDungRepository,
-                                DonHangRepository donHangRepository) {
-        this.paymentService = paymentService;
-        this.payOsService = payOsService;
-        this.nguoiDungRepository = nguoiDungRepository;
-        this.donHangRepository = donHangRepository;
-    }
 
     /**
      * API Tạo đơn hàng và sinh link thanh toán VietQR payOS

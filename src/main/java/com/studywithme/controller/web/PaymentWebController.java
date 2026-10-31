@@ -8,8 +8,8 @@ import com.studywithme.repository.KhoaHocRepository;
 import com.studywithme.repository.NguoiDungRepository;
 import com.studywithme.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,21 +19,13 @@ import java.security.Principal;
 import java.util.*;
 
 @Controller
+@RequiredArgsConstructor
+@Slf4j
 public class PaymentWebController {
-
-    private static final Logger log = LoggerFactory.getLogger(PaymentWebController.class);
 
     private final PaymentService paymentService;
     private final KhoaHocRepository khoaHocRepository;
     private final NguoiDungRepository nguoiDungRepository;
-
-    public PaymentWebController(PaymentService paymentService,
-                                KhoaHocRepository khoaHocRepository,
-                                NguoiDungRepository nguoiDungRepository) {
-        this.paymentService = paymentService;
-        this.khoaHocRepository = khoaHocRepository;
-        this.nguoiDungRepository = nguoiDungRepository;
-    }
 
     private Optional<NguoiDung> getUserFromPrincipal(Principal principal) {
         if (principal == null) return Optional.empty();

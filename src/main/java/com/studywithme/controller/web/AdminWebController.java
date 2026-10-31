@@ -24,6 +24,7 @@ import com.studywithme.service.BannerService;
 import com.studywithme.service.DanhMucService;
 import com.studywithme.service.GiangVienKycService;
 import com.studywithme.service.ProfileService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,6 +42,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin")
 @PreAuthorize("hasAuthority('ROLE_QUAN_TRI')")
+@RequiredArgsConstructor
 public class AdminWebController {
 
     private final NguoiDungRepository nguoiDungRepository;
@@ -58,38 +60,6 @@ public class AdminWebController {
     private final AdminNguoiDungService adminNguoiDungService;
     private final ProfileService profileService;
     private final YeuCauRutTienRepository yeuCauRutTienRepository;
-
-    public AdminWebController(NguoiDungRepository nguoiDungRepository,
-                              HoSoGiangVienRepository hoSoGiangVienRepository,
-                              KhoaHocRepository khoaHocRepository,
-                              DangKyLopHocRepository dangKyLopHocRepository,
-                              LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
-                              DanhGiaNhanXetRepository danhGiaNhanXetRepository,
-                              AdminThongKeService adminThongKeService,
-                              BannerService bannerService,
-                              DanhMucService danhMucService,
-                              GiangVienKycService giangVienKycService,
-                              AdminKhoaHocService adminKhoaHocService,
-                              AdminTaiChinhService adminTaiChinhService,
-                              AdminNguoiDungService adminNguoiDungService,
-                              ProfileService profileService,
-                              YeuCauRutTienRepository yeuCauRutTienRepository) {
-        this.nguoiDungRepository = nguoiDungRepository;
-        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
-        this.khoaHocRepository = khoaHocRepository;
-        this.dangKyLopHocRepository = dangKyLopHocRepository;
-        this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
-        this.danhGiaNhanXetRepository = danhGiaNhanXetRepository;
-        this.adminThongKeService = adminThongKeService;
-        this.bannerService = bannerService;
-        this.danhMucService = danhMucService;
-        this.giangVienKycService = giangVienKycService;
-        this.adminKhoaHocService = adminKhoaHocService;
-        this.adminTaiChinhService = adminTaiChinhService;
-        this.adminNguoiDungService = adminNguoiDungService;
-        this.profileService = profileService;
-        this.yeuCauRutTienRepository = yeuCauRutTienRepository;
-    }
 
     @ModelAttribute
     public void loadAdminCommonData(Model model, Principal principal) {

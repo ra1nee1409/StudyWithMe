@@ -168,11 +168,16 @@ Trước khi dựng giao diện cho Admin hay Trang chủ, Backend cần có s�
   - 3 Thẻ KPI: Tổng số tài khoản, Đang hoạt động, Đang tạm khóa.
   - Thanh tìm kiếm real-time lọc tức thì theo Họ tên, Email, Vai trò.
   - Bảng danh sách chi tiết: ID, Họ tên, Email, Số điện thoại, Vai trò (badge màu tím Admin, xanh ngọc Gia sư, xanh dương Học viên), Trạng thái (Hoạt động xanh / Tạm khóa đỏ), Ngày tạo.
-  - Thao tác: Nút Khóa tài khoản / Mở khóa nhanh (Toggle Ban/Unban) kèm hộp thoại xác nhận.
-* **Controller Backend đã viết ([AdminWebController.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/controller/web/AdminWebController.java)):**
+  - Thao tác:
+    - Nút Khóa tài khoản / Mở khóa nhanh (Toggle Ban/Unban) kèm hộp thoại xác nhận.
+    - **Nút Xóa vĩnh viễn (Hard Delete)**: Xóa triệt để tài khoản và toàn bộ dữ liệu phụ thuộc (đơn hàng, tiến độ bài học, đánh giá, ghi danh, hồ sơ gia sư, lịch sử ví) khỏi cơ sở dữ liệu.
+    - **Cơ chế bảo vệ an toàn**: Chặn tuyệt đối xóa tài khoản Quản trị viên mặc định `admin@studywithme.vn` và chặn Admin tự xóa tài khoản của chính mình khi đang đăng nhập.
+* **Service & Controller Backend ([AdminNguoiDungServiceImpl.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/service/impl/AdminNguoiDungServiceImpl.java), [AdminWebController.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/controller/web/AdminWebController.java)):**
   - `GET /admin/nguoi-dung`: Nạp toàn bộ danh sách người dùng và thống kê.
   - `POST /admin/doi-trang-thai-nguoi-dung/{id}`: Đổi trạng thái hoạt động / tạm khóa.
+  - `POST /admin/xoa-nguoi-dung/{id}`: Xóa vĩnh viễn tài khoản trong CSDL.
 * **Entities liên quan:** `NguoiDung.java`, `VaiTro.java`.
+* **Kiểm thử tích hợp:** [ProfileAndUserManagementIntegrationTest.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/test/java/com/studywithme/ProfileAndUserManagementIntegrationTest.java).
 
 ---
 
@@ -193,6 +198,19 @@ Trước khi dựng giao diện cho Admin hay Trang chủ, Backend cần có s�
   - `POST /api/admin/tai-chinh/yeu-cau-rut-tien/{id}/tu-choi`: Từ chối lệnh (`TU_CHOI`), hoàn tiền vào ví giảng viên (`soDuVi = soDuVi + soTienRut`) và ghi sổ cái `HOAN_TIEN`.
 * **Entities liên quan:** `YeuCauRutTien.java`, `LichSuViTien.java`, `HoSoGiangVien.java`.
 * **Kiểm thử tích hợp:** [PayoutApprovalIntegrationTest.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/test/java/com/studywithme/PayoutApprovalIntegrationTest.java) (6/6 tests passed).
+
+---
+
+### Trang A8: Quản lý Dòng tiền & Giao dịch Hệ thống (Cash Flow & Transactions) - ✅ HOÀN THÀNH 100%
+* **Mục đích:** Theo dõi minh bạch mọi dòng tiền ra / tiền vào toàn sàn, tự động phân chia doanh thu sàn 20% và ví giảng viên 80%.
+* **Đường dẫn Frontend:** `/admin/tai-chinh/dong-tien` (hoặc `/admin/transactions`)
+* **Giao diện gồm:**
+  - 4 Thẻ KPI tài chính: Tổng dòng tiền vào (VNĐ), Tổng tiền đã giải ngân (VNĐ), Doanh thu sàn thu được 20%, Số dư khả dụng trong ví giảng viên.
+  - Thanh công cụ lọc: Lọc theo chiều dòng tiền (`Tất cả`, `Tiền vào`, `Tiền ra`), lọc theo nguồn dịch vụ (`Khóa học video`, `Lớp học gia sư`, `Rút tiền về ngân hàng`), và ô tìm kiếm tức thời theo mã giao dịch/tên người dùng.
+  - Bảng giao dịch chi tiết: Màu sắc trực quan (+ Xanh lá cho Tiền vào, - Đỏ cho Tiền ra), tỷ lệ sàn 20% và giảng viên 80%.
+  - Modal xem Biên lai chi tiết giao dịch.
+* **Backend:** [AdminTaiChinhApiController.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/controller/api/admin/AdminTaiChinhApiController.java) (`GET /api/admin/tai-chinh/dong-tien`, `GET /api/admin/tai-chinh/dong-tien/thong-ke`).
+* **Entities liên quan:** `DonHang.java`, `ChiTietDonHang.java`, `YeuCauRutTien.java`, `LichSuViTien.java`.
 
 ---
 

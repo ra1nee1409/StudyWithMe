@@ -15,6 +15,7 @@ import com.studywithme.repository.GhiDanhKhoaHocRepository;
 import com.studywithme.repository.NguoiDungRepository;
 import com.studywithme.service.ProfileService;
 import com.studywithme.service.StudentLearningService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -35,6 +36,7 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/student")
 @PreAuthorize("isAuthenticated()")
+@RequiredArgsConstructor
 public class StudentWebController {
 
     private final NguoiDungRepository nguoiDungRepository;
@@ -44,22 +46,6 @@ public class StudentWebController {
     private final DanhSachYeuThichRepository danhSachYeuThichRepository;
     private final StudentLearningService studentLearningService;
     private final ProfileService profileService;
-
-    public StudentWebController(NguoiDungRepository nguoiDungRepository,
-                                DangKyLopHocRepository dangKyLopHocRepository,
-                                DonHangRepository donHangRepository,
-                                GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository,
-                                DanhSachYeuThichRepository danhSachYeuThichRepository,
-                                StudentLearningService studentLearningService,
-                                ProfileService profileService) {
-        this.nguoiDungRepository = nguoiDungRepository;
-        this.dangKyLopHocRepository = dangKyLopHocRepository;
-        this.donHangRepository = donHangRepository;
-        this.ghiDanhKhoaHocRepository = ghiDanhKhoaHocRepository;
-        this.danhSachYeuThichRepository = danhSachYeuThichRepository;
-        this.studentLearningService = studentLearningService;
-        this.profileService = profileService;
-    }
 
     private Optional<NguoiDung> getUserByPrincipal(Principal principal) {
         if (principal == null) return Optional.empty();

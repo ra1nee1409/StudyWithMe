@@ -71,18 +71,15 @@ public class PayOsServiceImpl implements PayOsService {
     @Override
     @Transactional
     public String taoLinkThanhToan(DonHang donHang, String baseUrl) {
-        // Sinh orderCode dạng số nguyên dương an toàn 10 chữ số cho chuẩn VietQR
         long orderCode = Long.parseLong(String.valueOf(System.currentTimeMillis()).substring(3));
         donHang.setOrderCodePayos(orderCode);
         donHangRepository.save(donHang);
 
-        // Mô tả giao dịch tối đa 25 ký tự không dấu chuẩn quy định ngân hàng
         String description = "SWM Don " + donHang.getId();
         if (description.length() > 25) {
             description = description.substring(0, 25);
         }
 
-        // Tạo danh sách mặt hàng
         List<PaymentLinkItem> items = new ArrayList<>();
         List<ChiTietDonHang> danhSachChiTiet = chiTietDonHangRepository.findByDonHangId(donHang.getId());
         if (danhSachChiTiet == null || danhSachChiTiet.isEmpty()) {
@@ -153,12 +150,24 @@ public class PayOsServiceImpl implements PayOsService {
             return false;
         }
 
-        Long orderCode = webhookData.getOrderCode();
-        DonHang donHang = donHangRepository.findByOrderCodePayos(orderCode)
-                .orElse(null);
+        return kichHoatDonHang(
+                webhookData.getOrderCode(),
+                webhookData.getReference(),
+                webhookData.getAmount()
+        );
+    }
 
+    @Override
+    @Transactional
+    public boolean kichHoatDonHang(Long orderCode, String maGiaoDich, Long soTien) {
+        if (orderCode == null) {
+            log.warn("Không thể kích hoạt đơn hàng với orderCode null");
+            return false;
+        }
+
+        DonHang donHang = donHangRepository.findByOrderCodePayos(orderCode).orElse(null);
         if (donHang == null) {
-            log.warn("Không tìm thấy đơn hàng với payOS orderCode: {} (có thể là Webhook test từ payOS Dashboard).", orderCode);
+            log.warn("Không tìm thấy đơn hàng với payOS orderCode: {}", orderCode);
             return false;
         }
 
@@ -170,8 +179,10 @@ public class PayOsServiceImpl implements PayOsService {
         // Cập nhật trạng thái đơn hàng
         donHang.setTrangThaiThanhToan(TrangThaiThanhToan.DA_THANH_TOAN);
         donHang.setNgayThanhToan(LocalDateTime.now());
-        if (webhookData.getReference() != null && !webhookData.getReference().isBlank()) {
-            donHang.setMaGiaoDichPayos(webhookData.getReference());
+        if (maGiaoDich != null && !maGiaoDich.isBlank()) {
+            donHang.setMaGiaoDichPayos(maGiaoDich);
+        } else if (donHang.getMaGiaoDichPayos() == null) {
+            donHang.setMaGiaoDichPayos(String.valueOf(orderCode));
         }
         donHangRepository.save(donHang);
 

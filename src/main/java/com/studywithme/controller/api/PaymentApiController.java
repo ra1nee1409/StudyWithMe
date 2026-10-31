@@ -155,20 +155,8 @@ public class PaymentApiController {
         DonHang donHang = donHangRepository.findByOrderCodePayos(orderCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng với mã orderCode: " + orderCode));
 
-        WebhookData mockData = WebhookData.builder()
-                .orderCode(orderCode)
-                .amount(donHang.getTongTienThanhToan() != null ? donHang.getTongTienThanhToan().longValue() : 0L)
-                .description("Demo kich hoat don #" + donHang.getId())
-                .accountNumber("DEMO_BANK_ACCOUNT")
-                .reference("DEMO_TXN_" + System.currentTimeMillis())
-                .transactionDateTime("2026-10-31 08:30:00")
-                .currency("VND")
-                .paymentLinkId("DEMO_LINK_" + orderCode)
-                .code("00")
-                .desc("Thanh cong")
-                .build();
-
-        boolean ok = payOsService.xuLyDonHangThanhCong(mockData);
+        long amountVal = donHang.getTongTienThanhToan() != null ? donHang.getTongTienThanhToan().longValue() : 0L;
+        payOsService.kichHoatDonHang(orderCode, "DEMO_TXN_" + System.currentTimeMillis(), amountVal);
         PaymentResultDto result = paymentService.xuLyPayOsCallback(orderCode);
 
         return ResponseEntity.ok(ApiResponse.success("Mô phỏng thanh toán VietQR payOS thành công.", result));

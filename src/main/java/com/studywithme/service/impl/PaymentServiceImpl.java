@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.payos.model.v2.paymentRequests.PaymentLink;
-import vn.payos.model.webhooks.WebhookData;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -94,12 +93,7 @@ public class PaymentServiceImpl implements PaymentService {
             donHang.setOrderCodePayos(freeOrderCode);
             donHangRepository.save(donHang);
 
-            WebhookData freeData = WebhookData.builder()
-                    .orderCode(freeOrderCode)
-                    .accountNumber("FREE_COURSE")
-                    .reference("FREE_" + freeOrderCode)
-                    .build();
-            payOsService.xuLyDonHangThanhCong(freeData);
+            payOsService.kichHoatDonHang(freeOrderCode, "FREE_" + freeOrderCode, 0L);
 
             Map<String, String> response = new HashMap<>();
             response.put("maDonHang", maDonHang);
@@ -169,12 +163,8 @@ public class PaymentServiceImpl implements PaymentService {
             String statusName = linkInfo.getStatus().name();
 
             if ("PAID".equalsIgnoreCase(statusName)) {
-                WebhookData dummyData = WebhookData.builder()
-                        .orderCode(orderCode)
-                        .accountNumber("123456789")
-                        .reference(String.valueOf(orderCode))
-                        .build();
-                payOsService.xuLyDonHangThanhCong(dummyData);
+                long amountVal = donHang.getTongTienThanhToan() != null ? donHang.getTongTienThanhToan().longValue() : 0L;
+                payOsService.kichHoatDonHang(orderCode, String.valueOf(orderCode), amountVal);
 
                 return PaymentResultDto.builder()
                         .thanhCong(true)

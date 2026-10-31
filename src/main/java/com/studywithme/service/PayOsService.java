@@ -22,11 +22,20 @@ public interface PayOsService {
     WebhookData xacThucWebhook(Object webhookBody);
 
     /**
-     * Xử lý cộng tiền ví giảng viên, ghi danh khóa học và cập nhật đơn hàng sang DA_THANH_TOAN.
+     * Xử lý cộng tiền ví giảng viên, ghi danh khóa học và cập nhật đơn hàng sang DA_THANH_TOAN từ WebhookData.
      * @param webhookData Dữ liệu giao dịch từ payOS
      * @return true nếu xử lý thành công
      */
     boolean xuLyDonHangThanhCong(WebhookData webhookData);
+
+    /**
+     * Kích hoạt đơn hàng, ghi danh khóa học và cộng 80% ví giảng viên trực tiếp theo orderCode.
+     * @param orderCode Mã đơn hàng payOS
+     * @param maGiaoDich Mã tham chiếu giao dịch
+     * @param soTien Số tiền giao dịch
+     * @return true nếu kích hoạt thành công
+     */
+    boolean kichHoatDonHang(Long orderCode, String maGiaoDich, Long soTien);
 
     /**
      * Tra cứu thông tin trạng thái thanh toán từ payOS qua mã orderCode.

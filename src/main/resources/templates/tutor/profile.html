@@ -34,57 +34,103 @@
         </div>
       </section>
 
+      <!-- Flash Notification Message -->
+      <div th:if="${message}" class="p-4 rounded-xl bg-status-success/10 border border-status-success/30 text-status-success flex items-center gap-3 shadow-sm">
+        <span class="material-symbols-outlined text-[22px]">check_circle</span>
+        <span class="text-sm font-semibold" th:text="${message}"></span>
+      </div>
+
+      <div th:if="${errorMessage}" class="p-4 rounded-xl bg-error-container/20 border border-error/40 text-error flex items-center gap-3 shadow-sm">
+        <span class="material-symbols-outlined text-[22px]">error</span>
+        <span class="text-sm font-semibold" th:text="${errorMessage}"></span>
+      </div>
+
+      <div th:if="${passwordSuccessMessage}" class="p-4 rounded-xl bg-status-success/10 border border-status-success/30 text-status-success flex items-center gap-3 shadow-sm">
+        <span class="material-symbols-outlined text-[22px]">lock_reset</span>
+        <span class="text-sm font-semibold" th:text="${passwordSuccessMessage}"></span>
+      </div>
+
+      <div th:if="${passwordErrorMessage}" class="p-4 rounded-xl bg-error-container/20 border border-error/40 text-error flex items-center gap-3 shadow-sm">
+        <span class="material-symbols-outlined text-[22px]">warning</span>
+        <span class="text-sm font-semibold" th:text="${passwordErrorMessage}"></span>
+      </div>
+
       <!-- Profile Form & Credentials -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Cột 1: Thông tin cá nhân & Giới thiệu -->
         <div class="lg:col-span-2 bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 space-y-6">
           <h2 class="text-base font-bold text-on-surface pb-3 border-b border-surface-container/40">Thông Tin Giảng Viên</h2>
           
-          <form onsubmit="event.preventDefault(); alert('Đã cập nhật hồ sơ thành công!');" class="space-y-4 text-xs">
+          <form th:action="@{/tutor/profile/cap-nhat}" method="post" class="space-y-4 text-xs">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block font-bold text-on-surface mb-1">Họ và tên</label>
-                <input type="text" th:value="${tutorName}" placeholder="Nhập họ và tên giảng viên" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container font-semibold">
+                <label class="block font-bold text-on-surface mb-1">Họ và tên giảng viên <span class="text-error">*</span></label>
+                <input type="text" name="hoTen" required th:value="${currentUser != null ? currentUser.hoTen : tutorName}" placeholder="Nhập họ và tên giảng viên" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container font-semibold">
               </div>
               <div>
-                <label class="block font-bold text-on-surface mb-1">Học vị / Chuyên môn</label>
-                <input type="text" th:value="${hoSoGiangVien != null ? hoSoGiangVien.tieuDeChuyenMon : ''}" placeholder="Nhập học vị / chuyên môn (ví dụ: Thạc sĩ Sư phạm Toán)" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+                <label class="block font-bold text-on-surface mb-1">Email đăng nhập (Không thể thay đổi)</label>
+                <input type="email" th:value="${currentUser != null ? currentUser.email : ''}" readonly disabled class="w-full px-3 py-2 rounded-lg bg-surface-container-low/60 border border-surface-container text-on-surface-variant cursor-not-allowed">
               </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block font-bold text-on-surface mb-1">Môn giảng dạy chính</label>
-                <input type="text" placeholder="Ví dụ: Toán học (Lớp 10, 11, 12, Luyện thi ĐH)" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+                <label class="block font-bold text-on-surface mb-1">Số điện thoại liên hệ</label>
+                <input type="tel" name="soDienThoai" th:value="${currentUser != null ? currentUser.soDienThoai : ''}" placeholder="Nhập số điện thoại liên hệ" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
               </div>
               <div>
-                <label class="block font-bold text-on-surface mb-1">Mức học phí đề xuất (đ/giờ)</label>
-                <input type="text" placeholder="Ví dụ: 250.000 đ/giờ" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+                <label class="block font-bold text-on-surface mb-1">Học vị / Tiêu đề chuyên môn</label>
+                <input type="text" name="tieuDeChuyenMon" th:value="${hoSoGiangVien != null ? hoSoGiangVien.tieuDeChuyenMon : ''}" placeholder="Ví dụ: Thạc sĩ Sư phạm Toán - 7 năm KN" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
               </div>
             </div>
 
             <div>
-              <label class="block font-bold text-on-surface mb-1">Kinh nghiệm giảng dạy</label>
-              <input type="text" placeholder="Ví dụ: 5 năm luyện thi học sinh giỏi & THPT Quốc gia" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+              <label class="block font-bold text-on-surface mb-1">Đường dẫn ảnh đại diện (Avatar URL)</label>
+              <input type="url" name="anhDaiDien" th:value="${currentUser != null ? currentUser.anhDaiDien : ''}" placeholder="https://example.com/avatar.jpg" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
             </div>
 
             <div>
               <label class="block font-bold text-on-surface mb-1">Giới thiệu bản thân & Phương pháp giảng dạy</label>
-              <textarea rows="4" th:text="${hoSoGiangVien != null ? hoSoGiangVien.gioiThieuBanThan : ''}" placeholder="Mô tả quá trình học tập, phương pháp giảng dạy và thế mạnh của bạn..." class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container leading-relaxed"></textarea>
+              <textarea rows="4" name="gioiThieuBanThan" th:text="${hoSoGiangVien != null ? hoSoGiangVien.gioiThieuBanThan : ''}" placeholder="Mô tả quá trình học tập, phương pháp giảng dạy và thế mạnh của bạn..." class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container leading-relaxed"></textarea>
             </div>
 
             <div class="pt-3 border-t border-surface-container/40 flex items-center justify-end">
-              <button type="submit" class="px-5 py-2.5 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-sm transition-all">
+              <button type="submit" class="px-5 py-2.5 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-sm transition-all cursor-pointer">
                 Lưu Thay Đổi
               </button>
             </div>
           </form>
         </div>
 
-        <!-- Cột 2: Bằng cấp & Chứng chỉ -->
-        <div class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 space-y-5">
-          <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
-            <h2 class="text-base font-bold text-on-surface">Chứng Chỉ Đã Nộp</h2>
+        <!-- Cột 2: Đổi mật khẩu & Chứng chỉ -->
+        <div class="space-y-6">
+          <!-- Form Đổi mật khẩu -->
+          <div class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 space-y-4">
+            <h2 class="text-base font-bold text-on-surface pb-3 border-b border-surface-container/40">Bảo Mật Tài Khoản</h2>
+            <form th:action="@{/tutor/profile/doi-mat-khau}" method="post" class="space-y-3 text-xs">
+              <div>
+                <label class="block font-bold text-on-surface mb-1">Mật khẩu hiện tại</label>
+                <input type="password" name="matKhauHienTai" required class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+              </div>
+              <div>
+                <label class="block font-bold text-on-surface mb-1">Mật khẩu mới (tối thiểu 6 ký tự)</label>
+                <input type="password" name="matKhauMoi" required minlength="6" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+              </div>
+              <div>
+                <label class="block font-bold text-on-surface mb-1">Nhập lại mật khẩu mới</label>
+                <input type="password" name="xacNhanMatKhau" required minlength="6" class="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+              </div>
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-surface-container text-on-surface font-bold hover:bg-surface-container-high transition-all mt-2 cursor-pointer">
+                Đổi Mật Khẩu
+              </button>
+            </form>
+          </div>
+
+          <!-- Bằng cấp & Chứng chỉ -->
+          <div class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
+              <h2 class="text-base font-bold text-on-surface">Chứng Chỉ Đã Nộp</h2>
+            </div>
             <button type="button" onclick="alert('Tính năng tải lên bổ sung chứng chỉ đang được cập nhật!')" class="text-xs font-bold text-tertiary-container hover:underline flex items-center gap-1 cursor-pointer">
               <span class="material-symbols-outlined text-[16px]">upload_file</span>
               <span>Tải lên</span>

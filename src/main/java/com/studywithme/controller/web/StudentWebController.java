@@ -1,6 +1,8 @@
 package com.studywithme.controller.web;
 
 import com.studywithme.dto.response.PhongHocDto;
+import com.studywithme.dto.user.CapNhatHoSoRequest;
+import com.studywithme.dto.user.DoiMatKhauRequest;
 import com.studywithme.entity.DangKyLopHoc;
 import com.studywithme.entity.DanhSachYeuThich;
 import com.studywithme.entity.DonHang;
@@ -11,6 +13,7 @@ import com.studywithme.repository.DanhSachYeuThichRepository;
 import com.studywithme.repository.DonHangRepository;
 import com.studywithme.repository.GhiDanhKhoaHocRepository;
 import com.studywithme.repository.NguoiDungRepository;
+import com.studywithme.service.ProfileService;
 import com.studywithme.service.StudentLearningService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,8 +22,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -38,19 +43,22 @@ public class StudentWebController {
     private final GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository;
     private final DanhSachYeuThichRepository danhSachYeuThichRepository;
     private final StudentLearningService studentLearningService;
+    private final ProfileService profileService;
 
     public StudentWebController(NguoiDungRepository nguoiDungRepository,
                                 DangKyLopHocRepository dangKyLopHocRepository,
                                 DonHangRepository donHangRepository,
                                 GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository,
                                 DanhSachYeuThichRepository danhSachYeuThichRepository,
-                                StudentLearningService studentLearningService) {
+                                StudentLearningService studentLearningService,
+                                ProfileService profileService) {
         this.nguoiDungRepository = nguoiDungRepository;
         this.dangKyLopHocRepository = dangKyLopHocRepository;
         this.donHangRepository = donHangRepository;
         this.ghiDanhKhoaHocRepository = ghiDanhKhoaHocRepository;
         this.danhSachYeuThichRepository = danhSachYeuThichRepository;
         this.studentLearningService = studentLearningService;
+        this.profileService = profileService;
     }
 
     private Optional<NguoiDung> getUserByPrincipal(Principal principal) {
@@ -176,6 +184,30 @@ public class StudentWebController {
     @GetMapping({"/ho-so", "/profile"})
     public String profile(Model model, Principal principal) {
         return "student/profile";
+    }
+
+    @PostMapping({"/ho-so/cap-nhat", "/profile/cap-nhat"})
+    public String capNhatHoSo(CapNhatHoSoRequest request, Principal principal, RedirectAttributes redirectAttributes) {
+        if (principal == null) return "redirect:/login";
+        try {
+            profileService.capNhatThongTin(principal.getName(), request);
+            redirectAttributes.addFlashAttribute("message", "Cập nhật thông tin học viên thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể cập nhật hồ sơ: " + e.getMessage());
+        }
+        return "redirect:/student/profile";
+    }
+
+    @PostMapping({"/ho-so/doi-mat-khau", "/profile/doi-mat-khau"})
+    public String doiMatKhau(DoiMatKhauRequest request, Principal principal, RedirectAttributes redirectAttributes) {
+        if (principal == null) return "redirect:/login";
+        try {
+            profileService.doiMatKhau(principal.getName(), request);
+            redirectAttributes.addFlashAttribute("passwordSuccessMessage", "Đổi mật khẩu thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("passwordErrorMessage", e.getMessage());
+        }
+        return "redirect:/student/profile";
     }
 
     /**

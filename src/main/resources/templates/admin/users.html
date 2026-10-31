@@ -21,6 +21,11 @@
         <span class="text-sm font-semibold" th:text="${message}"></span>
       </div>
 
+      <div th:if="${errorMessage}" class="p-4 rounded-xl bg-error-container/20 border border-error/40 text-error flex items-center gap-3 shadow-sm">
+        <span class="material-symbols-outlined text-[22px] text-error">error</span>
+        <span class="text-sm font-semibold" th:text="${errorMessage}"></span>
+      </div>
+
       <!-- Header Banner -->
       <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-xl shadow-sm border border-surface-container/40">
         <div class="flex flex-col gap-1">
@@ -166,28 +171,41 @@
                 <!-- Ngày tạo -->
                 <td class="py-3.5 px-4 text-on-surface-variant" th:text="${#temporals.format(user.ngayTao, 'dd/MM/yyyy HH:mm')}">17/10/2026</td>
 
-                <!-- Thao tác Khóa / Mở khóa -->
+                <!-- Thao tác Khóa / Mở khóa & Xóa vĩnh viễn -->
                 <td class="py-3.5 px-4 text-right">
                   <!-- Không cho phép khóa chính quản trị viên mặc định -->
                   <div th:if="${user.email == 'admin@studywithme.vn'}" class="text-[11px] text-outline font-medium italic">
                     Tài khoản gốc
                   </div>
                   
-                  <form th:unless="${user.email == 'admin@studywithme.vn'}" th:action="@{/admin/doi-trang-thai-nguoi-dung/{id}(id=${user.id})}" method="post"
-                        onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái tài khoản này?');">
-                    
-                    <button th:if="${user.trangThai.name() == 'HOAT_DONG'}" type="submit"
-                            class="px-3 py-1.5 rounded-lg border border-error/30 text-error hover:bg-error-container text-xs font-semibold transition-all inline-flex items-center gap-1 cursor-pointer">
-                      <span class="material-symbols-outlined text-[15px]">lock</span>
-                      Khóa TK
-                    </button>
+                  <div th:unless="${user.email == 'admin@studywithme.vn'}" class="flex items-center justify-end gap-1.5">
+                    <!-- Nút Khóa / Mở khóa -->
+                    <form th:action="@{/admin/doi-trang-thai-nguoi-dung/{id}(id=${user.id})}" method="post"
+                          onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái tài khoản này?');" class="inline">
+                      
+                      <button th:if="${user.trangThai.name() == 'HOAT_DONG'}" type="submit" title="Tạm khóa tài khoản"
+                              class="px-2.5 py-1.5 rounded-lg border border-amber-500/40 text-amber-700 dark:text-amber-400 hover:bg-amber-500/10 text-xs font-semibold transition-all inline-flex items-center gap-1 cursor-pointer">
+                        <span class="material-symbols-outlined text-[15px]">lock</span>
+                        <span>Khóa</span>
+                      </button>
 
-                    <button th:if="${user.trangThai.name() == 'TAM_KHOA'}" type="submit"
-                            class="px-3 py-1.5 rounded-lg bg-status-success/10 text-status-success hover:bg-status-success hover:text-white text-xs font-semibold transition-all inline-flex items-center gap-1 cursor-pointer">
-                      <span class="material-symbols-outlined text-[15px]">lock_open</span>
-                      Mở khóa
-                    </button>
-                  </form>
+                      <button th:if="${user.trangThai.name() == 'TAM_KHOA'}" type="submit" title="Mở khóa tài khoản"
+                              class="px-2.5 py-1.5 rounded-lg bg-status-success/10 text-status-success hover:bg-status-success hover:text-white text-xs font-semibold transition-all inline-flex items-center gap-1 cursor-pointer">
+                        <span class="material-symbols-outlined text-[15px]">lock_open</span>
+                        <span>Mở</span>
+                      </button>
+                    </form>
+
+                    <!-- Nút Xóa hẳn trong CSDL (Hard Delete) -->
+                    <form th:action="@{/admin/xoa-nguoi-dung/{id}(id=${user.id})}" method="post"
+                          onsubmit="return confirm('CẢNH BÁO NGUY HIỂM: Tài khoản này và toàn bộ dữ liệu liên quan sẽ bị XÓA HẲN khỏi cơ sở dữ liệu và không thể khôi phục! Bạn có chắc chắn muốn xóa?');" class="inline">
+                      <button type="submit" title="Xóa vĩnh viễn khỏi CSDL"
+                              class="px-2.5 py-1.5 rounded-lg bg-error-container/40 text-error hover:bg-error hover:text-white text-xs font-semibold transition-all inline-flex items-center gap-1 cursor-pointer">
+                        <span class="material-symbols-outlined text-[15px]">delete_forever</span>
+                        <span>Xóa DB</span>
+                      </button>
+                    </form>
+                  </div>
                 </td>
 
               </tr>

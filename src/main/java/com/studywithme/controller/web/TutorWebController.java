@@ -1,5 +1,7 @@
 package com.studywithme.controller.web;
 
+import com.studywithme.dto.user.CapNhatHoSoRequest;
+import com.studywithme.dto.user.DoiMatKhauRequest;
 import com.studywithme.entity.ChungChiGiangVien;
 import com.studywithme.entity.DangKyLopHoc;
 import com.studywithme.entity.HoSoGiangVien;
@@ -12,12 +14,15 @@ import com.studywithme.repository.HoSoGiangVienRepository;
 import com.studywithme.repository.LichSuViTienRepository;
 import com.studywithme.repository.LopHocTrucTuyenRepository;
 import com.studywithme.repository.NguoiDungRepository;
+import com.studywithme.service.ProfileService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.security.Principal;
@@ -38,19 +43,22 @@ public class TutorWebController {
     private final DangKyLopHocRepository dangKyLopHocRepository;
     private final LichSuViTienRepository lichSuViTienRepository;
     private final ChungChiGiangVienRepository chungChiGiangVienRepository;
+    private final ProfileService profileService;
 
     public TutorWebController(NguoiDungRepository nguoiDungRepository,
                               HoSoGiangVienRepository hoSoGiangVienRepository,
                               LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
                               DangKyLopHocRepository dangKyLopHocRepository,
                               LichSuViTienRepository lichSuViTienRepository,
-                              ChungChiGiangVienRepository chungChiGiangVienRepository) {
+                              ChungChiGiangVienRepository chungChiGiangVienRepository,
+                              ProfileService profileService) {
         this.nguoiDungRepository = nguoiDungRepository;
         this.hoSoGiangVienRepository = hoSoGiangVienRepository;
         this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
         this.dangKyLopHocRepository = dangKyLopHocRepository;
         this.lichSuViTienRepository = lichSuViTienRepository;
         this.chungChiGiangVienRepository = chungChiGiangVienRepository;
+        this.profileService = profileService;
     }
 
     private Optional<HoSoGiangVien> getHoSoByPrincipal(Principal principal) {
@@ -86,6 +94,7 @@ public class TutorWebController {
 
         NumberFormat vnFormat = NumberFormat.getInstance(Locale.of("vi", "VN"));
         model.addAttribute("tutorName", tutorName);
+        model.addAttribute("currentUser", principal != null ? nguoiDungRepository.findByEmail(principal.getName()).orElse(null) : null);
         model.addAttribute("tongLopHoc", tongLopHoc);
         model.addAttribute("tongHocVien", tongHocVien);
         model.addAttribute("soDuViFormat", vnFormat.format(soDuVi));
@@ -169,5 +178,29 @@ public class TutorWebController {
         }
         model.addAttribute("danhSachChungChi", danhSachChungChi);
         return "tutor/profile";
+    }
+
+    @PostMapping({"/ho-so/cap-nhat", "/profile/cap-nhat"})
+    public String capNhatHoSo(CapNhatHoSoRequest request, Principal principal, RedirectAttributes redirectAttributes) {
+        if (principal == null) return "redirect:/login";
+        try {
+            profileService.capNhatThongTin(principal.getName(), request);
+            redirectAttributes.addFlashAttribute("message", "Cập nhật hồ sơ giảng viên thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể cập nhật hồ sơ: " + e.getMessage());
+        }
+        return "redirect:/tutor/profile";
+    }
+
+    @PostMapping({"/ho-so/doi-mat-khau", "/profile/doi-mat-khau"})
+    public String doiMatKhau(DoiMatKhauRequest request, Principal principal, RedirectAttributes redirectAttributes) {
+        if (principal == null) return "redirect:/login";
+        try {
+            profileService.doiMatKhau(principal.getName(), request);
+            redirectAttributes.addFlashAttribute("passwordSuccessMessage", "Đổi mật khẩu thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("passwordErrorMessage", e.getMessage());
+        }
+        return "redirect:/tutor/profile";
     }
 }

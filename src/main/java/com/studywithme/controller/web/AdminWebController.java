@@ -1,6 +1,8 @@
 package com.studywithme.controller.web;
 
 import com.studywithme.dto.response.ThongKeTongQuanResponse;
+import com.studywithme.dto.user.CapNhatHoSoRequest;
+import com.studywithme.dto.user.DoiMatKhauRequest;
 import com.studywithme.entity.HoSoGiangVien;
 import com.studywithme.entity.NguoiDung;
 import com.studywithme.entity.enums.admin.TrangThaiGiangVien;
@@ -15,11 +17,13 @@ import com.studywithme.entity.enums.admin.TrangThaiRutTien;
 import com.studywithme.repository.KhoaHocRepository;
 import com.studywithme.repository.YeuCauRutTienRepository;
 import com.studywithme.service.AdminKhoaHocService;
+import com.studywithme.service.AdminNguoiDungService;
 import com.studywithme.service.AdminTaiChinhService;
 import com.studywithme.service.AdminThongKeService;
 import com.studywithme.service.BannerService;
 import com.studywithme.service.DanhMucService;
 import com.studywithme.service.GiangVienKycService;
+import com.studywithme.service.ProfileService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -51,6 +55,8 @@ public class AdminWebController {
     private final GiangVienKycService giangVienKycService;
     private final AdminKhoaHocService adminKhoaHocService;
     private final AdminTaiChinhService adminTaiChinhService;
+    private final AdminNguoiDungService adminNguoiDungService;
+    private final ProfileService profileService;
     private final YeuCauRutTienRepository yeuCauRutTienRepository;
 
     public AdminWebController(NguoiDungRepository nguoiDungRepository,
@@ -65,6 +71,8 @@ public class AdminWebController {
                               GiangVienKycService giangVienKycService,
                               AdminKhoaHocService adminKhoaHocService,
                               AdminTaiChinhService adminTaiChinhService,
+                              AdminNguoiDungService adminNguoiDungService,
+                              ProfileService profileService,
                               YeuCauRutTienRepository yeuCauRutTienRepository) {
         this.nguoiDungRepository = nguoiDungRepository;
         this.hoSoGiangVienRepository = hoSoGiangVienRepository;
@@ -78,12 +86,15 @@ public class AdminWebController {
         this.giangVienKycService = giangVienKycService;
         this.adminKhoaHocService = adminKhoaHocService;
         this.adminTaiChinhService = adminTaiChinhService;
+        this.adminNguoiDungService = adminNguoiDungService;
+        this.profileService = profileService;
         this.yeuCauRutTienRepository = yeuCauRutTienRepository;
     }
 
     @ModelAttribute
     public void loadAdminCommonData(Model model, Principal principal) {
         model.addAttribute("adminName", principal != null ? principal.getName() : "Quản Trị Viên");
+        model.addAttribute("currentUser", principal != null ? nguoiDungRepository.findByEmail(principal.getName()).orElse(null) : null);
         model.addAttribute("tongNguoiDung", nguoiDungRepository.count());
         model.addAttribute("tongGiaSu", hoSoGiangVienRepository.countByTrangThaiDuyet(TrangThaiGiangVien.DA_DUYET));
         model.addAttribute("hoSoChoDuyet", hoSoGiangVienRepository.countByTrangThaiDuyet(TrangThaiGiangVien.CHO_DUYET));
@@ -162,7 +173,7 @@ public class AdminWebController {
     // ==========================================
     @GetMapping("/nguoi-dung")
     public String nguoiDungPage(Model model) {
-        List<NguoiDung> allUsers = nguoiDungRepository.findAllByOrderByNgayTaoDesc();
+        List<NguoiDung> allUsers = adminNguoiDungService.layTatCaNguoiDung();
         long activeCount = allUsers.stream().filter(u -> u.getTrangThai() == TrangThaiNguoiDung.HOAT_DONG).count();
         long lockedCount = allUsers.size() - activeCount;
 
@@ -174,15 +185,24 @@ public class AdminWebController {
 
     @PostMapping("/doi-trang-thai-nguoi-dung/{id}")
     public String doiTrangThaiNguoiDungAction(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        nguoiDungRepository.findById(id).ifPresent(nd -> {
-            if (nd.getTrangThai() == TrangThaiNguoiDung.HOAT_DONG) {
-                nd.setTrangThai(TrangThaiNguoiDung.TAM_KHOA);
-            } else {
-                nd.setTrangThai(TrangThaiNguoiDung.HOAT_DONG);
-            }
-            nguoiDungRepository.save(nd);
-        });
-        redirectAttributes.addFlashAttribute("message", "Đã cập nhật trạng thái người dùng thành công!");
+        try {
+            adminNguoiDungService.doiTrangThaiNguoiDung(id);
+            redirectAttributes.addFlashAttribute("message", "Đã cập nhật trạng thái người dùng thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/admin/nguoi-dung";
+    }
+
+    @PostMapping("/xoa-nguoi-dung/{id}")
+    public String xoaNguoiDungAction(@PathVariable Long id, Principal principal, RedirectAttributes redirectAttributes) {
+        try {
+            String currentAdminEmail = principal != null ? principal.getName() : null;
+            adminNguoiDungService.xoaNguoiDungVinhVien(id, currentAdminEmail);
+            redirectAttributes.addFlashAttribute("message", "Đã xóa vĩnh viễn tài khoản người dùng và toàn bộ dữ liệu liên quan khỏi cơ sở dữ liệu!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể xóa tài khoản: " + e.getMessage());
+        }
         return "redirect:/admin/nguoi-dung";
     }
 
@@ -269,6 +289,39 @@ public class AdminWebController {
         model.addAttribute("keyword", keyword != null ? keyword : "");
         model.addAttribute("activeTab", "transactions");
         return "admin/transactions";
+    }
+
+    // ==========================================
+    // 10. HỒ SƠ QUẢN TRỊ VIÊN & ĐỔI MẬT KHẨU
+    // ==========================================
+    @GetMapping({"/profile", "/ho-so"})
+    public String adminProfilePage(Model model, Principal principal) {
+        model.addAttribute("activeTab", "profile");
+        return "admin/profile";
+    }
+
+    @PostMapping({"/profile/cap-nhat", "/ho-so/cap-nhat"})
+    public String capNhatHoSoAdmin(CapNhatHoSoRequest request, Principal principal, RedirectAttributes redirectAttributes) {
+        if (principal == null) return "redirect:/login";
+        try {
+            profileService.capNhatThongTin(principal.getName(), request);
+            redirectAttributes.addFlashAttribute("message", "Cập nhật thông tin quản trị viên thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể cập nhật hồ sơ: " + e.getMessage());
+        }
+        return "redirect:/admin/profile";
+    }
+
+    @PostMapping({"/profile/doi-mat-khau", "/ho-so/doi-mat-khau"})
+    public String doiMatKhauAdmin(DoiMatKhauRequest request, Principal principal, RedirectAttributes redirectAttributes) {
+        if (principal == null) return "redirect:/login";
+        try {
+            profileService.doiMatKhau(principal.getName(), request);
+            redirectAttributes.addFlashAttribute("passwordSuccessMessage", "Đổi mật khẩu quản trị viên thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("passwordErrorMessage", e.getMessage());
+        }
+        return "redirect:/admin/profile";
     }
 }
 

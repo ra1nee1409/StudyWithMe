@@ -32,4 +32,14 @@ public interface PayOsService {
      * Tra cứu thông tin trạng thái thanh toán từ payOS qua mã orderCode.
      */
     PaymentLink layThongTinThanhToan(Long orderCode);
+
+    /**
+     * Hủy liên kết thanh toán trên payOS khi đơn hàng bị hủy hoặc quá hạn.
+     */
+    PaymentLink huyLinkThanhToan(Long orderCode, String lyDoHuy);
+
+    /**
+     * Tự động đăng ký Webhook URL với payOS qua SDK.
+     */
+    String dangKyWebhook(String webhookUrl);
 }

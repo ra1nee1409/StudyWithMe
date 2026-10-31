@@ -245,5 +245,35 @@ class PaymentPayOsIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false));
     }
+
+    @Test
+    @Transactional
+    @DisplayName("Endpoint mô phỏng Demo: Kích hoạt đơn hàng qua API /demo/kich-hoat/{orderCode}")
+    void testDemoPaymentSimulation() throws Exception {
+        NguoiDung hocVien = nguoiDungRepository.save(NguoiDung.builder()
+                .email("demo_student_" + UUID.randomUUID() + "@studywithme.vn")
+                .matKhau(passwordEncoder.encode("Demo@123"))
+                .hoTen("Học viên Demo")
+                .trangThai(TrangThaiNguoiDung.HOAT_DONG)
+                .build());
+
+        long orderCode = System.currentTimeMillis();
+        DonHang donHang = donHangRepository.save(DonHang.builder()
+                .maDonHang("SWM-DEMO-" + orderCode)
+                .nguoiDung(hocVien)
+                .tongTienThanhToan(BigDecimal.valueOf(500000))
+                .phuongThucThanhToan(PhuongThucThanhToan.PAYOS)
+                .trangThaiThanhToan(TrangThaiThanhToan.CHO_THANH_TOAN)
+                .orderCodePayos(orderCode)
+                .build());
+
+        mockMvc.perform(post("/api/payment/demo/kich-hoat/" + orderCode))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.thanhCong").value(true))
+                .andExpect(jsonPath("$.duLieu.thanhCong").value(true));
+
+        DonHang updated = donHangRepository.findById(donHang.getId()).orElseThrow();
+        assertThat(updated.getTrangThaiThanhToan()).isEqualTo(TrangThaiThanhToan.DA_THANH_TOAN);
+    }
 }
 

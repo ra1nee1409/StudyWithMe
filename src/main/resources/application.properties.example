@@ -22,6 +22,9 @@ spring.data.mongodb.uri=mongodb://localhost:27017/studywithme_chat
 spring.servlet.multipart.max-file-size=100MB
 spring.servlet.multipart.max-request-size=100MB
 
+# Cấu hình Jackson JSON
+spring.jackson.deserialization.fail-on-unknown-properties=false
+
 # ==============================================================================
 # CẤU HÌNH CỔNG THANH TOÁN TỰ ĐỘNG VIETQR PAYOS
 # Đăng ký và lấy thông tin tại https://my.payos.vn

@@ -11,7 +11,6 @@ import com.studywithme.entity.NguoiDung;
 import com.studywithme.entity.enums.admin.LoaiGiaoDichVi;
 import com.studywithme.entity.enums.shared.LoaiSanPhamDonHang;
 import com.studywithme.entity.enums.shared.TrangThaiThanhToan;
-import com.studywithme.exception.ResourceNotFoundException;
 import com.studywithme.repository.ChiTietDonHangRepository;
 import com.studywithme.repository.DonHangRepository;
 import com.studywithme.repository.GhiDanhKhoaHocRepository;
@@ -28,6 +27,7 @@ import vn.payos.model.v2.paymentRequests.CreatePaymentLinkRequest;
 import vn.payos.model.v2.paymentRequests.CreatePaymentLinkResponse;
 import vn.payos.model.v2.paymentRequests.PaymentLink;
 import vn.payos.model.v2.paymentRequests.PaymentLinkItem;
+import vn.payos.model.webhooks.ConfirmWebhookResponse;
 import vn.payos.model.webhooks.WebhookData;
 
 import java.math.BigDecimal;
@@ -71,12 +71,12 @@ public class PayOsServiceImpl implements PayOsService {
     @Override
     @Transactional
     public String taoLinkThanhToan(DonHang donHang, String baseUrl) {
-        // Sinh orderCode dạng số nguyên dương duy nhất
-        long orderCode = System.currentTimeMillis();
+        // Sinh orderCode dạng số nguyên dương an toàn 10 chữ số cho chuẩn VietQR
+        long orderCode = Long.parseLong(String.valueOf(System.currentTimeMillis()).substring(3));
         donHang.setOrderCodePayos(orderCode);
         donHangRepository.save(donHang);
 
-        // Mô tả giao dịch tối đa 25 ký tự
+        // Mô tả giao dịch tối đa 25 ký tự không dấu chuẩn quy định ngân hàng
         String description = "SWM Don " + donHang.getId();
         if (description.length() > 25) {
             description = description.substring(0, 25);
@@ -97,7 +97,6 @@ public class PayOsServiceImpl implements PayOsService {
                     tenSp = kh.getTieuDe();
                 }
             }
-            // Giới hạn độ dài tên sản phẩm cho payOS
             if (tenSp.length() > 50) {
                 tenSp = tenSp.substring(0, 47) + "...";
             }
@@ -168,20 +167,10 @@ public class PayOsServiceImpl implements PayOsService {
             return true;
         }
 
-        // Kiểm tra số tiền chuyển khoản nếu có
-        if (webhookData.getAmount() != null && donHang.getTongTienThanhToan() != null) {
-            long expectedAmount = donHang.getTongTienThanhToan().longValue();
-            long actualAmount = webhookData.getAmount();
-            if (actualAmount < expectedAmount) {
-                log.warn("Cảnh báo: Số tiền thực nhận ({}) nhỏ hơn tổng tiền đơn hàng ({}) cho đơn #{}",
-                        actualAmount, expectedAmount, donHang.getMaDonHang());
-            }
-        }
-
         // Cập nhật trạng thái đơn hàng
         donHang.setTrangThaiThanhToan(TrangThaiThanhToan.DA_THANH_TOAN);
         donHang.setNgayThanhToan(LocalDateTime.now());
-        if (webhookData.getReference() != null) {
+        if (webhookData.getReference() != null && !webhookData.getReference().isBlank()) {
             donHang.setMaGiaoDichPayos(webhookData.getReference());
         }
         donHangRepository.save(donHang);
@@ -248,6 +237,29 @@ public class PayOsServiceImpl implements PayOsService {
         } catch (Exception e) {
             log.error("Lỗi lấy thông tin payment link từ payOS: {}", e.getMessage());
             return null;
+        }
+    }
+
+    @Override
+    public PaymentLink huyLinkThanhToan(Long orderCode, String lyDoHuy) {
+        if (orderCode == null) return null;
+        try {
+            return payOS.paymentRequests().cancel(orderCode, lyDoHuy != null ? lyDoHuy : "Hủy giao dịch theo yêu cầu");
+        } catch (Exception e) {
+            log.error("Lỗi khi hủy payment link trên payOS: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public String dangKyWebhook(String webhookUrl) {
+        try {
+            log.info("Đăng ký Webhook URL với payOS: {}", webhookUrl);
+            ConfirmWebhookResponse response = payOS.webhooks().confirm(webhookUrl);
+            return response != null ? response.getWebhookUrl() : webhookUrl;
+        } catch (Exception e) {
+            log.error("Lỗi khi đăng ký webhook URL với payOS: {}", e.getMessage());
+            throw new RuntimeException("Không thể xác nhận webhook URL với payOS: " + e.getMessage(), e);
         }
     }
 }

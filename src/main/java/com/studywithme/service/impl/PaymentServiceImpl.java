@@ -88,6 +88,27 @@ public class PaymentServiceImpl implements PaymentService {
             donHang.getDanhSachChiTiet().add(chiTiet);
         }
 
+        // Trường hợp đặc biệt: Khóa học miễn phí (0 đ) - kích hoạt ngay không qua payOS
+        if (tongTien.compareTo(BigDecimal.ZERO) <= 0) {
+            long freeOrderCode = Long.parseLong(String.valueOf(System.currentTimeMillis()).substring(3));
+            donHang.setOrderCodePayos(freeOrderCode);
+            donHangRepository.save(donHang);
+
+            WebhookData freeData = WebhookData.builder()
+                    .orderCode(freeOrderCode)
+                    .accountNumber("FREE_COURSE")
+                    .reference("FREE_" + freeOrderCode)
+                    .build();
+            payOsService.xuLyDonHangThanhCong(freeData);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("maDonHang", maDonHang);
+            response.put("paymentUrl", (baseUrl != null ? baseUrl : "") + "/payment/payos-callback?orderCode=" + freeOrderCode);
+            response.put("tongTien", "0");
+            response.put("orderCode", String.valueOf(freeOrderCode));
+            return response;
+        }
+
         String paymentUrl = payOsService.taoLinkThanhToan(donHang, baseUrl);
 
         Map<String, String> response = new HashMap<>();
@@ -128,7 +149,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
 
-        // Nếu đã thanh toán qua Webhook trước đó
+        // 1. Nếu đã được thanh toán qua Webhook trước đó
         if (donHang.getTrangThaiThanhToan() == TrangThaiThanhToan.DA_THANH_TOAN) {
             return PaymentResultDto.builder()
                     .thanhCong(true)
@@ -136,34 +157,52 @@ public class PaymentServiceImpl implements PaymentService {
                     .maGiaoDich(donHang.getMaGiaoDichPayos() != null ? donHang.getMaGiaoDichPayos() : String.valueOf(orderCode))
                     .soTien(donHang.getTongTienThanhToan())
                     .nganHang("VietQR / payOS")
-                    .thoiGianThanhToan(donHang.getNgayThanhToan())
+                    .thoiGianThanhToan(donHang.getNgayThanhToan() != null ? donHang.getNgayThanhToan() : LocalDateTime.now())
                     .danhSachKhoaHoc(tenKhoaHocs)
                     .thongDiep("Thanh toán đơn hàng qua VietQR payOS thành công.")
                     .build();
         }
 
-        // Nếu chưa, kiểm tra trực tiếp trạng thái từ payOS
+        // 2. Nếu chưa, tra cứu trực tiếp trạng thái đơn hàng từ payOS Server
         PaymentLink linkInfo = payOsService.layThongTinThanhToan(orderCode);
-        if (linkInfo != null && "PAID".equalsIgnoreCase(linkInfo.getStatus() != null ? linkInfo.getStatus().name() : "")) {
-            WebhookData dummyData = WebhookData.builder()
-                    .orderCode(orderCode)
-                    .accountNumber("123456789")
-                    .reference(String.valueOf(orderCode))
-                    .build();
-            payOsService.xuLyDonHangThanhCong(dummyData);
+        if (linkInfo != null && linkInfo.getStatus() != null) {
+            String statusName = linkInfo.getStatus().name();
 
-            return PaymentResultDto.builder()
-                    .thanhCong(true)
-                    .maDonHang(donHang.getMaDonHang())
-                    .maGiaoDich(String.valueOf(orderCode))
-                    .soTien(donHang.getTongTienThanhToan())
-                    .nganHang("VietQR / payOS")
-                    .thoiGianThanhToan(LocalDateTime.now())
-                    .danhSachKhoaHoc(tenKhoaHocs)
-                    .thongDiep("Thanh toán đơn hàng qua VietQR payOS thành công.")
-                    .build();
+            if ("PAID".equalsIgnoreCase(statusName)) {
+                WebhookData dummyData = WebhookData.builder()
+                        .orderCode(orderCode)
+                        .accountNumber("123456789")
+                        .reference(String.valueOf(orderCode))
+                        .build();
+                payOsService.xuLyDonHangThanhCong(dummyData);
+
+                return PaymentResultDto.builder()
+                        .thanhCong(true)
+                        .maDonHang(donHang.getMaDonHang())
+                        .maGiaoDich(String.valueOf(orderCode))
+                        .soTien(donHang.getTongTienThanhToan())
+                        .nganHang("VietQR / payOS")
+                        .thoiGianThanhToan(LocalDateTime.now())
+                        .danhSachKhoaHoc(tenKhoaHocs)
+                        .thongDiep("Thanh toán đơn hàng qua VietQR payOS thành công.")
+                        .build();
+            }
+
+            if ("CANCELLED".equalsIgnoreCase(statusName)) {
+                donHang.setTrangThaiThanhToan(TrangThaiThanhToan.DA_HUY);
+                donHangRepository.save(donHang);
+
+                return PaymentResultDto.builder()
+                        .thanhCong(false)
+                        .maDonHang(donHang.getMaDonHang())
+                        .maLoi("CANCELLED")
+                        .thongDiep("Giao dịch đã được hủy trên cổng thanh toán VietQR payOS.")
+                        .soTien(donHang.getTongTienThanhToan())
+                        .build();
+            }
         }
 
+        // 3. Đang chờ chuyển khoản hoặc chưa nhận được tiền
         return PaymentResultDto.builder()
                 .thanhCong(false)
                 .maDonHang(donHang.getMaDonHang())

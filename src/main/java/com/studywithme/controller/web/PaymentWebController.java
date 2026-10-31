@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.*;
@@ -56,6 +57,7 @@ public class PaymentWebController {
     @GetMapping("/checkout")
     public String checkout(@RequestParam(required = false) Long courseId,
                            @RequestParam(required = false) String courseIds,
+                           @RequestParam(required = false) Boolean cancel,
                            Model model,
                            Principal principal) {
         Optional<NguoiDung> userOpt = getUserFromPrincipal(principal);
@@ -93,6 +95,10 @@ public class PaymentWebController {
         model.addAttribute("buyNowCourse", items.isEmpty() ? null : items.get(0));
         model.addAttribute("selectedCourseId", courseId);
 
+        if (Boolean.TRUE.equals(cancel)) {
+            model.addAttribute("cancelledMessage", "Bạn đã hủy giao dịch trên cổng thanh toán. Bạn có thể kiểm tra lại thông tin và thanh toán lại khi sẵn sàng.");
+        }
+
         return "checkout/index";
     }
 
@@ -104,9 +110,9 @@ public class PaymentWebController {
                                        @RequestParam(name = "ghiChu", required = false) String ghiChu,
                                        Principal principal,
                                        HttpServletRequest request,
-                                       Model model) {
+                                       RedirectAttributes redirectAttributes) {
         if (courseIds == null || courseIds.isEmpty()) {
-            model.addAttribute("error", "Vui lòng chọn ít nhất 1 khóa học để thanh toán.");
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng chọn ít nhất 1 khóa học để thanh toán.");
             return "redirect:/cart";
         }
 
@@ -129,8 +135,8 @@ public class PaymentWebController {
             return "redirect:" + paymentUrl;
         } catch (Exception e) {
             log.error("Lỗi khi tạo đơn hàng payOS", e);
-            model.addAttribute("error", "Đã xảy ra lỗi khi tạo link thanh toán payOS: " + e.getMessage());
-            return "redirect:/checkout?error=" + e.getMessage();
+            redirectAttributes.addFlashAttribute("errorMessage", "Đã xảy ra lỗi khi tạo liên kết thanh toán payOS: " + e.getMessage());
+            return "redirect:/checkout";
         }
     }
 
@@ -139,9 +145,11 @@ public class PaymentWebController {
      */
     @GetMapping("/payment/payos-callback")
     public String payosCallback(@RequestParam(name = "orderCode", required = false) Long orderCode,
+                                @RequestParam(name = "status", required = false) String status,
+                                @RequestParam(name = "cancel", required = false) Boolean cancel,
                                 Model model,
                                 Principal principal) {
-        log.info("Nhận callback từ payOS với orderCode: {}", orderCode);
+        log.info("Nhận callback từ payOS: orderCode={}, status={}, cancel={}", orderCode, status, cancel);
         PaymentResultDto result = paymentService.xuLyPayOsCallback(orderCode);
 
         Optional<NguoiDung> userOpt = getUserFromPrincipal(principal);

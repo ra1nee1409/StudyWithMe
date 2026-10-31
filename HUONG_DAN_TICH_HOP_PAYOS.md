@@ -177,10 +177,9 @@ public ResponseEntity<?> handlePayOSWebhook(@RequestBody ObjectNode body) {
 
 ---
 
-## 5. HƯỚNG DẪN TEST WEBHOOK TRÊN MÔI TRƯỜNG LOCAL (NGROK)
+## 5. HƯỚNG DẪN TEST THANH TOÁN & WEBHOOK (DÀNH CHO DEV VÀ BẢO VỆ ĐỒ ÁN)
 
-Khi chạy ứng dụng ở máy cá nhân (`localhost:8080`), payOS không thể gửi Webhook trực tiếp vào máy của bạn qua mạng LAN. Vì vậy cần sử dụng công cụ tạo đường hầm (tunnel):
-
+### Cách 1: Quét mã VietQR thật qua Ngrok (Môi trường Localhost)
 1. **Khởi động ứng dụng Spring Boot:** Chạy cổng `8080`.
 2. **Khởi chạy Ngrok:**
    ```bash
@@ -190,11 +189,22 @@ Khi chạy ứng dụng ở máy cá nhân (`localhost:8080`), payOS không th�
 3. **Cấu hình Webhook trên trang quản trị payOS:**
    - Đăng nhập [my.payos.vn](https://my.payos.vn) -> Chọn Kênh thanh toán -> Mục **Webhook**.
    - Dán URL: `https://abcdef.ngrok-free.app/api/payment/payos_transfer_handler`.
-   - Bấm nút **Xác nhận Webhook**.
+   - Bấm nút **Xác nhận Webhook** (hoặc gọi API `POST /api/payment/dang-ky-webhook?webhookUrl=https://abcdef.ngrok-free.app/api/payment/payos_transfer_handler`).
 4. **Kiểm thử thanh toán:**
    - Mở ứng dụng StudyWithMe -> Chọn khóa học -> Bấm Thanh toán.
    - Quét mã QR bằng App ngân hàng thật bất kỳ (chuyển 2.000đ hoặc thanh toán test).
    - Kiểm tra log Spring Boot: Webhook bắn về ngay lập tức, đơn hàng chuyển thành công và khóa học mở trong tích tắc!
+
+### Cách 2: Chế độ Mô phỏng Demo (Cực kỳ tiện lợi khi bảo vệ trước Hội đồng chấm Đồ án)
+Khi thuyết trình trước Hội đồng hoặc khi mạng internet trường học không ổn định, bạn có thể demo luồng thanh toán mà không cần chuyển tiền thật:
+1. Tạo đơn hàng và chuyển sang cổng VietQR payOS để thầy cô quan sát mã QR động VietQR chuyên nghiệp.
+2. Quay lại trang kết quả đơn hàng (`/payment/payos-callback?orderCode=...`).
+3. Bấm nút màu xanh lá **"⚡ Mô Phỏng Chuyển Khoản Thành Công (Demo Hội Đồng)"** có sẵn trên giao diện.
+4. Hệ thống sẽ tự động gọi API `POST /api/payment/demo/kich-hoat/{orderCode}` giả lập tín hiệu Webhook chuẩn từ ngân hàng:
+   - Tự động kích hoạt khóa học vào Bàn Học Của Tôi.
+   - Tự động trích xuất 80% học phí vào ví tiền của Giảng viên.
+   - Tự động lưu vết biến động số dư trong Lịch sử ví tiền.
+   - Trang web tự động tải lại hiển thị trạng thái **"Thanh Toán Thành Công"** cùng danh sách khóa học sẵn sàng học!
 
 ---
 

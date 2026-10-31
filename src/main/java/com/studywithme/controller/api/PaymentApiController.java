@@ -3,8 +3,10 @@ package com.studywithme.controller.api;
 import com.studywithme.dto.cart.CheckoutRequest;
 import com.studywithme.dto.cart.PaymentResultDto;
 import com.studywithme.dto.response.ApiResponse;
+import com.studywithme.entity.DonHang;
 import com.studywithme.entity.NguoiDung;
 import com.studywithme.exception.ResourceNotFoundException;
+import com.studywithme.repository.DonHangRepository;
 import com.studywithme.repository.NguoiDungRepository;
 import com.studywithme.service.PayOsService;
 import com.studywithme.service.PaymentService;
@@ -29,13 +31,16 @@ public class PaymentApiController {
     private final PaymentService paymentService;
     private final PayOsService payOsService;
     private final NguoiDungRepository nguoiDungRepository;
+    private final DonHangRepository donHangRepository;
 
     public PaymentApiController(PaymentService paymentService,
                                 PayOsService payOsService,
-                                NguoiDungRepository nguoiDungRepository) {
+                                NguoiDungRepository nguoiDungRepository,
+                                DonHangRepository donHangRepository) {
         this.paymentService = paymentService;
         this.payOsService = payOsService;
         this.nguoiDungRepository = nguoiDungRepository;
+        this.donHangRepository = donHangRepository;
     }
 
     /**
@@ -127,6 +132,46 @@ public class PaymentApiController {
         } else {
             return ResponseEntity.badRequest().body(ApiResponse.error(result.getThongDiep(), result));
         }
+    }
+
+    /**
+     * API Tự động đăng ký Webhook URL với payOS qua SDK
+     */
+    @PostMapping("/dang-ky-webhook")
+    public ResponseEntity<ApiResponse<String>> dangKyWebhook(@RequestParam String webhookUrl) {
+        try {
+            String registeredUrl = payOsService.dangKyWebhook(webhookUrl);
+            return ResponseEntity.ok(ApiResponse.success("Đăng ký Webhook URL với payOS thành công.", registeredUrl));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Không thể đăng ký Webhook: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * API Mô phỏng thanh toán thành công (Dành riêng cho việc Demo & Bảo vệ Đồ án tốt nghiệp)
+     */
+    @PostMapping("/demo/kich-hoat/{orderCode}")
+    public ResponseEntity<ApiResponse<PaymentResultDto>> demoKichHoatDonHang(@PathVariable Long orderCode) {
+        DonHang donHang = donHangRepository.findByOrderCodePayos(orderCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng với mã orderCode: " + orderCode));
+
+        WebhookData mockData = WebhookData.builder()
+                .orderCode(orderCode)
+                .amount(donHang.getTongTienThanhToan() != null ? donHang.getTongTienThanhToan().longValue() : 0L)
+                .description("Demo kich hoat don #" + donHang.getId())
+                .accountNumber("DEMO_BANK_ACCOUNT")
+                .reference("DEMO_TXN_" + System.currentTimeMillis())
+                .transactionDateTime("2026-10-31 08:30:00")
+                .currency("VND")
+                .paymentLinkId("DEMO_LINK_" + orderCode)
+                .code("00")
+                .desc("Thanh cong")
+                .build();
+
+        boolean ok = payOsService.xuLyDonHangThanhCong(mockData);
+        PaymentResultDto result = paymentService.xuLyPayOsCallback(orderCode);
+
+        return ResponseEntity.ok(ApiResponse.success("Mô phỏng thanh toán VietQR payOS thành công.", result));
     }
 
     private String getBaseUrl(HttpServletRequest request) {

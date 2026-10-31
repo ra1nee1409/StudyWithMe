@@ -131,6 +131,15 @@
           </a>
         </div>
 
+        <!-- Demo Mode Simulator Box for Final Thesis Defense -->
+        <div class="mt-6 pt-4 border-t border-dashed border-surface-container space-y-2">
+          <span class="text-[11px] text-on-surface-variant block">Công cụ trợ giúp bảo vệ Đồ án tốt nghiệp:</span>
+          <button type="button" onclick="simulateSuccessPayment()" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">smart_toy</span>
+            <span>Mô Phỏng Chuyển Khoản Thành Công (Demo Hội Đồng)</span>
+          </button>
+        </div>
+
       </div>
 
     </div>
@@ -139,18 +148,52 @@
   <!-- Footer -->
   <footer th:replace="~{components/user/footer :: main-footer}"></footer>
 
-  <!-- Clean Cart upon success -->
-  <script th:if="${result.thanhCong}">
+  <!-- Clean Cart upon success & Demo simulator handler -->
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
-      try {
-        localStorage.removeItem('studywithme_cart');
-        if (typeof updateCartBadgeCount === 'function') {
-          updateCartBadgeCount();
+      const isSuccess = /*[[${result.thanhCong}]]*/ false;
+      if (isSuccess) {
+        try {
+          localStorage.removeItem('studywithme_cart');
+          if (typeof updateCartBadgeCount === 'function') {
+            updateCartBadgeCount();
+          }
+        } catch (e) {
+          console.error(e);
         }
-      } catch (e) {
-        console.error(e);
       }
     });
+
+    function simulateSuccessPayment() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderCode = urlParams.get('orderCode');
+      if (!orderCode) {
+        alert('Không tìm thấy mã orderCode trên đường dẫn để mô phỏng.');
+        return;
+      }
+
+      if (!confirm('Bạn có muốn mô phỏng nhận Webhook chuyển khoản thành công từ ngân hàng cho đơn hàng #' + orderCode + '?')) {
+        return;
+      }
+
+      fetch('/api/payment/demo/kich-hoat/' + orderCode, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.thanhCong || data.success) {
+          alert('Mô phỏng thanh toán thành công! Hệ thống đã kích hoạt khóa học và trích doanh thu cho giảng viên.');
+          window.location.reload();
+        } else {
+          alert('Lỗi: ' + (data.thongBao || data.message || 'Không thể kích hoạt đơn hàng'));
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Đã xảy ra lỗi kết nối khi mô phỏng: ' + err.message);
+      });
+    }
   </script>
 
 </body>

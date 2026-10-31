@@ -32,6 +32,17 @@
         </p>
       </div>
 
+      <!-- Alert Messages: Cancelled or Error -->
+      <div th:if="${cancelledMessage}" class="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-200 text-xs sm:text-sm flex items-center gap-3">
+        <span class="material-symbols-outlined text-amber-500 text-[22px] shrink-0">info</span>
+        <span th:text="${cancelledMessage}">Bạn đã hủy giao dịch trên cổng thanh toán.</span>
+      </div>
+
+      <div th:if="${errorMessage}" class="mb-6 p-4 rounded-2xl bg-error-container/20 border border-error/30 text-error text-xs sm:text-sm flex items-center gap-3">
+        <span class="material-symbols-outlined text-error text-[22px] shrink-0">error</span>
+        <span th:text="${errorMessage}">Đã xảy ra lỗi khi xử lý thanh toán.</span>
+      </div>
+
       <!-- Checkout Form wrapping the entire flow -->
       <form th:action="@{/checkout/payos}" method="post" id="checkoutForm">
 

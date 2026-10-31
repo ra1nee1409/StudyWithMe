@@ -39,6 +39,7 @@ public class DataSeeder implements CommandLineRunner {
     private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
     private final YeuCauRutTienRepository yeuCauRutTienRepository;
     private final PasswordEncoder passwordEncoder;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     public DataSeeder(VaiTroRepository vaiTroRepository,
                       NguoiDungRepository nguoiDungRepository,
@@ -52,7 +53,8 @@ public class DataSeeder implements CommandLineRunner {
                       BaiHocRepository baiHocRepository,
                       LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
                       YeuCauRutTienRepository yeuCauRutTienRepository,
-                      PasswordEncoder passwordEncoder) {
+                      PasswordEncoder passwordEncoder,
+                      org.springframework.jdbc.core.JdbcTemplate jdbcTemplate) {
         this.vaiTroRepository = vaiTroRepository;
         this.nguoiDungRepository = nguoiDungRepository;
         this.hoSoGiangVienRepository = hoSoGiangVienRepository;
@@ -66,10 +68,13 @@ public class DataSeeder implements CommandLineRunner {
         this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
         this.yeuCauRutTienRepository = yeuCauRutTienRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public void run(String... args) {
+        capNhatCheckConstraintDonHang();
+
         // 1. Khởi tạo 3 vai trò cơ bản nếu chưa tồn tại
         VaiTro roleQuanTri = initRole(VaiTroName.ROLE_QUAN_TRI, "Quản trị viên hệ thống");
         VaiTro roleGiangVien = initRole(VaiTroName.ROLE_GIANG_VIEN, "Giảng viên / Gia sư trực tuyến");
@@ -867,6 +872,25 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         logger.info(">>> Đã khởi tạo các lệnh rút tiền mẫu (1 chờ xử lý, 1 đã chuyển, 1 từ chối) thành công.");
+    }
+
+    private void capNhatCheckConstraintDonHang() {
+        try {
+            jdbcTemplate.execute("""
+                DECLARE @ConstraintName NVARCHAR(200);
+                SELECT @ConstraintName = Name FROM sys.check_constraints
+                WHERE parent_object_id = OBJECT_ID('don_hang')
+                AND parent_column_id = COLUMNPROPERTY(OBJECT_ID('don_hang'), 'phuong_thuc_thanh_toan', 'ColumnId');
+
+                IF @ConstraintName IS NOT NULL
+                BEGIN
+                    EXEC('ALTER TABLE don_hang DROP CONSTRAINT [' + @ConstraintName + ']');
+                    ALTER TABLE don_hang ADD CHECK (phuong_thuc_thanh_toan IN ('VNPAY', 'MOMO', 'CHUYEN_KHOAN', 'PAYOS'));
+                END
+            """);
+        } catch (Exception e) {
+            logger.warn("Không thể cập nhật check constraint phuong_thuc_thanh_toan: {}", e.getMessage());
+        }
     }
 
     private VaiTro initRole(VaiTroName vaiTroName, String moTa) {

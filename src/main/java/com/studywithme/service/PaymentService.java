@@ -29,4 +29,14 @@ public interface PaymentService {
      * Lấy thông tin đơn hàng theo mã đơn
      */
     DonHang layDonHangTheoMa(String maDonHang);
+
+    /**
+     * Tạo đơn hàng mới và sinh đường dẫn thanh toán VietQR payOS.
+     */
+    Map<String, String> taoDonHangVaLayUrlPayOs(CheckoutRequest request, NguoiDung nguoiDung, String baseUrl);
+
+    /**
+     * Xử lý kết quả trả về khi người dùng hoàn tất chuyển khoản payOS và quay lại web.
+     */
+    PaymentResultDto xuLyPayOsCallback(Long orderCode);
 }

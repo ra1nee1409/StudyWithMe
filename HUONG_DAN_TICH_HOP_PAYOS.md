@@ -207,3 +207,4 @@ Khi chạy ứng dụng ở máy cá nhân (`localhost:8080`), payOS không th�
 5. `src/main/java/com/studywithme/controller/api/PaymentApiController.java`: Thêm handler `@PostMapping("/api/payment/payos_transfer_handler")`.
 6. `src/main/java/com/studywithme/config/SecurityConfig.java`: Cấu hình permitAll endpoint webhook `/api/payment/payos_transfer_handler`.
 7. `src/main/resources/templates/checkout/index.html`: Cập nhật giao diện thanh toán sang thương hiệu và trải nghiệm quét VietQR.
+

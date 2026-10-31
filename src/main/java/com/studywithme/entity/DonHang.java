@@ -52,6 +52,12 @@ public class DonHang {
     @Column(name = "ngay_thanh_toan")
     private LocalDateTime ngayThanhToan;
 
+    @Column(name = "order_code_payos")
+    private Long orderCodePayos;
+
+    @Column(name = "ma_giao_dich_payos", length = 100)
+    private String maGiaoDichPayos;
+
     @OneToMany(mappedBy = "donHang", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ChiTietDonHang> danhSachChiTiet = new ArrayList<>();

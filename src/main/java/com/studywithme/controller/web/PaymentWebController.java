@@ -144,6 +144,62 @@ public class PaymentWebController {
     }
 
     /**
+     * Xử lý gửi thanh toán chuyển tiếp sang cổng VietQR payOS
+     */
+    @PostMapping("/checkout/payos")
+    public String processPayOsCheckout(@RequestParam(name = "courseIds", required = false) List<Long> courseIds,
+                                       @RequestParam(name = "ghiChu", required = false) String ghiChu,
+                                       Principal principal,
+                                       HttpServletRequest request,
+                                       Model model) {
+        if (courseIds == null || courseIds.isEmpty()) {
+            model.addAttribute("error", "Vui lòng chọn ít nhất 1 khóa học để thanh toán.");
+            return "redirect:/cart";
+        }
+
+        Optional<NguoiDung> userOpt = getUserFromPrincipal(principal);
+        if (userOpt.isEmpty()) {
+            return "redirect:/login?redirect=/checkout" + (courseIds.size() == 1 ? "?courseId=" + courseIds.get(0) : "");
+        }
+
+        NguoiDung user = userOpt.get();
+        String baseUrl = getBaseUrl(request);
+
+        CheckoutRequest checkoutReq = new CheckoutRequest();
+        checkoutReq.setCourseIds(courseIds);
+        checkoutReq.setPaymentMethod("PAYOS");
+        checkoutReq.setGhiChu(ghiChu);
+
+        try {
+            Map<String, String> result = paymentService.taoDonHangVaLayUrlPayOs(checkoutReq, user, baseUrl);
+            String paymentUrl = result.get("paymentUrl");
+            return "redirect:" + paymentUrl;
+        } catch (Exception e) {
+            log.error("Lỗi khi tạo đơn hàng payOS", e);
+            model.addAttribute("error", "Đã xảy ra lỗi khi tạo link thanh toán payOS: " + e.getMessage());
+            return "redirect:/checkout?error=" + e.getMessage();
+        }
+    }
+
+    /**
+     * Nhận kết quả callback từ payOS chuyển hướng về
+     */
+    @GetMapping("/payment/payos-callback")
+    public String payosCallback(@RequestParam(name = "orderCode", required = false) Long orderCode,
+                                Model model,
+                                Principal principal) {
+        log.info("Nhận callback từ payOS với orderCode: {}", orderCode);
+        PaymentResultDto result = paymentService.xuLyPayOsCallback(orderCode);
+
+        Optional<NguoiDung> userOpt = getUserFromPrincipal(principal);
+        model.addAttribute("result", result);
+        model.addAttribute("currentUser", userOpt.orElse(null));
+        model.addAttribute("isLoggedIn", userOpt.isPresent());
+
+        return "checkout/result";
+    }
+
+    /**
      * Nhận kết quả callback từ VNPAY chuyển hướng về
      */
     @GetMapping("/payment/vnpay-callback")
@@ -159,6 +215,16 @@ public class PaymentWebController {
         model.addAttribute("isLoggedIn", userOpt.isPresent());
 
         return "checkout/result";
+    }
+
+    private String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+        int serverPort = request.getServerPort();
+        if ((scheme.equals("http") && serverPort == 80) || (scheme.equals("https") && serverPort == 443)) {
+            return scheme + "://" + serverName;
+        }
+        return scheme + "://" + serverName + ":" + serverPort;
     }
 
     private String getClientIp(HttpServletRequest request) {

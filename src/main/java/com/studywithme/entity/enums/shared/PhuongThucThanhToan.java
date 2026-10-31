@@ -4,5 +4,6 @@ package com.studywithme.entity.enums.shared;
 public enum PhuongThucThanhToan {
     VNPAY,
     MOMO,
-    CHUYEN_KHOAN
+    CHUYEN_KHOAN,
+    PAYOS
 }

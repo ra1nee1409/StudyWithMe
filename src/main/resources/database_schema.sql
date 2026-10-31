@@ -220,7 +220,7 @@ BEGIN
         [ma_don_hang] NVARCHAR(50) NOT NULL UNIQUE,
         [nguoi_dung_id] BIGINT NOT NULL,
         [tong_tien_thanh_toan] DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
-        [phuong_thuc_thanh_toan] NVARCHAR(30) NOT NULL DEFAULT 'VNPAY' CHECK ([phuong_thuc_thanh_toan] IN ('VNPAY', 'MOMO', 'CHUYEN_KHOAN')),
+        [phuong_thuc_thanh_toan] NVARCHAR(30) NOT NULL DEFAULT 'PAYOS' CHECK ([phuong_thuc_thanh_toan] IN ('VNPAY', 'MOMO', 'CHUYEN_KHOAN', 'PAYOS')),
         [trang_thai_thanh_toan] NVARCHAR(30) NOT NULL DEFAULT 'CHO_THANH_TOAN' CHECK ([trang_thai_thanh_toan] IN ('CHO_THANH_TOAN', 'DA_THANH_TOAN', 'THAT_BAI', 'DA_HUY')),
         [ngay_thanh_toan] DATETIME2 NULL,
         [ngay_tao_don] DATETIME2 NOT NULL DEFAULT SYSDATETIME(),

@@ -17,6 +17,9 @@ public interface DonHangRepository extends JpaRepository<DonHang, Long> {
     @EntityGraph(attributePaths = {"danhSachChiTiet", "nguoiDung"})
     Optional<DonHang> findByMaDonHang(String maDonHang);
 
+    @EntityGraph(attributePaths = {"danhSachChiTiet", "nguoiDung"})
+    Optional<DonHang> findByOrderCodePayos(Long orderCodePayos);
+
     @EntityGraph(attributePaths = {"danhSachChiTiet"})
     List<DonHang> findByNguoiDungIdOrderByNgayTaoDonDesc(Long nguoiDungId);
 

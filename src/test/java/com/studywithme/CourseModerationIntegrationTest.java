@@ -22,10 +22,11 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -101,12 +102,12 @@ class CourseModerationIntegrationTest {
     void testLayChiTietKhoaHoc() throws Exception {
         String token = layAdminToken();
         List<KhoaHoc> list = khoaHocRepository.findAll();
-        assertTrue(!list.isEmpty(), "Cần có ít nhất 1 khóa học mẫu");
+        assertFalse(list.isEmpty(), "Cần có ít nhất 1 khóa học mẫu");
         Long courseId = list.get(0).getId();
 
         mockMvc.perform(get("/api/admin/khoa-hoc/" + courseId + "/chi-tiet")
                         .header("Authorization", "Bearer " + token))
-                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.thanhCong").value(true))
                 .andExpect(jsonPath("$.duLieu.id").value(courseId))

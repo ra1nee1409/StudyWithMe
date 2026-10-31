@@ -689,7 +689,15 @@ public class DataSeeder implements CommandLineRunner {
                 gvNam, dmToanThpt, TrangThaiKhoaHoc.TU_CHOI,
                 "Video bài giảng chất lượng 360p mờ, âm thanh micro có tiếng ồn và đề cương chưa đầy đủ các chương trọng tâm.");
 
-        logger.info(">>> Đã khởi tạo các khóa học mẫu (8 đã xuất bản, 2 chờ duyệt, 1 từ chối) thành công.");
+        // Khóa 12: Khóa học Test Cổng Thanh Toán VietQR payOS giá 5.000 VNĐ
+        taoKhoaHoc("[TEST] Khóa Học Trải Nghiệm Thanh Toán VietQR payOS (5.000đ)",
+                "khoa-hoc-test-thanh-toan-payos-5k",
+                "Khóa học chuyên dụng để học viên và giảng viên kiểm thử tính năng quét mã VietQR tự động qua cổng thanh toán payOS với mức học phí tượng trưng chỉ 5.000 VNĐ.",
+                "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&auto=format&fit=crop&q=80",
+                new BigDecimal("50000"), new BigDecimal("5000"), "CAP_3", 25, new BigDecimal("5.00"), 10,
+                gvNam, dmToanThpt);
+
+        logger.info(">>> Đã khởi tạo các khóa học mẫu (bao gồm khóa học test 5.000đ) thành công.");
     }
 
     private void taoKhoaHoc(String tieuDe, String slug, String moTa, String anhDaiDien,

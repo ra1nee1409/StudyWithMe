@@ -72,4 +72,17 @@ public class ApiResponse<T> {
                 .duLieu(duLieu)
                 .build();
     }
+
+    // Compatibility helpers for JSON clients (status, message, data)
+    public String getStatus() {
+        return this.thanhCong ? "success" : "error";
+    }
+
+    public String getMessage() {
+        return this.thongBao;
+    }
+
+    public T getData() {
+        return this.duLieu;
+    }
 }

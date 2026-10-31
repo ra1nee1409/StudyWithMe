@@ -4,17 +4,22 @@ import com.studywithme.dto.user.CapNhatHoSoRequest;
 import com.studywithme.dto.user.DoiMatKhauRequest;
 import com.studywithme.entity.ChungChiGiangVien;
 import com.studywithme.entity.DangKyLopHoc;
+import com.studywithme.entity.DanhMuc;
 import com.studywithme.entity.HoSoGiangVien;
+import com.studywithme.entity.KhoaHoc;
 import com.studywithme.entity.LichSuViTien;
 import com.studywithme.entity.LopHocTrucTuyen;
 import com.studywithme.entity.NguoiDung;
+import com.studywithme.entity.enums.admin.TrangThaiKhoaHoc;
 import com.studywithme.repository.ChungChiGiangVienRepository;
 import com.studywithme.repository.DangKyLopHocRepository;
+import com.studywithme.repository.DanhMucRepository;
 import com.studywithme.repository.HoSoGiangVienRepository;
 import com.studywithme.repository.LichSuViTienRepository;
 import com.studywithme.repository.LopHocTrucTuyenRepository;
 import com.studywithme.repository.NguoiDungRepository;
 import com.studywithme.service.ProfileService;
+import com.studywithme.service.TutorKhoaHocService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -46,6 +51,8 @@ public class TutorWebController {
     private final LichSuViTienRepository lichSuViTienRepository;
     private final ChungChiGiangVienRepository chungChiGiangVienRepository;
     private final ProfileService profileService;
+    private final TutorKhoaHocService tutorKhoaHocService;
+    private final DanhMucRepository danhMucRepository;
 
     private Optional<HoSoGiangVien> getHoSoByPrincipal(Principal principal) {
         if (principal == null) return Optional.empty();
@@ -113,6 +120,35 @@ public class TutorWebController {
 
         model.addAttribute("danhSachLop", danhSachLop);
         return "tutor/classes";
+    }
+
+    @GetMapping({"/khoa-hoc", "/courses"})
+    public String courses(Model model, Principal principal) {
+        Optional<HoSoGiangVien> hoSoOpt = getHoSoByPrincipal(principal);
+        List<KhoaHoc> danhSachKhoaHoc = new ArrayList<>();
+        long tongKhoaHoc = 0;
+        long daXuatBan = 0;
+        long choDuyet = 0;
+        long biTuChoi = 0;
+
+        if (hoSoOpt.isPresent()) {
+            Long gvId = hoSoOpt.get().getId();
+            danhSachKhoaHoc = tutorKhoaHocService.layDanhSachKhoaHocCuaGiangVien(gvId);
+            tongKhoaHoc = danhSachKhoaHoc.size();
+            daXuatBan = danhSachKhoaHoc.stream().filter(k -> k.getTrangThai() == TrangThaiKhoaHoc.DA_XUAT_BAN).count();
+            choDuyet = danhSachKhoaHoc.stream().filter(k -> k.getTrangThai() == TrangThaiKhoaHoc.CHO_DUYET).count();
+            biTuChoi = danhSachKhoaHoc.stream().filter(k -> k.getTrangThai() == TrangThaiKhoaHoc.TU_CHOI).count();
+        }
+
+        List<DanhMuc> danhSachDanhMuc = danhMucRepository.findAll();
+
+        model.addAttribute("danhSachKhoaHoc", danhSachKhoaHoc);
+        model.addAttribute("danhSachDanhMuc", danhSachDanhMuc);
+        model.addAttribute("kpiTongKhoaHoc", tongKhoaHoc);
+        model.addAttribute("kpiDaXuatBan", daXuatBan);
+        model.addAttribute("kpiChoDuyet", choDuyet);
+        model.addAttribute("kpiBiTuChoi", biTuChoi);
+        return "tutor/courses";
     }
 
     @GetMapping({"/lich-day", "/schedule"})

@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Studio Quản lý Khóa học - StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== TUTOR SIDEBAR ==================== -->
+  <aside th:replace="~{components/tutor/sidebar :: tutor-sidebar('courses')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar -->
+    <header th:replace="~{components/tutor/header :: tutor-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-16 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Breadcrumbs & Header Banner -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <h1 class="text-2xl font-bold text-on-surface tracking-tight">Studio Khóa Học & Bài Giảng</h1>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-tertiary-container/15 text-tertiary border border-tertiary-container/30">
+              Video Theo Yêu Cầu (VOD)
+            </span>
+          </div>
+          <p class="text-xs text-on-surface-variant">Tự do xây dựng giáo trình video, thiết lập bài học xem thử và gửi ban quản trị phê duyệt xuất bản lên sàn khóa học.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button type="button" onclick="openCreateCourseModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-sm transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">add_circle</span>
+            <span>Tạo Khóa Học Mới</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- KPI Statistics Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Tổng khóa học -->
+        <div class="bg-surface-card p-5 rounded-2xl border border-surface-container/40 shadow-xs flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-semibold text-on-surface-variant uppercase tracking-wider">Tổng khóa học</p>
+            <h3 class="text-2xl font-extrabold text-on-surface mt-1" th:text="${kpiTongKhoaHoc}">0</h3>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-surface-container-low text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">video_library</span>
+          </div>
+        </div>
+
+        <!-- Đã xuất bản -->
+        <div class="bg-surface-card p-5 rounded-2xl border border-surface-container/40 shadow-xs flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-semibold text-status-success uppercase tracking-wider">Đang kinh doanh</p>
+            <h3 class="text-2xl font-extrabold text-status-success mt-1" th:text="${kpiDaXuatBan}">0</h3>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-status-success/10 text-status-success flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">verified</span>
+          </div>
+        </div>
+
+        <!-- Chờ kiểm duyệt -->
+        <div class="bg-surface-card p-5 rounded-2xl border border-surface-container/40 shadow-xs flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-semibold text-status-warning uppercase tracking-wider">Chờ xét duyệt</p>
+            <h3 class="text-2xl font-extrabold text-status-warning mt-1" th:text="${kpiChoDuyet}">0</h3>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-status-warning/10 text-status-warning flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">pending_actions</span>
+          </div>
+        </div>
+
+        <!-- Cần chỉnh sửa -->
+        <div class="bg-surface-card p-5 rounded-2xl border border-surface-container/40 shadow-xs flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-semibold text-primary uppercase tracking-wider">Cần chỉnh sửa</p>
+            <h3 class="text-2xl font-extrabold text-primary mt-1" th:text="${kpiBiTuChoi}">0</h3>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">report_problem</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Bar & Search -->
+      <div class="flex flex-wrap items-center justify-between gap-4 bg-surface-card p-4 rounded-xl border border-surface-container/30 shadow-xs">
+        <!-- Filter Tabs -->
+        <div class="flex flex-wrap items-center gap-1.5 bg-surface-container-low p-1 rounded-xl" id="filterTabs">
+          <button type="button" onclick="filterCourses('ALL', this)" class="course-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white shadow-xs text-tertiary">
+            Tất cả (<span th:text="${kpiTongKhoaHoc}">0</span>)
+          </button>
+          <button type="button" onclick="filterCourses('DA_XUAT_BAN', this)" class="course-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">
+            Đã xuất bản (<span th:text="${kpiDaXuatBan}">0</span>)
+          </button>
+          <button type="button" onclick="filterCourses('CHO_DUYET', this)" class="course-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">
+            Chờ duyệt (<span th:text="${kpiChoDuyet}">0</span>)
+          </button>
+          <button type="button" onclick="filterCourses('BAN_NHAP', this)" class="course-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">
+            Bản nháp
+          </button>
+          <button type="button" onclick="filterCourses('TU_CHOI', this)" class="course-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">
+            Bị từ chối (<span th:text="${kpiBiTuChoi}">0</span>)
+          </button>
+        </div>
+
+        <!-- Live Search Input -->
+        <div class="relative w-full sm:w-72">
+          <input type="text" id="searchCourseInput" onkeyup="searchCourses()" placeholder="Tìm theo tên khóa học..."
+                 class="w-full pl-9 pr-3 py-2 rounded-xl bg-surface-container-low text-xs border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+          <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[18px] text-outline">search</span>
+        </div>
+      </div>
+
+      <!-- Khối Empty State khi chưa có khóa học -->
+      <div th:if="${#lists.isEmpty(danhSachKhoaHoc)}" class="p-12 text-center bg-surface-card rounded-2xl border border-dashed border-surface-container/60 shadow-sm">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-tertiary-container/10 flex items-center justify-center text-tertiary mb-3">
+          <span class="material-symbols-outlined text-4xl">video_call</span>
+        </div>
+        <h3 class="text-base font-bold text-on-surface">Bạn chưa có khóa học video nào</h3>
+        <p class="text-xs text-on-surface-variant max-w-md mx-auto mt-1 mb-5">
+          Hãy biến những kiến thức tâm huyết của bạn thành các video bài giảng chất lượng cao để tiếp cận hàng ngàn học viên trên StudyWithMe!
+        </p>
+        <button type="button" onclick="openCreateCourseModal()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-sm transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          <span>Tạo Khóa Học Đầu Tiên</span>
+        </button>
+      </div>
+
+      <!-- Danh sách khóa học dạng Cards Grid -->
+      <div th:unless="${#lists.isEmpty(danhSachKhoaHoc)}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="courseGrid">
+        <div th:each="kh : ${danhSachKhoaHoc}"
+             class="course-card bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 overflow-hidden flex flex-col justify-between hover:shadow-md transition-all group"
+             th:data-status="${kh.trangThai.name()}"
+             th:data-title="${kh.tieuDe}"
+             th:data-id="${kh.id}">
+          
+          <!-- Thumbnail & Status Badge -->
+          <div class="relative w-full aspect-video bg-surface-container-high overflow-hidden">
+            <img th:if="${kh.anhDaiDienKhoaHoc != null && !kh.anhDaiDienKhoaHoc.isEmpty()}"
+                 th:src="${kh.anhDaiDienKhoaHoc}"
+                 alt="Thumbnail"
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div th:unless="${kh.anhDaiDienKhoaHoc != null && !kh.anhDaiDienKhoaHoc.isEmpty()}"
+                 class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-tertiary-container/10 to-primary/10 text-tertiary">
+              <span class="material-symbols-outlined text-4xl mb-1">play_lesson</span>
+              <span class="text-[11px] font-bold">StudyWithMe Video</span>
+            </div>
+
+            <!-- Status Badge Overlay -->
+            <div class="absolute top-3 left-3">
+              <span th:if="${kh.trangThai.name() == 'DA_XUAT_BAN'}"
+                    class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-status-success text-white shadow-xs inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-[13px]">check_circle</span>
+                <span>Đã xuất bản</span>
+              </span>
+              <span th:if="${kh.trangThai.name() == 'CHO_DUYET'}"
+                    class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-status-warning text-white shadow-xs inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-[13px]">hourglass_top</span>
+                <span>Đang chờ duyệt</span>
+              </span>
+              <span th:if="${kh.trangThai.name() == 'BAN_NHAP'}"
+                    class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-surface-container-highest text-on-surface-variant shadow-xs inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-[13px]">edit_note</span>
+                <span>Bản nháp</span>
+              </span>
+              <span th:if="${kh.trangThai.name() == 'TU_CHOI'}"
+                    class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-primary text-white shadow-xs inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-[13px]">cancel</span>
+                <span>Bị từ chối</span>
+              </span>
+            </div>
+
+            <!-- Category tag overlay -->
+            <div class="absolute bottom-3 right-3">
+              <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-black/60 backdrop-blur-xs text-white"
+                    th:text="${kh.danhMuc != null ? kh.danhMuc.tenDanhMuc : 'Chung'}">Toán học</span>
+            </div>
+          </div>
+
+          <!-- Card Content Body -->
+          <div class="p-5 flex-1 flex flex-col justify-between gap-4">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between text-xs text-on-surface-variant">
+                <span class="text-[11px] font-bold text-tertiary uppercase tracking-wider"
+                      th:text="${kh.thePhanLoai ?: 'Khóa học'}">THPT</span>
+                <div class="flex items-center gap-1 text-status-warning font-bold">
+                  <span class="material-symbols-outlined text-[14px]">star</span>
+                  <span th:text="${kh.diemDanhGiaTrungBinh != null ? kh.diemDanhGiaTrungBinh : '5.0'}">5.0</span>
+                  <span class="text-on-surface-variant text-[10px]" th:text="'(' + ${kh.tongSoDanhGia ?: 0} + ')'">(0)</span>
+                </div>
+              </div>
+
+              <h2 class="text-sm font-bold text-on-surface line-clamp-2 hover:text-tertiary transition-colors"
+                  th:text="${kh.tieuDe}">Tên khóa học</h2>
+              
+              <p class="text-xs text-on-surface-variant line-clamp-2"
+                 th:text="${kh.moTaChiTiet ?: 'Chưa có mô tả chi tiết cho khóa học này.'}">Mô tả ngắn</p>
+
+              <!-- Warning Box if TU_CHOI -->
+              <div th:if="${kh.trangThai.name() == 'TU_CHOI' && kh.lyDoTuChoi != null}"
+                   class="p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-xs text-primary space-y-1">
+                <div class="flex items-center gap-1 font-bold">
+                  <span class="material-symbols-outlined text-[15px]">info</span>
+                  <span>Lý do từ chối từ Ban Quản Trị:</span>
+                </div>
+                <p class="text-[11px] italic pl-5" th:text="${kh.lyDoTuChoi}">Nội dung bài học chưa đủ chi tiết...</p>
+              </div>
+
+              <!-- Metrics -->
+              <div class="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-surface-container-low text-xs">
+                <div class="flex items-center gap-1.5 text-on-surface-variant">
+                  <span class="material-symbols-outlined text-[15px] text-outline">group</span>
+                  <span>Học viên: <b class="text-on-surface" th:text="${kh.tongSoHocVien ?: 0}">0</b></span>
+                </div>
+                <div class="flex items-center gap-1.5 text-on-surface-variant">
+                  <span class="material-symbols-outlined text-[15px] text-outline">format_list_bulleted</span>
+                  <span>Chương: <b class="text-on-surface" th:text="${kh.danhSachChuongHoc != null ? #lists.size(kh.danhSachChuongHoc) : 0}">0</b></span>
+                </div>
+              </div>
+
+              <!-- Giá bán -->
+              <div class="flex items-baseline gap-2 pt-1">
+                <span class="text-sm font-extrabold text-tertiary-container"
+                      th:text="${kh.giaKhuyenMai != null ? #numbers.formatDecimal(kh.giaKhuyenMai, 0, 'COMMA', 0, 'POINT') + ' đ' : (kh.giaGoc != null ? #numbers.formatDecimal(kh.giaGoc, 0, 'COMMA', 0, 'POINT') + ' đ' : 'Miễn phí')}">
+                  500.000 đ
+                </span>
+                <span th:if="${kh.giaKhuyenMai != null && kh.giaGoc != null && kh.giaGoc.compareTo(kh.giaKhuyenMai) > 0}"
+                      class="text-[11px] text-outline line-through"
+                      th:text="${#numbers.formatDecimal(kh.giaGoc, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                  700.000 đ
+                </span>
+              </div>
+            </div>
+
+            <!-- Action Buttons Footer -->
+            <div class="pt-3 border-t border-surface-container/40 flex flex-col gap-2">
+              <div class="flex items-center gap-2">
+                <!-- Nút Soạn giáo trình -->
+                <button type="button"
+                        th:onclick="'openCurriculumModal(' + ${kh.id} + ')'"
+                        class="flex-1 py-2 px-3 rounded-xl bg-tertiary-container hover:bg-tertiary text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer">
+                  <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                  <span>Soạn Giáo Trình</span>
+                </button>
+
+                <!-- Nút Sửa thông tin -->
+                <button type="button"
+                        th:onclick="'openEditCourseModal(' + ${kh.id} + ')'"
+                        class="p-2 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-all cursor-pointer"
+                        title="Chỉnh sửa thông tin khóa học">
+                  <span class="material-symbols-outlined text-[18px]">edit</span>
+                </button>
+
+                <!-- Nút Xóa khóa học -->
+                <button type="button"
+                        th:onclick="'confirmDeleteCourse(' + ${kh.id} + ', \'' + ${kh.tieuDe} + '\')'"
+                        class="p-2 rounded-xl bg-surface-container-low hover:bg-primary/10 text-on-surface-variant hover:text-primary transition-all cursor-pointer"
+                        title="Xóa khóa học">
+                  <span class="material-symbols-outlined text-[18px]">delete</span>
+                </button>
+              </div>
+
+              <!-- Nút Gửi kiểm duyệt (cho Bản nháp hoặc Bị từ chối) -->
+              <button th:if="${kh.trangThai.name() == 'BAN_NHAP' || kh.trangThai.name() == 'TU_CHOI'}"
+                      type="button"
+                      th:onclick="'submitForReview(' + ${kh.id} + ')'"
+                      class="w-full py-2 px-3 rounded-xl bg-status-warning/15 hover:bg-status-warning/25 text-status-warning text-xs font-bold flex items-center justify-center gap-1.5 border border-status-warning/30 transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">send</span>
+                <span>Gửi Ban Quản Trị Xét Duyệt</span>
+              </button>
+
+              <!-- Nút Xem trên sàn (nếu Đã xuất bản) -->
+              <a th:if="${kh.trangThai.name() == 'DA_XUAT_BAN'}"
+                 th:href="@{'/courses/' + ${kh.duongDanSlug}}"
+                 target="_blank"
+                 class="w-full py-2 px-3 rounded-xl bg-status-success/15 hover:bg-status-success/25 text-status-success text-xs font-bold flex items-center justify-center gap-1.5 border border-status-success/30 transition-all">
+                <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+                <span>Xem Trên Sàn Học Viên</span>
+              </a>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Không tìm thấy khi search -->
+      <div id="noMatchCard" class="hidden p-8 text-center bg-surface-card rounded-2xl border border-surface-container/40">
+        <span class="material-symbols-outlined text-3xl text-outline mb-1">search_off</span>
+        <p class="text-xs font-bold text-on-surface">Không tìm thấy khóa học nào phù hợp với từ khóa.</p>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ==================== MODAL 1: TẠO KHÓA HỌC MỚI ==================== -->
+  <div id="modal-create-course" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-surface-card rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-surface-container space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-tertiary-container/15 text-tertiary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px]">add_box</span>
+          </div>
+          <h3 class="text-base font-bold text-on-surface">Tạo Khóa Học Mới</h3>
+        </div>
+        <button onclick="closeModal('modal-create-course')" class="p-1 rounded-lg hover:bg-surface-container text-outline">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="form-create-course" onsubmit="handleCreateCourse(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-on-surface mb-1">Tiêu đề khóa học <span class="text-primary">*</span></label>
+          <input type="text" id="create-tieuDe" required placeholder="VD: Khóa Học Luyện Thi THPT Quốc Gia Môn Toán 2026"
+                 class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-on-surface mb-1">Danh mục môn học <span class="text-primary">*</span></label>
+            <select id="create-danhMucId" required
+                    class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+              <option value="" disabled selected>-- Chọn danh mục --</option>
+              <option th:each="dm : ${danhSachDanhMuc}" th:value="${dm.id}" th:text="${dm.tenDanhMuc}">Toán học</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-on-surface mb-1">Trình độ khóa học</label>
+            <select id="create-trinhDo"
+                    class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+              <option value="MOI_TRINH_DO">Mọi trình độ</option>
+              <option value="CO_BAN">Cơ bản</option>
+              <option value="TRUNG_CAP">Trung cấp</option>
+              <option value="NANG_CAO">Nâng cao</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-on-surface mb-1">Giá gốc (VNĐ) <span class="text-primary">*</span></label>
+            <input type="number" id="create-giaGoc" required min="0" step="1000" placeholder="VD: 599000"
+                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+          </div>
+          <div>
+            <label class="block font-bold text-on-surface mb-1">Giá khuyến mãi (VNĐ - nếu có)</label>
+            <input type="number" id="create-giaKhuyenMai" min="0" step="1000" placeholder="VD: 399000"
+                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-on-surface mb-1">Thẻ phân loại cấp học (Tag)</label>
+          <input type="text" id="create-thePhanLoai" placeholder="VD: Lớp 12, THPT, Ôn thi ĐH, IELTS, Giao tiếp..."
+                 class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+        </div>
+
+        <div>
+          <label class="block font-bold text-on-surface mb-1">Ảnh bìa khóa học (URL Thumbnail)</label>
+          <input type="url" id="create-anhDaiDienKhoaHoc" placeholder="https://images.unsplash.com/photo-..."
+                 class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+          <p class="text-[10px] text-outline mt-1">Gợi ý: Dán đường dẫn ảnh thumbnail sắc nét (tỉ lệ 16:9).</p>
+        </div>
+
+        <div>
+          <label class="block font-bold text-on-surface mb-1">Mô tả khóa học</label>
+          <textarea id="create-moTaChiTiet" rows="4" placeholder="Giới thiệu mục tiêu khóa học, kiến thức học viên sẽ đạt được sau khi hoàn thành..."
+                    class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container"></textarea>
+        </div>
+
+        <div class="pt-3 border-t border-surface-container/40 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-create-course')" class="px-4 py-2 rounded-xl bg-surface-container-low text-on-surface-variant font-bold hover:bg-surface-container">Hủy</button>
+          <button type="submit" id="btn-submit-create" class="px-5 py-2.5 rounded-xl bg-tertiary-container text-white font-bold hover:bg-tertiary shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">check</span>
+            <span>Tạo Khóa Học</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: CHỈNH SỬA KHÓA HỌC ==================== -->
+  <div id="modal-edit-course" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-surface-card rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-surface-container space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-tertiary-container/15 text-tertiary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px]">edit_note</span>
+          </div>
+          <h3 class="text-base font-bold text-on-surface">Chỉnh Sửa Thông Tin Khóa Học</h3>
+        </div>
+        <button onclick="closeModal('modal-edit-course')" class="p-1 rounded-lg hover:bg-surface-container text-outline">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="form-edit-course" onsubmit="handleEditCourse(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="edit-id">
+
+        <div>
+          <label class="block font-bold text-on-surface mb-1">Tiêu đề khóa học <span class="text-primary">*</span></label>
+          <input type="text" id="edit-tieuDe" required class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-on-surface mb-1">Danh mục môn học <span class="text-primary">*</span></label>
+            <select id="edit-danhMucId" required class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+              <option th:each="dm : ${danhSachDanhMuc}" th:value="${dm.id}" th:text="${dm.tenDanhMuc}">Toán học</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-on-surface mb-1">Trình độ</label>
+            <select id="edit-trinhDo" class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+              <option value="MOI_TRINH_DO">Mọi trình độ</option>
+              <option value="CO_BAN">Cơ bản</option>
+              <option value="TRUNG_CAP">Trung cấp</option>
+              <option value="NANG_CAO">Nâng cao</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-on-surface mb-1">Giá gốc (VNĐ) <span class="text-primary">*</span></label>
+            <input type="number" id="edit-giaGoc" required min="0" step="1000" class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+          </div>
+          <div>
+            <label class="block font-bold text-on-surface mb-1">Giá khuyến mãi (VNĐ)</label>
+            <input type="number" id="edit-giaKhuyenMai" min="0" step="1000" class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-on-surface mb-1">Thẻ phân loại</label>
+          <input type="text" id="edit-thePhanLoai" class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+        </div>
+
+        <div>
+          <label class="block font-bold text-on-surface mb-1">Ảnh bìa khóa học (URL Thumbnail)</label>
+          <input type="url" id="edit-anhDaiDienKhoaHoc" class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+        </div>
+
+        <div>
+          <label class="block font-bold text-on-surface mb-1">Mô tả khóa học</label>
+          <textarea id="edit-moTaChiTiet" rows="4" class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container"></textarea>
+        </div>
+
+        <div class="pt-3 border-t border-surface-container/40 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-edit-course')" class="px-4 py-2 rounded-xl bg-surface-container-low text-on-surface-variant font-bold hover:bg-surface-container">Hủy</button>
+          <button type="submit" id="btn-submit-edit" class="px-5 py-2.5 rounded-xl bg-tertiary-container text-white font-bold hover:bg-tertiary shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">save</span>
+            <span>Lưu Thay Đổi</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 3: STUDIO SOẠN GIÁO TRÌNH (CURRICULUM STUDIO) ==================== -->
+  <div id="modal-curriculum" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-surface-card rounded-3xl max-w-4xl w-full h-[90vh] shadow-2xl border border-surface-container flex flex-col overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-surface-container flex items-center justify-between bg-surface-container-low/40">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-tertiary-container text-white flex items-center justify-center shadow-xs">
+            <span class="material-symbols-outlined text-[22px]">video_library</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-bold text-on-surface" id="curriculumCourseTitle">Soạn Giáo Trình Khóa Học</h3>
+              <span id="curriculumStatusBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-container-highest text-on-surface-variant">Bản nháp</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant">Quản lý các chương mục và video bài giảng YouTube cho khóa học.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="btnSubmitCurriculumReview" onclick="submitCurrentCourseForReview()" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-status-warning/15 hover:bg-status-warning/25 text-status-warning text-xs font-bold border border-status-warning/30 transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">send</span>
+            <span>Gửi Duyệt Khóa Học</span>
+          </button>
+          <button onclick="closeModal('modal-curriculum')" class="p-2 rounded-xl hover:bg-surface-container text-outline">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Split Content) -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-surface-canvas/50">
+
+        <!-- Toolbar: Thêm chương học -->
+        <div class="bg-surface-card p-4 rounded-2xl border border-surface-container/50 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-tertiary text-[20px]">folder_special</span>
+            <span class="text-xs font-bold text-on-surface">Đề cương chi tiết</span>
+            <span id="curriculumTotalStats" class="text-[11px] text-on-surface-variant font-medium">(0 chương • 0 bài học)</span>
+          </div>
+          <button type="button" onclick="showAddChapterForm()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-tertiary-container hover:bg-tertiary text-white text-xs font-bold transition-all shadow-xs cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">add_circle</span>
+            <span>Thêm Chương Mới</span>
+          </button>
+        </div>
+
+        <!-- Inline Add Chapter Form (Hidden by default) -->
+        <div id="inlineAddChapterBox" class="hidden bg-surface-card p-4 rounded-2xl border-2 border-dashed border-tertiary-container/50 shadow-xs space-y-3">
+          <h4 class="text-xs font-bold text-tertiary flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">create_new_folder</span>
+            <span>Thêm Chương Học Mới</span>
+          </h4>
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <input type="text" id="newChapterTitle" placeholder="Nhập tiêu đề chương (VD: Chương 1: Hàm số & Đạo hàm)"
+                   class="flex-1 w-full px-3.5 py-2 rounded-xl bg-surface-container-low border border-surface-container text-xs focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+            <input type="number" id="newChapterOrder" placeholder="Thứ tự (1, 2...)" value="1" min="1"
+                   class="w-full sm:w-28 px-3.5 py-2 rounded-xl bg-surface-container-low border border-surface-container text-xs focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <button type="button" onclick="handleCreateChapter()" class="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-tertiary-container hover:bg-tertiary text-white text-xs font-bold transition-all shadow-xs cursor-pointer">Lưu Chương</button>
+              <button type="button" onclick="document.getElementById('inlineAddChapterBox').classList.add('hidden')" class="px-3 py-2 rounded-xl bg-surface-container-low text-on-surface-variant text-xs font-bold hover:bg-surface-container">Hủy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Curriculum Chapters Container -->
+        <div id="curriculumChaptersList" class="space-y-4">
+          <!-- Dynamic chapters will be rendered here by JS -->
+          <div class="text-center py-12 text-outline">
+            <span class="material-symbols-outlined text-4xl mb-2 animate-spin">progress_activity</span>
+            <p class="text-xs">Đang tải đề cương khóa học...</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-3 border-t border-surface-container bg-surface-card flex items-center justify-between text-xs">
+        <span class="text-on-surface-variant flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+          <span>Hệ thống tự động lưu mỗi khi thêm/xóa bài học</span>
+        </span>
+        <button type="button" onclick="closeModal('modal-curriculum')" class="px-5 py-2 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface font-bold transition-all cursor-pointer">
+          Đóng Studio
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 4: THÊM BÀI HỌC VÀO CHƯƠNG ==================== -->
+  <div id="modal-add-lesson" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-surface-card rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-surface-container space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-tertiary-container/15 text-tertiary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px]">smart_display</span>
+          </div>
+          <h3 class="text-base font-bold text-on-surface">Thêm Bài Học Video Mới</h3>
+        </div>
+        <button onclick="closeModal('modal-add-lesson')" class="p-1 rounded-lg hover:bg-surface-container text-outline">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="form-add-lesson" onsubmit="handleCreateLesson(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="lessonChapterId">
+
+        <div>
+          <label class="block font-bold text-on-surface mb-1">Tiêu đề bài học <span class="text-primary">*</span></label>
+          <input type="text" id="lessonTitle" required placeholder="VD: Bài 1: Khảo sát sự biến thiên của hàm bậc 3"
+                 class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+        </div>
+
+        <div>
+          <label class="block font-bold text-on-surface mb-1">Đường dẫn Video YouTube <span class="text-primary">*</span></label>
+          <input type="url" id="lessonVideoUrl" required placeholder="https://www.youtube.com/watch?v=... hoặc https://youtu.be/..."
+                 class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container"
+                 onchange="previewYouTubeVideo(this.value)">
+          <p class="text-[10px] text-outline mt-1">Hỗ trợ đầy đủ định dạng link YouTube (Unlisted hoặc Public).</p>
+        </div>
+
+        <!-- Video Preview Box -->
+        <div id="videoPreviewBox" class="hidden aspect-video w-full rounded-xl overflow-hidden bg-black/10 border border-surface-container">
+          <iframe id="videoPreviewIframe" class="w-full h-full" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-on-surface mb-1">Thời lượng (Số phút)</label>
+            <input type="number" id="lessonDurationMinutes" value="15" min="1"
+                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+          </div>
+          <div>
+            <label class="block font-bold text-on-surface mb-1">Thứ tự bài học</label>
+            <input type="number" id="lessonOrder" value="1" min="1"
+                   class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-surface-container focus:outline-none focus:ring-1 focus:ring-tertiary-container">
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container/50 flex items-center justify-between">
+          <div>
+            <span class="font-bold text-on-surface block">Cho phép học viên học thử miễn phí</span>
+            <span class="text-[10px] text-on-surface-variant">Học viên chưa mua khóa học vẫn có thể xem bài giảng này.</span>
+          </div>
+          <input type="checkbox" id="lessonIsTrial" class="w-4 h-4 rounded text-tertiary focus:ring-tertiary-container cursor-pointer">
+        </div>
+
+        <div class="pt-3 border-t border-surface-container/40 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-add-lesson')" class="px-4 py-2 rounded-xl bg-surface-container-low text-on-surface-variant font-bold hover:bg-surface-container">Hủy</button>
+          <button type="submit" id="btn-submit-lesson" class="px-5 py-2.5 rounded-xl bg-tertiary-container text-white font-bold hover:bg-tertiary shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">add_circle</span>
+            <span>Thêm Bài Học</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="tutorToast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-surface-card border border-surface-container text-on-surface px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3">
+      <div id="tutorToastIcon" class="w-8 h-8 rounded-xl bg-status-success/15 text-status-success flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined text-[20px]">check_circle</span>
+      </div>
+      <div>
+        <h4 id="tutorToastTitle" class="text-xs font-bold">Thông báo</h4>
+        <p id="tutorToastMessage" class="text-[11px] text-on-surface-variant">Thao tác thành công</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CLIENT JAVASCRIPT ==================== -->
+  <script>
+    let currentViewingCourseId = null;
+    let currentCourseData = null;
+
+    /* Toast Helper */
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('tutorToast');
+      const msg = document.getElementById('tutorToastMessage');
+      const icon = document.getElementById('tutorToastIcon');
+      if (!toast || !msg) return;
+
+      msg.innerText = message;
+      if (type === 'success') {
+        icon.className = 'w-8 h-8 rounded-xl bg-status-success/15 text-status-success flex items-center justify-center shrink-0';
+        icon.innerHTML = '<span class="material-symbols-outlined text-[20px]">check_circle</span>';
+      } else {
+        icon.className = 'w-8 h-8 rounded-xl bg-primary/15 text-primary flex items-center justify-center shrink-0';
+        icon.innerHTML = '<span class="material-symbols-outlined text-[20px]">error</span>';
+      }
+
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 4000);
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
+    }
+
+    /* Tab Filter */
+    function filterCourses(status, btn) {
+      document.querySelectorAll('.course-tab-btn').forEach(b => {
+        b.className = 'course-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all';
+      });
+      btn.className = 'course-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white shadow-xs text-tertiary';
+
+      const cards = document.querySelectorAll('.course-card');
+      let visible = 0;
+      cards.forEach(card => {
+        const cStatus = card.getAttribute('data-status');
+        if (status === 'ALL' || cStatus === status) {
+          card.style.display = '';
+          visible++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      const noMatch = document.getElementById('noMatchCard');
+      if (noMatch) noMatch.classList.toggle('hidden', visible > 0);
+    }
+
+    /* Live Search */
+    function searchCourses() {
+      const q = document.getElementById('searchCourseInput').value.toLowerCase().trim();
+      const cards = document.querySelectorAll('.course-card');
+      let visible = 0;
+
+      cards.forEach(card => {
+        const title = (card.getAttribute('data-title') || '').toLowerCase();
+        if (!q || title.includes(q)) {
+          card.style.display = '';
+          visible++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      const noMatch = document.getElementById('noMatchCard');
+      if (noMatch) noMatch.classList.toggle('hidden', visible > 0);
+    }
+
+    /* YouTube Parser */
+    function extractYouTubeId(url) {
+      if (!url) return null;
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    function previewYouTubeVideo(url) {
+      const videoId = extractYouTubeId(url);
+      const box = document.getElementById('videoPreviewBox');
+      const iframe = document.getElementById('videoPreviewIframe');
+      if (videoId && box && iframe) {
+        iframe.src = 'https://www.youtube.com/embed/' + videoId;
+        box.classList.remove('hidden');
+      } else if (box) {
+        box.classList.add('hidden');
+      }
+    }
+
+    /* Modal 1: Open Create */
+    function openCreateCourseModal() {
+      document.getElementById('form-create-course').reset();
+      document.getElementById('modal-create-course').classList.remove('hidden');
+    }
+
+    async function handleCreateCourse(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-create');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span> Đang tạo...';
+
+      const payload = {
+        tieuDe: document.getElementById('create-tieuDe').value.trim(),
+        danhMucId: parseInt(document.getElementById('create-danhMucId').value),
+        trinhDo: document.getElementById('create-trinhDo').value,
+        giaGoc: parseFloat(document.getElementById('create-giaGoc').value),
+        giaKhuyenMai: document.getElementById('create-giaKhuyenMai').value ? parseFloat(document.getElementById('create-giaKhuyenMai').value) : null,
+        thePhanLoai: document.getElementById('create-thePhanLoai').value.trim(),
+        anhDaiDienKhoaHoc: document.getElementById('create-anhDaiDienKhoaHoc').value.trim(),
+        moTaChiTiet: document.getElementById('create-moTaChiTiet').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/giang-vien/khoa-hoc', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          showToast('Tạo khóa học thành công! Hãy soạn giáo trình cho khóa học.');
+          closeModal('modal-create-course');
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          showToast(data.message || 'Lỗi khi tạo khóa học', 'error');
+        }
+      } catch (err) {
+        showToast('Có lỗi xảy ra: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check</span><span>Tạo Khóa Học</span>';
+      }
+    }
+
+    /* Modal 2: Edit Course */
+    async function openEditCourseModal(courseId) {
+      try {
+        const res = await fetch('/api/giang-vien/khoa-hoc/' + courseId);
+        const data = await res.json();
+        if (data.status === 'success') {
+          const c = data.data;
+          document.getElementById('edit-id').value = c.id;
+          document.getElementById('edit-tieuDe').value = c.tieuDe || '';
+          document.getElementById('edit-danhMucId').value = c.danhMuc ? c.danhMuc.id : '';
+          document.getElementById('edit-trinhDo').value = c.trinhDo || 'MOI_TRINH_DO';
+          document.getElementById('edit-giaGoc').value = c.giaGoc || 0;
+          document.getElementById('edit-giaKhuyenMai').value = c.giaKhuyenMai || '';
+          document.getElementById('edit-thePhanLoai').value = c.thePhanLoai || '';
+          document.getElementById('edit-anhDaiDienKhoaHoc').value = c.anhDaiDienKhoaHoc || '';
+          document.getElementById('edit-moTaChiTiet').value = c.moTaChiTiet || '';
+
+          document.getElementById('modal-edit-course').classList.remove('hidden');
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (err) {
+        showToast('Không thể tải thông tin khóa học', 'error');
+      }
+    }
+
+    async function handleEditCourse(e) {
+      e.preventDefault();
+      const courseId = document.getElementById('edit-id').value;
+      const btn = document.getElementById('btn-submit-edit');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span> Đang lưu...';
+
+      const payload = {
+        tieuDe: document.getElementById('edit-tieuDe').value.trim(),
+        danhMucId: parseInt(document.getElementById('edit-danhMucId').value),
+        trinhDo: document.getElementById('edit-trinhDo').value,
+        giaGoc: parseFloat(document.getElementById('edit-giaGoc').value),
+        giaKhuyenMai: document.getElementById('edit-giaKhuyenMai').value ? parseFloat(document.getElementById('edit-giaKhuyenMai').value) : null,
+        thePhanLoai: document.getElementById('edit-thePhanLoai').value.trim(),
+        anhDaiDienKhoaHoc: document.getElementById('edit-anhDaiDienKhoaHoc').value.trim(),
+        moTaChiTiet: document.getElementById('edit-moTaChiTiet').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/giang-vien/khoa-hoc/' + courseId, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          showToast('Cập nhật khóa học thành công!');
+          closeModal('modal-edit-course');
+          setTimeout(() => window.location.reload(), 800);
+        } else {
+          showToast(data.message || 'Lỗi khi cập nhật', 'error');
+        }
+      } catch (err) {
+        showToast('Có lỗi xảy ra: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">save</span><span>Lưu Thay Đổi</span>';
+      }
+    }
+
+    /* Delete Course */
+    async function confirmDeleteCourse(courseId, title) {
+      if (!confirm(`Bạn có chắc chắn muốn xóa khóa học "${title}" không? Thao tác này sẽ xóa toàn bộ chương và bài học bên trong.`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/giang-vien/khoa-hoc/' + courseId, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          showToast('Đã xóa khóa học thành công!');
+          setTimeout(() => window.location.reload(), 800);
+        } else {
+          showToast(data.message || 'Không thể xóa khóa học', 'error');
+        }
+      } catch (err) {
+        showToast('Lỗi khi xóa khóa học', 'error');
+      }
+    }
+
+    /* Submit for Review */
+    async function submitForReview(courseId) {
+      if (!confirm('Bạn có chắc muốn gửi khóa học này lên Ban Quản Trị để xét duyệt xuất bản không?')) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/giang-vien/khoa-hoc/' + courseId + '/gui-duyet', {
+          method: 'POST'
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          showToast('Khóa học đã được gửi lên Ban Quản Trị xét duyệt thành công!');
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          showToast(data.message || 'Chưa đủ điều kiện gửi duyệt', 'error');
+        }
+      } catch (err) {
+        showToast('Lỗi khi gửi duyệt: ' + err.message, 'error');
+      }
+    }
+
+    function submitCurrentCourseForReview() {
+      if (currentViewingCourseId) {
+        submitForReview(currentViewingCourseId);
+      }
+    }
+
+    /* ==================== CURRICULUM STUDIO ENGINE ==================== */
+    async function openCurriculumModal(courseId) {
+      currentViewingCourseId = courseId;
+      document.getElementById('modal-curriculum').classList.remove('hidden');
+      document.getElementById('inlineAddChapterBox').classList.add('hidden');
+      await loadCurriculumData(courseId);
+    }
+
+    async function loadCurriculumData(courseId) {
+      const container = document.getElementById('curriculumChaptersList');
+      container.innerHTML = `
+        <div class="text-center py-12 text-outline">
+          <span class="material-symbols-outlined text-4xl mb-2 animate-spin">progress_activity</span>
+          <p class="text-xs">Đang tải đề cương khóa học...</p>
+        </div>`;
+
+      try {
+        const res = await fetch('/api/giang-vien/khoa-hoc/' + courseId);
+        const data = await res.json();
+        if (data.status === 'success') {
+          currentCourseData = data.data;
+          renderCurriculum(data.data);
+        } else {
+          container.innerHTML = `<div class="p-6 text-center text-primary text-xs font-bold">${data.message}</div>`;
+        }
+      } catch (err) {
+        container.innerHTML = `<div class="p-6 text-center text-primary text-xs font-bold">Lỗi tải dữ liệu đề cương: ${err.message}</div>`;
+      }
+    }
+
+    function renderCurriculum(course) {
+      document.getElementById('curriculumCourseTitle').innerText = course.tieuDe || 'Soạn Giáo Trình';
+      
+      const badge = document.getElementById('curriculumStatusBadge');
+      if (course.trangThai === 'DA_XUAT_BAN') {
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-status-success text-white';
+        badge.innerText = 'Đã xuất bản';
+      } else if (course.trangThai === 'CHO_DUYET') {
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-status-warning text-white';
+        badge.innerText = 'Chờ duyệt';
+      } else if (course.trangThai === 'TU_CHOI') {
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary text-white';
+        badge.innerText = 'Bị từ chối';
+      } else {
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-container-highest text-on-surface-variant';
+        badge.innerText = 'Bản nháp';
+      }
+
+      const chapters = course.danhSachChuongHoc || [];
+      let totalLessons = 0;
+      chapters.forEach(c => totalLessons += (c.danhSachBaiHoc ? c.danhSachBaiHoc.length : 0));
+      document.getElementById('curriculumTotalStats').innerText = `(${chapters.length} chương • ${totalLessons} bài học)`;
+
+      const container = document.getElementById('curriculumChaptersList');
+      if (chapters.length === 0) {
+        container.innerHTML = `
+          <div class="p-10 text-center bg-surface-card rounded-2xl border border-dashed border-surface-container/60">
+            <span class="material-symbols-outlined text-4xl text-outline mb-2">library_add</span>
+            <h4 class="text-xs font-bold text-on-surface">Chưa có chương học nào</h4>
+            <p class="text-[11px] text-on-surface-variant mt-1 mb-4">Hãy bấm "Thêm Chương Mới" phía trên để bắt đầu xây dựng cấu trúc giáo trình.</p>
+            <button type="button" onclick="showAddChapterForm()" class="px-4 py-2 rounded-xl bg-tertiary-container text-white text-xs font-bold shadow-xs">
+              Thêm Chương Đầu Tiên
+            </button>
+          </div>`;
+        return;
+      }
+
+      let html = '';
+      chapters.forEach((chap, cIdx) => {
+        const lessons = chap.danhSachBaiHoc || [];
+        html += `
+          <div class="bg-surface-card rounded-2xl border border-surface-container/50 shadow-xs overflow-hidden">
+            <!-- Chapter Header -->
+            <div class="p-4 bg-surface-container-low/60 flex items-center justify-between border-b border-surface-container/40">
+              <div class="flex items-center gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-tertiary-container/15 text-tertiary flex items-center justify-center text-xs font-bold">${cIdx + 1}</span>
+                <h4 class="text-xs font-bold text-on-surface">${escapeHtml(chap.tieuDeChuong)}</h4>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-surface-container font-semibold text-on-surface-variant">${lessons.length} bài</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="openAddLessonModal(${chap.id})" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-tertiary-container hover:bg-tertiary text-white text-[11px] font-bold shadow-xs cursor-pointer">
+                  <span class="material-symbols-outlined text-[15px]">add</span>
+                  <span>Thêm bài học</span>
+                </button>
+                <button type="button" onclick="deleteChapter(${chap.id})" class="p-1.5 rounded-lg hover:bg-primary/10 text-on-surface-variant hover:text-primary transition-all cursor-pointer" title="Xóa chương này">
+                  <span class="material-symbols-outlined text-[17px]">delete</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Lessons List in Chapter -->
+            <div class="divide-y divide-surface-container/30">`;
+
+        if (lessons.length === 0) {
+          html += `
+            <div class="p-4 text-center text-[11px] text-on-surface-variant italic">
+              Chưa có bài học nào trong chương này. Bấm "+ Thêm bài học" để thêm video YouTube.
+            </div>`;
+        } else {
+          lessons.forEach((les, lIdx) => {
+            const vidId = extractYouTubeId(les.linkVideo);
+            const thumbUrl = vidId ? `https://img.youtube.com/vi/${vidId}/hqdefault.jpg` : '';
+            html += `
+              <div class="p-3.5 flex items-center justify-between gap-3 hover:bg-surface-container-low/40 transition-colors">
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                  <!-- Video Icon or Thumbnail -->
+                  <div class="w-12 h-8 rounded-lg overflow-hidden bg-black/10 shrink-0 relative flex items-center justify-center">
+                    ${thumbUrl ? `<img src="${thumbUrl}" class="w-full h-full object-cover">` : `<span class="material-symbols-outlined text-[18px] text-tertiary">videocam</span>`}
+                    <div class="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                      <span class="material-symbols-outlined text-white text-[14px]">play_arrow</span>
+                    </div>
+                  </div>
+
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-semibold text-on-surface truncate">${escapeHtml(les.tieuDeBaiHoc)}</span>
+                      ${les.choPhepHocThu ? '<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-status-success/15 text-status-success border border-status-success/30">Học thử</span>' : ''}
+                    </div>
+                    <div class="flex items-center gap-3 text-[10px] text-on-surface-variant mt-0.5">
+                      <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">schedule</span> ${Math.round((les.thoiLuongGiay || 900) / 60)} phút</span>
+                      <a href="${les.linkVideo}" target="_blank" class="text-tertiary hover:underline flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-[12px]">link</span>
+                        <span>Xem video</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="deleteLesson(${les.id})" class="p-1.5 rounded-lg hover:bg-primary/10 text-on-surface-variant hover:text-primary transition-all cursor-pointer" title="Xóa bài học">
+                    <span class="material-symbols-outlined text-[16px]">close</span>
+                  </button>
+                </div>
+              </div>`;
+          });
+        }
+
+        html += `
+            </div>
+          </div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function showAddChapterForm() {
+      const box = document.getElementById('inlineAddChapterBox');
+      box.classList.remove('hidden');
+      document.getElementById('newChapterTitle').focus();
+    }
+
+    async function handleCreateChapter() {
+      const title = document.getElementById('newChapterTitle').value.trim();
+      const order = parseInt(document.getElementById('newChapterOrder').value) || 1;
+      if (!title) {
+        showToast('Vui lòng nhập tên chương học', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/giang-vien/khoa-hoc/${currentViewingCourseId}/chuong-hoc`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tieuDeChuong: title, thuTuSapXep: order })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          showToast('Đã thêm chương học thành công!');
+          document.getElementById('newChapterTitle').value = '';
+          document.getElementById('inlineAddChapterBox').classList.add('hidden');
+          await loadCurriculumData(currentViewingCourseId);
+        } else {
+          showToast(data.message || 'Lỗi thêm chương học', 'error');
+        }
+      } catch (err) {
+        showToast('Lỗi: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteChapter(chapId) {
+      if (!confirm('Bạn có chắc muốn xóa chương học này cùng tất cả các bài học bên trong?')) return;
+
+      try {
+        const res = await fetch(`/api/giang-vien/khoa-hoc/chuong-hoc/${chapId}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          showToast('Đã xóa chương học thành công!');
+          await loadCurriculumData(currentViewingCourseId);
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (err) {
+        showToast('Lỗi: ' + err.message, 'error');
+      }
+    }
+
+    /* Add Lesson Engine */
+    function openAddLessonModal(chapterId) {
+      document.getElementById('lessonChapterId').value = chapterId;
+      document.getElementById('form-add-lesson').reset();
+      document.getElementById('videoPreviewBox').classList.add('hidden');
+      document.getElementById('modal-add-lesson').classList.remove('hidden');
+    }
+
+    async function handleCreateLesson(e) {
+      e.preventDefault();
+      const chapId = document.getElementById('lessonChapterId').value;
+      const btn = document.getElementById('btn-submit-lesson');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span> Đang lưu...';
+
+      const minutes = parseInt(document.getElementById('lessonDurationMinutes').value) || 15;
+      const payload = {
+        tieuDeBaiHoc: document.getElementById('lessonTitle').value.trim(),
+        linkVideo: document.getElementById('lessonVideoUrl').value.trim(),
+        thoiLuongGiay: minutes * 60,
+        thuTuSapXep: parseInt(document.getElementById('lessonOrder').value) || 1,
+        choPhepHocThu: document.getElementById('lessonIsTrial').checked
+      };
+
+      try {
+        const res = await fetch(`/api/giang-vien/khoa-hoc/chuong-hoc/${chapId}/bai-hoc`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          showToast('Đã thêm bài học thành công!');
+          closeModal('modal-add-lesson');
+          await loadCurriculumData(currentViewingCourseId);
+        } else {
+          showToast(data.message || 'Lỗi thêm bài học', 'error');
+        }
+      } catch (err) {
+        showToast('Lỗi: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">add_circle</span><span>Thêm Bài Học</span>';
+      }
+    }
+
+    async function deleteLesson(lessonId) {
+      if (!confirm('Bạn có chắc muốn xóa bài học này?')) return;
+
+      try {
+        const res = await fetch(`/api/giang-vien/khoa-hoc/bai-hoc/${lessonId}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          showToast('Đã xóa bài học thành công!');
+          await loadCurriculumData(currentViewingCourseId);
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (err) {
+        showToast('Lỗi: ' + err.message, 'error');
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+
+</body>
+</html>
+

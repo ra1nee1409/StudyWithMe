@@ -26,6 +26,13 @@ public interface KhoaHocRepository extends JpaRepository<KhoaHoc, Long> {
 
     List<KhoaHoc> findByGiangVienId(Long giangVienId);
 
+    @EntityGraph(attributePaths = {"giangVien", "giangVien.nguoiDung", "danhMuc", "danhSachChuongHoc"})
+    List<KhoaHoc> findByGiangVienIdOrderByNgayTaoDesc(Long giangVienId);
+
+    long countByGiangVienId(Long giangVienId);
+
+    long countByGiangVienIdAndTrangThai(Long giangVienId, TrangThaiKhoaHoc trangThai);
+
     @EntityGraph(attributePaths = {"giangVien", "giangVien.nguoiDung", "danhMuc"})
     List<KhoaHoc> findByGiangVienIdAndTrangThaiOrderByNgayTaoDesc(Long giangVienId, TrangThaiKhoaHoc trangThai);
 

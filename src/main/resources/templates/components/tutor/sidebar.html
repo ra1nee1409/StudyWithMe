@@ -43,7 +43,15 @@
           <span>Bàn làm việc</span>
         </a>
 
-        <!-- 2. Lớp học của tôi -->
+        <!-- 2. Studio Khóa học Video -->
+        <a th:href="@{/tutor/khoa-hoc}"
+           th:classappend="${activeTab == 'courses'} ? 'bg-tertiary-container text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">video_library</span>
+          <span>Studio Khóa học</span>
+        </a>
+
+        <!-- 3. Lớp học của tôi -->
         <a th:href="@{/tutor/lop-hoc}"
            th:classappend="${activeTab == 'classes'} ? 'bg-tertiary-container text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">

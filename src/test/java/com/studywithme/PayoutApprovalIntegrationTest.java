@@ -3,13 +3,17 @@ package com.studywithme;
 import com.jayway.jsonpath.JsonPath;
 import com.studywithme.entity.HoSoGiangVien;
 import com.studywithme.entity.NguoiDung;
+import com.studywithme.entity.VaiTro;
 import com.studywithme.entity.YeuCauRutTien;
 import com.studywithme.entity.enums.admin.LoaiGiaoDichVi;
+import com.studywithme.entity.enums.admin.TrangThaiGiangVien;
 import com.studywithme.entity.enums.admin.TrangThaiRutTien;
 import com.studywithme.entity.enums.shared.TrangThaiNguoiDung;
+import com.studywithme.entity.enums.shared.VaiTroName;
 import com.studywithme.repository.HoSoGiangVienRepository;
 import com.studywithme.repository.LichSuViTienRepository;
 import com.studywithme.repository.NguoiDungRepository;
+import com.studywithme.repository.VaiTroRepository;
 import com.studywithme.repository.YeuCauRutTienRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,6 +61,9 @@ class PayoutApprovalIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private VaiTroRepository vaiTroRepository;
+
     private MockMvc mockMvc;
     private YeuCauRutTien testPendingPayout;
     private HoSoGiangVien testGiangVien;
@@ -74,22 +82,51 @@ class PayoutApprovalIntegrationTest {
             this.nguoiDungRepository.save(admin);
         });
 
-        // Tạo hồ sơ giảng viên & lệnh rút tiền mẫu cho test
-        NguoiDung tutorUser = this.nguoiDungRepository.findByEmail("tutor@studywithme.vn").orElse(null);
-        if (tutorUser != null) {
-            testGiangVien = this.hoSoGiangVienRepository.findByNguoiDungId(tutorUser.getId()).orElse(null);
-        }
-
-        if (testGiangVien != null) {
-            testPendingPayout = this.yeuCauRutTienRepository.save(YeuCauRutTien.builder()
-                    .giangVien(testGiangVien)
-                    .soTienRut(new BigDecimal("1000000"))
-                    .tenNganHang("Vietcombank")
-                    .soTaiKhoan("0123456789")
-                    .tenChuTaiKhoan("HOANG VAN NAM")
-                    .trangThai(TrangThaiRutTien.CHO_XU_LY)
+        // Đảm bảo có tài khoản học viên mẫu cho layStudentToken()
+        this.nguoiDungRepository.findByEmail("student@studywithme.vn").orElseGet(() -> {
+            VaiTro roleHocVien = vaiTroRepository.findByTenVaiTro(VaiTroName.ROLE_HOC_VIEN).orElseGet(() ->
+                    vaiTroRepository.save(VaiTro.builder().tenVaiTro(VaiTroName.ROLE_HOC_VIEN).moTa("Học viên").build())
+            );
+            return nguoiDungRepository.save(NguoiDung.builder()
+                    .email("student@studywithme.vn")
+                    .matKhau(this.passwordEncoder.encode("Student@123456"))
+                    .hoTen("Học viên Test")
+                    .trangThai(TrangThaiNguoiDung.HOAT_DONG)
+                    .danhSachVaiTro(Set.of(roleHocVien))
                     .build());
-        }
+        });
+
+        // Tạo hồ sơ giảng viên & lệnh rút tiền mẫu cho test
+        NguoiDung tutorUser = this.nguoiDungRepository.findByEmail("tutor@studywithme.vn").orElseGet(() -> {
+            VaiTro roleGiangVien = vaiTroRepository.findByTenVaiTro(VaiTroName.ROLE_GIANG_VIEN).orElseGet(() ->
+                    vaiTroRepository.save(VaiTro.builder().tenVaiTro(VaiTroName.ROLE_GIANG_VIEN).moTa("Giảng viên").build())
+            );
+            return nguoiDungRepository.save(NguoiDung.builder()
+                    .email("tutor@studywithme.vn")
+                    .matKhau(this.passwordEncoder.encode("dummy_test_pass"))
+                    .hoTen("Giảng viên Test Rút Tiền")
+                    .trangThai(TrangThaiNguoiDung.HOAT_DONG)
+                    .danhSachVaiTro(Set.of(roleGiangVien))
+                    .build());
+        });
+
+        testGiangVien = this.hoSoGiangVienRepository.findByNguoiDungId(tutorUser.getId()).orElseGet(() ->
+                hoSoGiangVienRepository.save(HoSoGiangVien.builder()
+                        .nguoiDung(tutorUser)
+                        .tieuDeChuyenMon("Giảng viên Test")
+                        .soDuVi(new BigDecimal("5000000"))
+                        .trangThaiDuyet(TrangThaiGiangVien.DA_DUYET)
+                        .build())
+        );
+
+        testPendingPayout = this.yeuCauRutTienRepository.save(YeuCauRutTien.builder()
+                .giangVien(testGiangVien)
+                .soTienRut(new BigDecimal("1000000"))
+                .tenNganHang("Vietcombank")
+                .soTaiKhoan("0123456789")
+                .tenChuTaiKhoan("HOANG VAN NAM")
+                .trangThai(TrangThaiRutTien.CHO_XU_LY)
+                .build());
     }
 
     private String layAdminToken() throws Exception {

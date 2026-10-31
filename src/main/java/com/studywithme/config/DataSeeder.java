@@ -11,6 +11,7 @@ import com.studywithme.entity.enums.shared.VaiTroName;
 import com.studywithme.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,9 @@ import java.util.Set;
 public class DataSeeder implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(DataSeeder.class);
+
+    @Value("${app.seed-sample-data:false}")
+    private boolean seedSampleData;
 
     private final VaiTroRepository vaiTroRepository;
     private final NguoiDungRepository nguoiDungRepository;
@@ -121,10 +125,23 @@ public class DataSeeder implements CommandLineRunner {
             });
         }
 
-        // 3. Khởi tạo tài khoản Giảng viên mẫu
+        // 3. Khởi tạo cây danh mục chuẩn (Tiểu học, THCS, THPT, Ngoại ngữ) nếu chưa có danh mục nào
+        if (danhMucRepository.count() == 0) {
+            initDanhMucChuan();
+        }
+
+        // 4. KIỂM TRA CHẾ ĐỘ NẠP DỮ LIỆU MẪU (Mặc định app.seed-sample-data=false để người dùng tự nhập dữ liệu thật)
+        if (!seedSampleData) {
+            logger.info(">>> [DATA SEEDER] Chế độ nhập dữ liệu thật đang BẬT (app.seed-sample-data=false). Đã tạm dừng nạp các dữ liệu mẫu giả lập.");
+            return;
+        }
+
+        logger.info(">>> [DATA SEEDER] Đang nạp dữ liệu mẫu giả lập (app.seed-sample-data=true)...");
+
+        // 5. Khởi tạo tài khoản Giảng viên mẫu
         initGiangVienMau(roleGiangVien);
 
-        // 4. Khởi tạo tài khoản Học sinh mẫu
+        // 6. Khởi tạo tài khoản Học sinh mẫu
         String studentEmail = "student@studywithme.vn";
         if (!nguoiDungRepository.existsByEmail(studentEmail)) {
             NguoiDung student = NguoiDung.builder()
@@ -140,7 +157,7 @@ public class DataSeeder implements CommandLineRunner {
             logger.info(">>> Đã khởi tạo tài khoản Học viên mẫu: {} / Student@123456", studentEmail);
         }
 
-        // 5. Khởi tạo Banner quảng cáo mẫu nếu chưa có banner nào
+        // 7. Khởi tạo Banner quảng cáo mẫu nếu chưa có banner nào
         if (bannerQuangCaoRepository.count() == 0) {
             com.studywithme.entity.BannerQuangCao b1 = com.studywithme.entity.BannerQuangCao.builder()
                     .tieuDe("Khai Giảng Khóa Học Luyện Thi Vào Lớp 10 Chuyên Toàn Diện")
@@ -200,11 +217,6 @@ public class DataSeeder implements CommandLineRunner {
                 }
                 logger.info(">>> Đã khởi tạo dữ liệu đơn hàng mẫu cho năm {}", currentYear);
             }
-        }
-
-        // 7. Khởi tạo cây danh mục chuẩn (Tiểu học, THCS, THPT, Ngoại ngữ) nếu chưa có danh mục nào
-        if (danhMucRepository.count() == 0) {
-            initDanhMucChuan();
         }
 
         // 8. Khởi tạo 8 khóa học mẫu nổi bật nếu chưa có khóa học nào

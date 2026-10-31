@@ -253,7 +253,7 @@ class PaymentPayOsIntegrationTest {
     void testDemoPaymentSimulation() throws Exception {
         NguoiDung hocVien = nguoiDungRepository.save(NguoiDung.builder()
                 .email("demo_student_" + UUID.randomUUID() + "@studywithme.vn")
-                .matKhau(passwordEncoder.encode("Demo@123"))
+                .matKhau(passwordEncoder.encode("dummy_test_pass"))
                 .hoTen("Học viên Demo")
                 .trangThai(TrangThaiNguoiDung.HOAT_DONG)
                 .build());

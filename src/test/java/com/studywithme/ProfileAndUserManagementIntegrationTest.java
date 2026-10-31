@@ -47,7 +47,7 @@ class ProfileAndUserManagementIntegrationTest {
         String testEmail = "student_profile_" + UUID.randomUUID() + "@studywithme.vn";
         NguoiDung user = nguoiDungRepository.save(NguoiDung.builder()
                 .email(testEmail)
-                .matKhau(passwordEncoder.encode("Pass@123"))
+                .matKhau(passwordEncoder.encode("dummy_test_pass"))
                 .hoTen("Tên Cũ")
                 .soDienThoai("0900000001")
                 .trangThai(TrangThaiNguoiDung.HOAT_DONG)
@@ -74,21 +74,21 @@ class ProfileAndUserManagementIntegrationTest {
         String testEmail = "student_pass_" + UUID.randomUUID() + "@studywithme.vn";
         NguoiDung user = nguoiDungRepository.save(NguoiDung.builder()
                 .email(testEmail)
-                .matKhau(passwordEncoder.encode("OldPassword@123"))
+                .matKhau(passwordEncoder.encode("old_test_password_123"))
                 .hoTen("Học viên Đổi Mật Khẩu")
                 .trangThai(TrangThaiNguoiDung.HOAT_DONG)
                 .build());
 
         DoiMatKhauRequest req = DoiMatKhauRequest.builder()
-                .matKhauHienTai("OldPassword@123")
-                .matKhauMoi("NewPassword@456")
-                .xacNhanMatKhau("NewPassword@456")
+                .matKhauHienTai("old_test_password_123")
+                .matKhauMoi("new_test_password_456")
+                .xacNhanMatKhau("new_test_password_456")
                 .build();
 
         profileService.doiMatKhau(testEmail, req);
 
         NguoiDung updated = nguoiDungRepository.findByEmail(testEmail).orElseThrow();
-        assertThat(passwordEncoder.matches("NewPassword@456", updated.getMatKhau())).isTrue();
+        assertThat(passwordEncoder.matches("new_test_password_456", updated.getMatKhau())).isTrue();
     }
 
     @Test
@@ -97,25 +97,25 @@ class ProfileAndUserManagementIntegrationTest {
         String testEmail = "student_wrongpass_" + UUID.randomUUID() + "@studywithme.vn";
         nguoiDungRepository.save(NguoiDung.builder()
                 .email(testEmail)
-                .matKhau(passwordEncoder.encode("CorrectPassword@123"))
+                .matKhau(passwordEncoder.encode("correct_test_password_123"))
                 .hoTen("Học viên")
                 .trangThai(TrangThaiNguoiDung.HOAT_DONG)
                 .build());
 
         // Sai mật khẩu cũ
         DoiMatKhauRequest reqSaiCu = DoiMatKhauRequest.builder()
-                .matKhauHienTai("WrongPassword@123")
-                .matKhauMoi("NewPassword@456")
-                .xacNhanMatKhau("NewPassword@456")
+                .matKhauHienTai("wrong_test_password_123")
+                .matKhauMoi("new_test_password_456")
+                .xacNhanMatKhau("new_test_password_456")
                 .build();
 
         assertThrows(IllegalArgumentException.class, () -> profileService.doiMatKhau(testEmail, reqSaiCu));
 
         // Xác nhận mật khẩu không khớp
         DoiMatKhauRequest reqKhongKhop = DoiMatKhauRequest.builder()
-                .matKhauHienTai("CorrectPassword@123")
-                .matKhauMoi("NewPassword@456")
-                .xacNhanMatKhau("DifferentPassword@789")
+                .matKhauHienTai("correct_test_password_123")
+                .matKhauMoi("new_test_password_456")
+                .xacNhanMatKhau("different_test_password_789")
                 .build();
 
         assertThrows(IllegalArgumentException.class, () -> profileService.doiMatKhau(testEmail, reqKhongKhop));
@@ -127,7 +127,7 @@ class ProfileAndUserManagementIntegrationTest {
         String testEmail = "user_to_delete_" + UUID.randomUUID() + "@studywithme.vn";
         NguoiDung user = nguoiDungRepository.save(NguoiDung.builder()
                 .email(testEmail)
-                .matKhau(passwordEncoder.encode("Pass@123"))
+                .matKhau(passwordEncoder.encode("dummy_test_pass"))
                 .hoTen("Người dùng cần xóa")
                 .trangThai(TrangThaiNguoiDung.HOAT_DONG)
                 .build());

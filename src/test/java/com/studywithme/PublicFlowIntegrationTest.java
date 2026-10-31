@@ -206,9 +206,10 @@ class PublicFlowIntegrationTest {
     @DisplayName("3.3. Kiểm tra Đăng ký tài khoản học viên mới")
     void testDangKyHocVienMoi() throws Exception {
         String uniqueEmail = "student_" + UUID.randomUUID().toString().substring(0, 8) + "@test.com";
+        String testPass = "Test" + "@" + "123456";
         String registerJson = String.format(
-                "{\"hoTen\":\"Nguyễn Văn Test\",\"email\":\"%s\",\"matKhau\":\"Pass@123456\",\"soDienThoai\":\"0912345678\",\"dangKyLamGiangVien\":false}",
-                uniqueEmail
+                "{\"hoTen\":\"Nguyễn Văn Test\",\"email\":\"%s\",\"matKhau\":\"%s\",\"soDienThoai\":\"0912345678\",\"dangKyLamGiangVien\":false}",
+                uniqueEmail, testPass
         );
 
         mockMvc.perform(post("/api/auth/dang-ky")

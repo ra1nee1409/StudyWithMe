@@ -1,5 +1,6 @@
 package com.studywithme.controller.web;
 
+import com.studywithme.dto.response.PhongHocDto;
 import com.studywithme.entity.DangKyLopHoc;
 import com.studywithme.entity.DanhSachYeuThich;
 import com.studywithme.entity.DonHang;
@@ -10,12 +11,16 @@ import com.studywithme.repository.DanhSachYeuThichRepository;
 import com.studywithme.repository.DonHangRepository;
 import com.studywithme.repository.GhiDanhKhoaHocRepository;
 import com.studywithme.repository.NguoiDungRepository;
+import com.studywithme.service.StudentLearningService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -32,17 +37,20 @@ public class StudentWebController {
     private final DonHangRepository donHangRepository;
     private final GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository;
     private final DanhSachYeuThichRepository danhSachYeuThichRepository;
+    private final StudentLearningService studentLearningService;
 
     public StudentWebController(NguoiDungRepository nguoiDungRepository,
                                 DangKyLopHocRepository dangKyLopHocRepository,
                                 DonHangRepository donHangRepository,
                                 GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository,
-                                DanhSachYeuThichRepository danhSachYeuThichRepository) {
+                                DanhSachYeuThichRepository danhSachYeuThichRepository,
+                                StudentLearningService studentLearningService) {
         this.nguoiDungRepository = nguoiDungRepository;
         this.dangKyLopHocRepository = dangKyLopHocRepository;
         this.donHangRepository = donHangRepository;
         this.ghiDanhKhoaHocRepository = ghiDanhKhoaHocRepository;
         this.danhSachYeuThichRepository = danhSachYeuThichRepository;
+        this.studentLearningService = studentLearningService;
     }
 
     private Optional<NguoiDung> getUserByPrincipal(Principal principal) {
@@ -168,5 +176,39 @@ public class StudentWebController {
     @GetMapping({"/ho-so", "/profile"})
     public String profile(Model model, Principal principal) {
         return "student/profile";
+    }
+
+    /**
+     * Trang S3: Phòng học video trực tuyến & Trình phát LMS Player
+     */
+    @GetMapping({"/learn/{slug}", "/hoc-tap/{slug}"})
+    public String learn(@PathVariable("slug") String slug,
+                        @RequestParam(value = "lessonId", required = false) Long lessonId,
+                        Model model,
+                        Principal principal) {
+        Optional<NguoiDung> userOpt = getUserByPrincipal(principal);
+        if (userOpt.isEmpty()) {
+            return "redirect:/login";
+        }
+        try {
+            PhongHocDto phongHoc = studentLearningService.layThongTinPhongHoc(slug, userOpt.get().getId(), lessonId);
+            model.addAttribute("title", phongHoc.getKhoaHoc().getTieuDe() + " - Phòng Học Trực Tuyến");
+            model.addAttribute("phongHoc", phongHoc);
+            model.addAttribute("khoaHoc", phongHoc.getKhoaHoc());
+            model.addAttribute("danhSachChuongHoc", phongHoc.getDanhSachChuongHoc());
+            model.addAttribute("baiHocHienTai", phongHoc.getBaiHocHienTai());
+            model.addAttribute("baiHocTruoc", phongHoc.getBaiHocTruoc());
+            model.addAttribute("baiHocTiepTheo", phongHoc.getBaiHocTiepTheo());
+            model.addAttribute("tapHopBaiHocDaHoanThanh", phongHoc.getTapHopBaiHocDaHoanThanh());
+            model.addAttribute("phanTramTienDo", phongHoc.getPhanTramTienDo());
+            model.addAttribute("soBaiDaHoanThanh", phongHoc.getSoBaiDaHoanThanh());
+            model.addAttribute("tongSoBaiHoc", phongHoc.getTongSoBaiHoc());
+            model.addAttribute("embedVideoUrl", phongHoc.getEmbedVideoUrl());
+            return "student/learning";
+        } catch (AccessDeniedException e) {
+            return "redirect:/khoa-hoc/" + slug + "?chuaGhiDanh=true";
+        } catch (Exception e) {
+            return "redirect:/student/courses?error=notfound";
+        }
     }
 }

@@ -10,4 +10,5 @@ import java.util.List;
 public interface BaiHocRepository extends JpaRepository<BaiHoc, Long> {
     List<BaiHoc> findByChuongHocIdOrderByThuTuSapXepAsc(Long chuongHocId);
     List<BaiHoc> findByChuongHocKhoaHocIdAndChoPhepHocThuTrue(Long khoaHocId);
+    long countByChuongHocKhoaHocId(Long khoaHocId);
 }

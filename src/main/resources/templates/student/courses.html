@@ -99,7 +99,7 @@
 
           <!-- Bottom Action Button -->
           <div class="p-5 pt-0">
-            <a th:href="@{'/khoa-hoc/' + ${item.khoaHoc.duongDanThanThien}}"
+            <a th:href="@{'/student/learn/' + ${item.khoaHoc.duongDanThanThien}}"
                class="w-full py-2.5 px-4 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-all">
               <span class="material-symbols-outlined text-[18px]">play_arrow</span>
               <span th:text="${item.phanTramTienDo != null && item.phanTramTienDo > 0} ? 'Tiếp Tục Bài Học' : 'Bắt Đầu Bài Đầu Tiên'">Tiếp Tục Bài Học</span>

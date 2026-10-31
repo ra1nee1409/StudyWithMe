@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head(${title} ?: 'Phòng Học Trực Tuyến - StudyWithMe')}"></head>
+
+<body class="bg-[#0f172a] text-slate-100 font-body-md antialiased h-screen flex flex-col overflow-hidden">
+
+  <!-- ==================== TOP NAVIGATION BAR ==================== -->
+  <header class="h-16 bg-[#1e293b] border-b border-slate-700/60 px-4 md:px-6 flex items-center justify-between shrink-0 z-30 shadow-md">
+    <!-- Left: Back button & Course Title -->
+    <div class="flex items-center gap-3 md:gap-4 min-w-0">
+      <a th:href="@{/student/courses}"
+         class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-all shrink-0 border border-slate-700"
+         title="Quay lại danh sách khóa học">
+        <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+      </a>
+
+      <div class="min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-primary/20 text-primary border border-primary/30">
+            Khóa học
+          </span>
+          <span class="text-xs text-slate-400 truncate hidden sm:inline"
+                th:text="${khoaHoc.danhMuc != null ? khoaHoc.danhMuc.tenDanhMuc : 'Trực tuyến'}">Toán học</span>
+        </div>
+        <h1 class="text-sm md:text-base font-bold text-white truncate max-w-xs sm:max-w-md md:max-w-xl"
+            th:text="${khoaHoc.tieuDe}">Tiêu đề khóa học</h1>
+      </div>
+    </div>
+
+    <!-- Right: Progress overview & Sidebar Toggle -->
+    <div class="flex items-center gap-4 shrink-0">
+      <!-- Progress Bar & Count -->
+      <div class="hidden sm:flex items-center gap-3">
+        <div class="text-right">
+          <div class="text-[11px] text-slate-400">Tiến độ khóa học</div>
+          <div class="text-xs font-bold text-emerald-400">
+            <span id="headerProgressText" th:text="${phanTramTienDo} + '%'">0%</span>
+            <span class="text-slate-400 font-normal">
+              (<span id="headerCompletedCount" th:text="${soBaiDaHoanThanh}">0</span>/<span th:text="${tongSoBaiHoc}">0</span> bài)
+            </span>
+          </div>
+        </div>
+        <div class="w-24 h-2.5 rounded-full bg-slate-800 border border-slate-700 overflow-hidden">
+          <div id="headerProgressBar"
+               class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500"
+               th:style="'width: ' + ${phanTramTienDo} + '%;'"></div>
+        </div>
+      </div>
+
+      <!-- Toggle Curriculum Sidebar (Mobile/Desktop) -->
+      <button id="btnToggleSidebar"
+              type="button"
+              class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 text-xs font-semibold transition-all">
+        <span class="material-symbols-outlined text-[18px]">menu_book</span>
+        <span class="hidden md:inline">Bài học</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN WORKSPACE AREA ==================== -->
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- ==================== LEFT: VIDEO PLAYER & LESSON DETAILS ==================== -->
+    <main class="flex-1 flex flex-col overflow-y-auto bg-[#0b1120] p-4 md:p-6 custom-scrollbar">
+      
+      <!-- Video Player Frame -->
+      <div class="w-full max-w-5xl mx-auto flex flex-col gap-4">
+        
+        <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-slate-800">
+          <!-- Case 1: Embed Video (YouTube / Web) -->
+          <th:block th:if="${embedVideoUrl != null && !#strings.isEmpty(embedVideoUrl)}">
+            <iframe th:if="${#strings.contains(embedVideoUrl, 'youtube.com') || #strings.contains(embedVideoUrl, 'youtu.be')}"
+                    id="mainVideoPlayer"
+                    class="w-full h-full border-0"
+                    th:src="${embedVideoUrl}"
+                    title="Video bài học"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen>
+            </iframe>
+
+            <!-- Case 2: Direct MP4 Video -->
+            <video th:unless="${#strings.contains(embedVideoUrl, 'youtube.com') || #strings.contains(embedVideoUrl, 'youtu.be')}"
+                   id="mainVideoPlayerDirect"
+                   class="w-full h-full object-cover"
+                   controls
+                   playsinline
+                   autoplay>
+              <source th:src="${embedVideoUrl}" type="video/mp4">
+              Trình duyệt của bạn không hỗ trợ thẻ video.
+            </video>
+          </th:block>
+
+          <!-- Case 3: Empty Video Link Placeholder -->
+          <div th:if="${embedVideoUrl == null || #strings.isEmpty(embedVideoUrl)}"
+               class="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-slate-900 to-slate-950">
+            <div class="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 border border-primary/20">
+              <span class="material-symbols-outlined text-4xl">auto_stories</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2" th:text="${baiHocHienTai != null ? baiHocHienTai.tieuDeBaiHoc : 'Nội dung bài học'}">
+              Bài đọc lý thuyết
+            </h3>
+            <p class="text-xs text-slate-400 max-w-md">
+              Bài học này không có video bài giảng hoặc đang cập nhật video. Bạn có thể đọc tài liệu đính kèm bên dưới và bấm nút Hoàn thành bài học để tiếp tục lộ trình.
+            </p>
+          </div>
+        </div>
+
+        <!-- Controls Bar: Prev - Complete Toggle - Next -->
+        <div class="flex flex-wrap items-center justify-between gap-3 bg-[#1e293b]/80 backdrop-blur p-4 rounded-2xl border border-slate-700/60 shadow-sm">
+          <!-- Previous Lesson Button -->
+          <div>
+            <a th:if="${baiHocTruoc != null}"
+               th:href="@{'/student/learn/' + ${khoaHoc.duongDanThanThien} + '?lessonId=' + ${baiHocTruoc.id}}"
+               class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all border border-slate-700">
+              <span class="material-symbols-outlined text-[16px]">skip_previous</span>
+              <span>Bài trước</span>
+            </a>
+            <button th:unless="${baiHocTruoc != null}"
+                    disabled
+                    class="px-4 py-2 rounded-xl bg-slate-800/40 text-slate-500 text-xs font-semibold flex items-center gap-1.5 cursor-not-allowed border border-slate-800">
+              <span class="material-symbols-outlined text-[16px]">skip_previous</span>
+              <span>Bài trước</span>
+            </button>
+          </div>
+
+          <!-- Mark Complete Toggle Button -->
+          <div th:if="${baiHocHienTai != null}">
+            <button id="btnToggleComplete"
+                    type="button"
+                    th:data-lesson-id="${baiHocHienTai.id}"
+                    th:data-completed="${tapHopBaiHocDaHoanThanh != null && tapHopBaiHocDaHoanThanh.contains(baiHocHienTai.id) ? 'true' : 'false'}"
+                    onclick="handleToggleComplete(this)"
+                    th:class="${tapHopBaiHocDaHoanThanh != null && tapHopBaiHocDaHoanThanh.contains(baiHocHienTai.id)} ? 
+                              'px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-2 shadow-md transition-all cursor-pointer' : 
+                              'px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold flex items-center gap-2 shadow-md transition-all cursor-pointer'">
+              <span id="completeIcon" class="material-symbols-outlined text-[18px]"
+                    th:text="${tapHopBaiHocDaHoanThanh != null && tapHopBaiHocDaHoanThanh.contains(baiHocHienTai.id)} ? 'task_alt' : 'check_circle'">
+                check_circle
+              </span>
+              <span id="completeText"
+                    th:text="${tapHopBaiHocDaHoanThanh != null && tapHopBaiHocDaHoanThanh.contains(baiHocHienTai.id)} ? 'Đã hoàn thành' : 'Đánh dấu hoàn thành'">
+                Đánh dấu hoàn thành
+              </span>
+            </button>
+          </div>
+
+          <!-- Next Lesson Button -->
+          <div>
+            <a th:if="${baiHocTiepTheo != null}"
+               th:href="@{'/student/learn/' + ${khoaHoc.duongDanThanThien} + '?lessonId=' + ${baiHocTiepTheo.id}}"
+               class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all border border-slate-700">
+              <span>Bài tiếp theo</span>
+              <span class="material-symbols-outlined text-[16px]">skip_next</span>
+            </a>
+            <button th:unless="${baiHocTiepTheo != null}"
+                    disabled
+                    class="px-4 py-2 rounded-xl bg-slate-800/40 text-slate-500 text-xs font-semibold flex items-center gap-1.5 cursor-not-allowed border border-slate-800">
+              <span>Bài tiếp theo</span>
+              <span class="material-symbols-outlined text-[16px]">skip_next</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Lesson Meta & Description Card -->
+        <div class="bg-[#1e293b] rounded-2xl border border-slate-700/60 p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-700/60 pb-4">
+            <div>
+              <span class="text-[11px] font-bold text-primary uppercase tracking-wider"
+                    th:text="${baiHocHienTai != null && baiHocHienTai.chuongHoc != null ? baiHocHienTai.chuongHoc.tieuDeChuong : 'Bài học'}">Chương 1</span>
+              <h2 class="text-lg md:text-xl font-bold text-white mt-1"
+                  th:text="${baiHocHienTai != null ? baiHocHienTai.tieuDeBaiHoc : 'Chưa có bài học'}">
+                Tiêu đề bài học
+              </h2>
+            </div>
+            <div class="flex items-center gap-3 text-xs text-slate-400">
+              <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">schedule</span>
+                <span th:text="${baiHocHienTai != null && baiHocHienTai.thoiLuongGiay != null && baiHocHienTai.thoiLuongGiay > 0 ? (baiHocHienTai.thoiLuongGiay / 60) + ' phút' : '15 phút'}">15 phút</span>
+              </span>
+              <span th:if="${baiHocHienTai != null && baiHocHienTai.choPhepHocThu}"
+                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                Học thử miễn phí
+              </span>
+            </div>
+          </div>
+
+          <!-- Instructor info & helper tips -->
+          <div class="flex items-center justify-between flex-wrap gap-4 pt-2">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-indigo-500 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+                <span th:text="${khoaHoc.giangVien != null && khoaHoc.giangVien.nguoiDung != null && khoaHoc.giangVien.nguoiDung.hoTen != null ? #strings.substring(khoaHoc.giangVien.nguoiDung.hoTen.trim(), 0, 1) : 'G'}">G</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-white"
+                     th:text="${khoaHoc.giangVien != null && khoaHoc.giangVien.nguoiDung != null ? (khoaHoc.giangVien.nguoiDung.hoTen ?: khoaHoc.giangVien.nguoiDung.email) : 'Giảng viên StudyWithMe'}">
+                  Thầy Nguyễn Văn A
+                </div>
+                <div class="text-[11px] text-slate-400">Giảng viên phụ trách khóa học</div>
+              </div>
+            </div>
+
+            <!-- Notes & Shortcuts tip -->
+            <div class="flex items-center gap-2 text-[11px] text-slate-400">
+              <span class="material-symbols-outlined text-[16px] text-primary">lightbulb</span>
+              <span>Gợi ý: Bấm hoàn thành sau khi xem xong để hệ thống ghi nhận tiến độ cấp chứng chỉ.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- ==================== RIGHT: CURRICULUM SIDEBAR ==================== -->
+    <aside id="curriculumSidebar"
+           class="w-80 md:w-96 bg-[#1e293b] border-l border-slate-700/60 flex flex-col shrink-0 z-20 transition-all duration-300">
+      
+      <!-- Sidebar Header -->
+      <div class="p-4 border-b border-slate-700/60 flex items-center justify-between bg-slate-800/40">
+        <div>
+          <h2 class="text-sm font-bold text-white">Nội dung khóa học</h2>
+          <p class="text-[11px] text-slate-400 mt-0.5">
+            <span id="sidebarCompletedCount" th:text="${soBaiDaHoanThanh}">0</span>/<span th:text="${tongSoBaiHoc}">0</span> bài học hoàn thành
+          </p>
+        </div>
+        <!-- Close button on Mobile -->
+        <button id="btnCloseSidebarMobile" class="md:hidden p-1.5 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Curriculum Chapters & Lessons List -->
+      <div class="flex-1 overflow-y-auto divide-y divide-slate-700/40 custom-scrollbar">
+        
+        <div th:each="chuong, cStat : ${danhSachChuongHoc}" class="group">
+          <!-- Chapter Header Accordion Toggle -->
+          <button type="button"
+                  th:onclick="'toggleChapterAccordion(' + ${chuong.id} + ')'"
+                  class="w-full px-4 py-3 bg-slate-800/70 hover:bg-slate-800 text-left flex items-center justify-between transition-colors">
+            <div class="min-w-0 pr-2">
+              <div class="text-[11px] font-bold text-primary truncate" th:text="'Chương ' + ${cStat.count}">Chương 1</div>
+              <div class="text-xs font-semibold text-slate-200 truncate mt-0.5" th:text="${chuong.tieuDeChuong}">Tên chương</div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-[11px] text-slate-400" th:text="${chuong.danhSachBaiHoc != null ? #lists.size(chuong.danhSachBaiHoc) : 0} + ' bài'">3 bài</span>
+              <span th:id="'arrow-chapter-' + ${chuong.id}" class="material-symbols-outlined text-[18px] text-slate-400 transition-transform duration-200">expand_more</span>
+            </div>
+          </button>
+
+          <!-- Lessons List under Chapter -->
+          <div th:id="'content-chapter-' + ${chuong.id}" class="divide-y divide-slate-800/60 bg-[#162032]">
+            <a th:each="bai : ${chuong.danhSachBaiHoc}"
+               th:href="@{'/student/learn/' + ${khoaHoc.duongDanThanThien} + '?lessonId=' + ${bai.id}}"
+               th:id="'lesson-item-' + ${bai.id}"
+               th:class="${baiHocHienTai != null && baiHocHienTai.id == bai.id} ? 
+                         'flex items-start gap-3 p-3.5 bg-primary/10 border-l-4 border-primary text-white transition-colors' : 
+                         'flex items-start gap-3 p-3.5 hover:bg-slate-800/50 border-l-4 border-transparent text-slate-300 hover:text-white transition-colors'">
+              
+              <!-- Completion / Current Icon -->
+              <div class="mt-0.5 shrink-0">
+                <!-- If this lesson is completed -->
+                <span th:id="'icon-lesson-' + ${bai.id}"
+                      th:class="${tapHopBaiHocDaHoanThanh != null && tapHopBaiHocDaHoanThanh.contains(bai.id)} ? 
+                                'material-symbols-outlined text-[18px] text-emerald-400' : 
+                                (${baiHocHienTai != null && baiHocHienTai.id == bai.id} ? 'material-symbols-outlined text-[18px] text-primary' : 'material-symbols-outlined text-[18px] text-slate-500')"
+                      th:text="${tapHopBaiHocDaHoanThanh != null && tapHopBaiHocDaHoanThanh.contains(bai.id)} ? 
+                               'task_alt' : 
+                               (${baiHocHienTai != null && baiHocHienTai.id == bai.id} ? 'play_circle' : 'radio_button_unchecked')">
+                  radio_button_unchecked
+                </span>
+              </div>
+
+              <!-- Lesson Title & Duration -->
+              <div class="flex-1 min-w-0">
+                <div class="text-xs font-medium line-clamp-2 leading-snug" th:text="${bai.tieuDeBaiHoc}">Tiêu đề bài học</div>
+                <div class="flex items-center gap-2 mt-1 text-[11px] text-slate-400">
+                  <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[13px]">schedule</span>
+                    <span th:text="${bai.thoiLuongGiay != null && bai.thoiLuongGiay > 0 ? (bai.thoiLuongGiay / 60) + ' phút' : '15 phút'}">15 phút</span>
+                  </span>
+                  <span th:if="${bai.choPhepHocThu}" class="text-[10px] text-amber-300 font-semibold">Học thử</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- Toast Notification Notification -->
+  <div id="toastNotification"
+       class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 border border-emerald-500/50 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+    <span class="material-symbols-outlined text-emerald-400 text-[20px]">check_circle</span>
+    <span id="toastMessage" class="text-xs font-semibold">Đã lưu tiến độ học tập thành công!</span>
+  </div>
+
+  <!-- ==================== CLIENT SCRIPTS ==================== -->
+  <script th:inline="javascript">
+    /* Accordion Toggle */
+    function toggleChapterAccordion(chapterId) {
+      const content = document.getElementById('content-chapter-' + chapterId);
+      const arrow = document.getElementById('arrow-chapter-' + chapterId);
+      if (content) {
+        if (content.classList.contains('hidden')) {
+          content.classList.remove('hidden');
+          if (arrow) arrow.style.transform = 'rotate(0deg)';
+        } else {
+          content.classList.add('hidden');
+          if (arrow) arrow.style.transform = 'rotate(-90deg)';
+        }
+      }
+    }
+
+    /* Sidebar Toggle for Desktop / Mobile */
+    const sidebar = document.getElementById('curriculumSidebar');
+    const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+    const btnCloseSidebarMobile = document.getElementById('btnCloseSidebarMobile');
+
+    if (btnToggleSidebar && sidebar) {
+      btnToggleSidebar.addEventListener('click', () => {
+        sidebar.classList.toggle('hidden');
+      });
+    }
+    if (btnCloseSidebarMobile && sidebar) {
+      btnCloseSidebarMobile.addEventListener('click', () => {
+        sidebar.classList.add('hidden');
+      });
+    }
+
+    /* Toast Notification Helper */
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('toastNotification');
+      const toastMsg = document.getElementById('toastMessage');
+      if (!toast || !toastMsg) return;
+
+      toastMsg.innerText = message;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    /* Handle Toggle Complete AJAX */
+    async function handleToggleComplete(btn) {
+      const lessonId = btn.getAttribute('data-lesson-id');
+      const isCurrentlyCompleted = btn.getAttribute('data-completed') === 'true';
+      const targetState = !isCurrentlyCompleted;
+
+      // Disable button during call
+      btn.disabled = true;
+
+      try {
+        const response = await fetch('/api/student/learning/toggle-complete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            baiHocId: parseInt(lessonId, 10),
+            daHoanThanh: targetState,
+            giayDungLai: 0
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Lỗi cập nhật tiến độ từ máy chủ (' + response.status + ')');
+        }
+
+        const data = await response.json();
+        if (data.thanhCong && data.duLieu) {
+          const res = data.duLieu;
+
+          // 1. Update button state
+          btn.setAttribute('data-completed', res.daHoanThanh ? 'true' : 'false');
+          const completeIcon = document.getElementById('completeIcon');
+          const completeText = document.getElementById('completeText');
+
+          if (res.daHoanThanh) {
+            btn.className = 'px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-2 shadow-md transition-all cursor-pointer';
+            if (completeIcon) completeIcon.innerText = 'task_alt';
+            if (completeText) completeText.innerText = 'Đã hoàn thành';
+          } else {
+            btn.className = 'px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold flex items-center gap-2 shadow-md transition-all cursor-pointer';
+            if (completeIcon) completeIcon.innerText = 'check_circle';
+            if (completeText) completeText.innerText = 'Đánh dấu hoàn thành';
+          }
+
+          // 2. Update Header Progress
+          const headerProgressText = document.getElementById('headerProgressText');
+          const headerProgressBar = document.getElementById('headerProgressBar');
+          const headerCompletedCount = document.getElementById('headerCompletedCount');
+          const sidebarCompletedCount = document.getElementById('sidebarCompletedCount');
+
+          if (headerProgressText) headerProgressText.innerText = res.phanTramTienDo + '%';
+          if (headerProgressBar) headerProgressBar.style.width = res.phanTramTienDo + '%';
+          if (headerCompletedCount) headerCompletedCount.innerText = res.soBaiDaHoanThanh;
+          if (sidebarCompletedCount) sidebarCompletedCount.innerText = res.soBaiDaHoanThanh;
+
+          // 3. Update icon in curriculum sidebar
+          const sidebarIcon = document.getElementById('icon-lesson-' + res.baiHocId);
+          if (sidebarIcon) {
+            if (res.daHoanThanh) {
+              sidebarIcon.className = 'material-symbols-outlined text-[18px] text-emerald-400';
+              sidebarIcon.innerText = 'task_alt';
+            } else {
+              sidebarIcon.className = 'material-symbols-outlined text-[18px] text-primary';
+              sidebarIcon.innerText = 'play_circle';
+            }
+          }
+
+          showToast(res.thongBao || 'Cập nhật tiến độ thành công!');
+        } else {
+          showToast(data.thongBao || 'Có lỗi xảy ra', false);
+        }
+      } catch (err) {
+        console.error('Lỗi toggle complete:', err);
+        showToast(err.message || 'Không thể kết nối đến máy chủ', false);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+
+  <style>
+    /* Styling scrollbar for sleek dark mode */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      display: block;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(71, 85, 105, 0.8);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 1);
+    }
+  </style>
+
+</body>
+</html>
+

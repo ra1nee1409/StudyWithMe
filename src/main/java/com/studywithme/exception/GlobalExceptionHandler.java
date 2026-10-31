@@ -37,15 +37,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
+        String firstErrorMessage = null;
+        for (org.springframework.validation.ObjectError error : ex.getBindingResult().getAllErrors()) {
+            String fieldName = error instanceof FieldError ? ((FieldError) error).getField() : error.getObjectName();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
-        });
+            if (firstErrorMessage == null) {
+                firstErrorMessage = errorMessage;
+            }
+        }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.<Map<String, String>>builder()
                         .thanhCong(false)
-                        .thongBao("Dữ liệu gửi lên không hợp lệ")
+                        .thongBao(firstErrorMessage != null ? firstErrorMessage : "Dữ liệu gửi lên không hợp lệ")
                         .duLieu(errors)
                         .build());
     }

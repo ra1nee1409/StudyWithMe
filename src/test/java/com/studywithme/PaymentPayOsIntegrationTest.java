@@ -117,7 +117,7 @@ class PaymentPayOsIntegrationTest {
     void testPayOsWebhookVerificationAndOrderActivation() {
         // 1. Tạo học viên
         NguoiDung hocVien = nguoiDungRepository.save(NguoiDung.builder()
-                .email("student_payos_" + UUID.randomUUID() + "@studywithme.vn")
+                .email("stu_pos_" + UUID.randomUUID().toString().substring(0, 8) + "@test.vn")
                 .matKhau(passwordEncoder.encode("dummy_test_pass"))
                 .hoTen("Học viên Test payOS")
                 .trangThai(TrangThaiNguoiDung.HOAT_DONG)
@@ -125,7 +125,7 @@ class PaymentPayOsIntegrationTest {
 
         // 2. Tạo giảng viên
         NguoiDung gvUser = nguoiDungRepository.save(NguoiDung.builder()
-                .email("teacher_payos_" + UUID.randomUUID() + "@studywithme.vn")
+                .email("tch_pos_" + UUID.randomUUID().toString().substring(0, 8) + "@test.vn")
                 .matKhau(passwordEncoder.encode("dummy_test_pass"))
                 .hoTen("Thầy Giáo payOS")
                 .trangThai(TrangThaiNguoiDung.HOAT_DONG)
@@ -253,7 +253,7 @@ class PaymentPayOsIntegrationTest {
     @DisplayName("Endpoint mô phỏng Demo: Kích hoạt đơn hàng qua API /demo/kich-hoat/{orderCode}")
     void testDemoPaymentSimulation() throws Exception {
         NguoiDung hocVien = nguoiDungRepository.save(NguoiDung.builder()
-                .email("demo_student_" + UUID.randomUUID() + "@studywithme.vn")
+                .email("demo_stu_" + UUID.randomUUID().toString().substring(0, 8) + "@test.vn")
                 .matKhau(passwordEncoder.encode("dummy_test_pass"))
                 .hoTen("Học viên Demo")
                 .trangThai(TrangThaiNguoiDung.HOAT_DONG)

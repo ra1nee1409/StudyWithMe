@@ -79,7 +79,7 @@ class CourseModerationIntegrationTest {
 
     private void taoKhoaHocTestChoKiemDuyet() {
         NguoiDung gvUser = nguoiDungRepository.save(NguoiDung.builder()
-                .email("gv_test_moderation_" + java.util.UUID.randomUUID() + "@studywithme.vn")
+                .email("gv_mod_" + java.util.UUID.randomUUID().toString().substring(0, 8) + "@study.vn")
                 .matKhau(passwordEncoder.encode("dummy_test_pass"))
                 .hoTen("Giảng viên Test Duyệt")
                 .trangThai(TrangThaiNguoiDung.HOAT_DONG)

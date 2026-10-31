@@ -27,17 +27,17 @@ public class NguoiDung {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true, length = 50)
     private String email;
 
     @com.fasterxml.jackson.annotation.JsonIgnore
-    @Column(name = "mat_khau", nullable = false)
+    @Column(name = "mat_khau", nullable = false, length = 100)
     private String matKhau;
 
-    @Column(name = "ho_ten", nullable = false, length = 100)
+    @Column(name = "ho_ten", nullable = false, length = 50)
     private String hoTen;
 
-    @Column(name = "so_dien_thoai", length = 20)
+    @Column(name = "so_dien_thoai", length = 15)
     private String soDienThoai;
 
     @Column(name = "anh_dai_dien", length = 500)

@@ -2,6 +2,7 @@ package com.studywithme.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,17 +13,21 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DangKyRequest {
 
-    @NotBlank(message = "Họ tên không được để trống")
+    @NotBlank(message = "Họ và tên không được để trống")
+    @Size(min = 2, max = 50, message = "Họ và tên phải từ 2 đến 50 ký tự")
     private String hoTen;
 
     @NotBlank(message = "Email không được để trống")
+    @Size(min = 5, max = 50, message = "Email phải từ 5 đến 50 ký tự")
     @Email(message = "Email không đúng định dạng")
     private String email;
 
     @NotBlank(message = "Mật khẩu không được để trống")
-    @Size(min = 4, message = "Mật khẩu phải có ít nhất 4 ký tự")
+    @Size(min = 6, max = 32, message = "Mật khẩu phải từ 6 đến 32 ký tự")
     private String matKhau;
 
+    @Pattern(regexp = "^$|^[0-9]{10,11}$", message = "Số điện thoại phải từ 10 đến 11 chữ số")
+    @Size(max = 11, message = "Số điện thoại không được vượt quá 11 ký tự")
     private String soDienThoai;
 
     @Builder.Default

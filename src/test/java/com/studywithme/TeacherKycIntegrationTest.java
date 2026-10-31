@@ -57,6 +57,34 @@ class TeacherKycIntegrationTest {
             admin.setTrangThai(TrangThaiNguoiDung.HOAT_DONG);
             this.nguoiDungRepository.save(admin);
         });
+
+        if (this.hoSoGiangVienRepository.countByTrangThaiDuyet(TrangThaiGiangVien.DA_DUYET) == 0) {
+            com.studywithme.entity.NguoiDung u = this.nguoiDungRepository.save(com.studywithme.entity.NguoiDung.builder()
+                    .email("gv_kyc_dd_" + java.util.UUID.randomUUID().toString().substring(0, 8) + "@test.vn")
+                    .matKhau(this.passwordEncoder.encode("Password@123"))
+                    .hoTen("Giảng Viên Đã Duyệt")
+                    .trangThai(TrangThaiNguoiDung.HOAT_DONG)
+                    .build());
+            this.hoSoGiangVienRepository.save(HoSoGiangVien.builder()
+                    .nguoiDung(u)
+                    .tieuDeChuyenMon("Gia sư Toán")
+                    .trangThaiDuyet(TrangThaiGiangVien.DA_DUYET)
+                    .build());
+        }
+
+        if (this.hoSoGiangVienRepository.countByTrangThaiDuyet(TrangThaiGiangVien.CHO_DUYET) == 0) {
+            com.studywithme.entity.NguoiDung u = this.nguoiDungRepository.save(com.studywithme.entity.NguoiDung.builder()
+                    .email("gv_kyc_cd_" + java.util.UUID.randomUUID().toString().substring(0, 8) + "@test.vn")
+                    .matKhau(this.passwordEncoder.encode("Password@123"))
+                    .hoTen("Giảng Viên Chờ Duyệt")
+                    .trangThai(TrangThaiNguoiDung.HOAT_DONG)
+                    .build());
+            this.hoSoGiangVienRepository.save(HoSoGiangVien.builder()
+                    .nguoiDung(u)
+                    .tieuDeChuyenMon("Gia sư Văn")
+                    .trangThaiDuyet(TrangThaiGiangVien.CHO_DUYET)
+                    .build());
+        }
     }
 
     private String layAdminToken() throws Exception {

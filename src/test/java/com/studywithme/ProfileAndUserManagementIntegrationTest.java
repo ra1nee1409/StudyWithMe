@@ -44,7 +44,7 @@ class ProfileAndUserManagementIntegrationTest {
     @Test
     @DisplayName("1. Học viên cập nhật thông tin cá nhân thành công - Email giữ nguyên")
     void testCapNhatThongTinHocVienKhongDoiEmail() {
-        String testEmail = "student_profile_" + UUID.randomUUID() + "@studywithme.vn";
+        String testEmail = "stu_prof_" + UUID.randomUUID().toString().substring(0, 8) + "@test.vn";
         NguoiDung user = nguoiDungRepository.save(NguoiDung.builder()
                 .email(testEmail)
                 .matKhau(passwordEncoder.encode("dummy_test_pass"))
@@ -71,7 +71,7 @@ class ProfileAndUserManagementIntegrationTest {
     @Test
     @DisplayName("2. Đổi mật khẩu thành công khi nhập đúng mật khẩu cũ")
     void testDoiMatKhauThanhCong() {
-        String testEmail = "student_pass_" + UUID.randomUUID() + "@studywithme.vn";
+        String testEmail = "stu_pass_" + UUID.randomUUID().toString().substring(0, 8) + "@test.vn";
         NguoiDung user = nguoiDungRepository.save(NguoiDung.builder()
                 .email(testEmail)
                 .matKhau(passwordEncoder.encode("old_test_password_123"))
@@ -94,7 +94,7 @@ class ProfileAndUserManagementIntegrationTest {
     @Test
     @DisplayName("3. Đổi mật khẩu thất bại khi mật khẩu cũ không đúng hoặc xác nhận không khớp")
     void testDoiMatKhauSaiMatKhauCu() {
-        String testEmail = "student_wrongpass_" + UUID.randomUUID() + "@studywithme.vn";
+        String testEmail = "stu_wpass_" + UUID.randomUUID().toString().substring(0, 8) + "@test.vn";
         nguoiDungRepository.save(NguoiDung.builder()
                 .email(testEmail)
                 .matKhau(passwordEncoder.encode("correct_test_password_123"))
@@ -124,7 +124,7 @@ class ProfileAndUserManagementIntegrationTest {
     @Test
     @DisplayName("4. Admin xóa vĩnh viễn tài khoản người dùng khỏi CSDL (Hard Delete)")
     void testAdminXoaNguoiDungVinhVien() {
-        String testEmail = "user_to_delete_" + UUID.randomUUID() + "@studywithme.vn";
+        String testEmail = "usr_del_" + UUID.randomUUID().toString().substring(0, 8) + "@test.vn";
         NguoiDung user = nguoiDungRepository.save(NguoiDung.builder()
                 .email(testEmail)
                 .matKhau(passwordEncoder.encode("dummy_test_pass"))
@@ -160,7 +160,7 @@ class ProfileAndUserManagementIntegrationTest {
     @Test
     @DisplayName("6. Chặn admin tự xóa tài khoản của chính mình khi đang đăng nhập")
     void testChanAdminTuXoaChinhMinh() {
-        String selfEmail = "active_admin_" + UUID.randomUUID() + "@studywithme.vn";
+        String selfEmail = "act_adm_" + UUID.randomUUID().toString().substring(0, 8) + "@test.vn";
         NguoiDung admin = nguoiDungRepository.save(NguoiDung.builder()
                 .email(selfEmail)
                 .matKhau(passwordEncoder.encode("dummy_test_pass"))

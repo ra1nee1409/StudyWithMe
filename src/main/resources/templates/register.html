@@ -702,22 +702,22 @@
 
         <div class="input-group">
           <i class="fa-regular fa-user input-icon"></i>
-          <input type="text" id="reg-hoTen" placeholder="Họ và tên của bạn" required autocomplete="name">
+          <input type="text" id="reg-hoTen" placeholder="Họ và tên của bạn (2 - 50 ký tự)" minlength="2" maxlength="50" required autocomplete="name">
         </div>
 
         <div class="input-group">
           <i class="fa-regular fa-envelope input-icon"></i>
-          <input type="email" id="reg-email" placeholder="Địa chỉ email liên hệ" required autocomplete="email">
+          <input type="email" id="reg-email" placeholder="Địa chỉ email (tối đa 50 ký tự)" minlength="5" maxlength="50" required autocomplete="email">
         </div>
 
         <div class="input-group">
           <i class="fa-solid fa-phone input-icon"></i>
-          <input type="tel" id="reg-sdt" placeholder="Số điện thoại" required autocomplete="tel">
+          <input type="tel" id="reg-sdt" placeholder="Số điện thoại (10 - 11 chữ số)" maxlength="11" pattern="[0-9]{10,11}" required autocomplete="tel">
         </div>
 
         <div class="input-group">
           <i class="fa-solid fa-lock input-icon"></i>
-          <input type="password" id="reg-matKhau" placeholder="Mật khẩu (tối thiểu 6 ký tự)" required autocomplete="new-password">
+          <input type="password" id="reg-matKhau" placeholder="Mật khẩu (6 - 32 ký tự)" minlength="6" maxlength="32" required autocomplete="new-password">
           <button type="button" class="toggle-pass-btn" onclick="togglePass('reg-matKhau', this)" title="Ẩn/Hiện mật khẩu">
             <i class="fa-regular fa-eye-slash"></i>
           </button>
@@ -725,7 +725,7 @@
 
         <div class="input-group">
           <i class="fa-solid fa-shield-halved input-icon"></i>
-          <input type="password" id="reg-xacNhanMatKhau" placeholder="Nhập lại mật khẩu" required autocomplete="new-password">
+          <input type="password" id="reg-xacNhanMatKhau" placeholder="Nhập lại mật khẩu (6 - 32 ký tự)" minlength="6" maxlength="32" required autocomplete="new-password">
           <button type="button" class="toggle-pass-btn" onclick="togglePass('reg-xacNhanMatKhau', this)" title="Ẩn/Hiện mật khẩu">
             <i class="fa-regular fa-eye-slash"></i>
           </button>
@@ -773,12 +773,12 @@
 
         <div class="input-group">
           <i class="fa-regular fa-envelope input-icon"></i>
-          <input type="email" id="login-email" placeholder="Địa chỉ email đăng nhập" required autocomplete="email">
+          <input type="email" id="login-email" placeholder="Địa chỉ email đăng nhập (tối đa 50 ký tự)" minlength="5" maxlength="50" required autocomplete="email">
         </div>
 
         <div class="input-group">
           <i class="fa-solid fa-lock input-icon"></i>
-          <input type="password" id="login-matKhau" placeholder="Mật khẩu của bạn" required autocomplete="current-password">
+          <input type="password" id="login-matKhau" placeholder="Mật khẩu của bạn (tối đa 32 ký tự)" maxlength="32" required autocomplete="current-password">
           <button type="button" class="toggle-pass-btn" onclick="togglePass('login-matKhau', this)" title="Ẩn/Hiện mật khẩu">
             <i class="fa-regular fa-eye-slash"></i>
           </button>
@@ -948,6 +948,20 @@
       const email = document.getElementById('login-email').value.trim();
       const matKhau = document.getElementById('login-matKhau').value;
 
+      if (email.length < 5 || email.length > 50) {
+        alertBox.className = "alert-banner alert-error";
+        alertText.textContent = "Email phải từ 5 đến 50 ký tự!";
+        alertBox.classList.remove('hidden');
+        return;
+      }
+
+      if (matKhau.length > 32) {
+        alertBox.className = "alert-banner alert-error";
+        alertText.textContent = "Mật khẩu không được vượt quá 32 ký tự!";
+        alertBox.classList.remove('hidden');
+        return;
+      }
+
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>ĐANG XÁC THỰC...</span>';
 
@@ -1011,11 +1025,42 @@
     // Handle Register API Submission
     async function handleRegisterSubmit(event) {
       event.preventDefault();
+      const hoTen = document.getElementById('reg-hoTen').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const sdt = document.getElementById('reg-sdt').value.trim();
       const pwd = document.getElementById('reg-matKhau').value;
       const pwdConfirm = document.getElementById('reg-xacNhanMatKhau').value;
       const alertBox = document.getElementById('register-alert');
       const alertText = alertBox.querySelector('.alert-text');
       const btn = document.getElementById('btn-submit-register');
+
+      if (hoTen.length < 2 || hoTen.length > 50) {
+        alertBox.className = "alert-banner alert-error";
+        alertText.textContent = "Họ và tên phải từ 2 đến 50 ký tự!";
+        alertBox.classList.remove('hidden');
+        return;
+      }
+
+      if (email.length < 5 || email.length > 50) {
+        alertBox.className = "alert-banner alert-error";
+        alertText.textContent = "Email phải từ 5 đến 50 ký tự!";
+        alertBox.classList.remove('hidden');
+        return;
+      }
+
+      if (sdt && !/^[0-9]{10,11}$/.test(sdt)) {
+        alertBox.className = "alert-banner alert-error";
+        alertText.textContent = "Số điện thoại phải gồm 10 đến 11 chữ số!";
+        alertBox.classList.remove('hidden');
+        return;
+      }
+
+      if (pwd.length < 6 || pwd.length > 32) {
+        alertBox.className = "alert-banner alert-error";
+        alertText.textContent = "Mật khẩu phải từ 6 đến 32 ký tự!";
+        alertBox.classList.remove('hidden');
+        return;
+      }
 
       if (pwd !== pwdConfirm) {
         alertBox.className = "alert-banner alert-error";
@@ -1025,9 +1070,9 @@
       }
 
       const payload = {
-        hoTen: document.getElementById('reg-hoTen').value.trim(),
-        email: document.getElementById('reg-email').value.trim(),
-        soDienThoai: document.getElementById('reg-sdt').value.trim(),
+        hoTen: hoTen,
+        email: email,
+        soDienThoai: sdt,
         matKhau: pwd,
         dangKyLamGiangVien: document.getElementById('reg-dangKyLamGiangVien').value === 'true'
       };

@@ -303,17 +303,25 @@ Trước khi dựng giao diện cho Admin hay Trang chủ, Backend cần có s�
 ---
 
 ## 🎒 GIAI ĐOẠN 4: PHÂN HỆ HỌC VIÊN (STUDENT PORTAL)
-*(Đang triển khai - Đã hoàn thành 4 trang cốt lõi)*
+*(Đang triển khai - Đã hoàn thành 5/6 trang cốt lõi, đang nâng cấp chuyển đổi cổng thanh toán sang payOS)*
 
-* **Trang S1: Giỏ hàng & Thanh toán VNPAY Sandbox (Cart & Checkout) - ✅ HOÀN THÀNH 100%**:
+* **Trang S1: Giỏ hàng & Thanh toán tự động qua payOS (Cart & payOS VietQR Checkout)**:
+  - **Mục tiêu chuyển đổi kiến trúc:** Thay thế sandbox VNPAY cũ sang **Cổng thanh toán tự động VietQR payOS** (dựa trên giải pháp chính thức từ repository [`payOSHQ/payos-demo-java-spring`](https://github.com/payOSHQ/payos-demo-java-spring)).
+  - **Cơ chế hoạt động:**
+    - Sử dụng SDK chính thức: `vn.payos:payos-java:2.0.1`.
+    - Cấu hình kết nối qua `application.properties`: `payos.client-id`, `payos.api-key`, `payos.checksum-key`.
+    - Sinh mã thanh toán chuẩn VietQR tự động qua `payOS.paymentRequests().create(...)` hoặc `payOS.createPaymentLink(...)`.
+    - Webhook IPN xử lý tức thì: Endpoint `/api/payment/payos_transfer_handler` nhận thông báo chuyển khoản thành công, gọi `payOS.verifyPaymentWebhookData(body)` để xác thực chữ ký số HMAC-SHA256, tự động cập nhật đơn hàng thành `DA_THANH_TOAN`.
+    - Kích hoạt bản quyền học tập ngay lập tức (`GhiDanhKhoaHoc`) và tự động cộng 80% học phí vào ví giảng viên (`soDuVi` & `LichSuViTien`).
   - Giao diện Giỏ hàng ([cart/index.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/cart/index.html)): Tự động đồng bộ giỏ hàng, xóa từng môn/xóa tất cả, badge đếm số lượng giỏ hàng trên Header toàn sàn.
-  - Giao diện Thanh toán ([checkout/index.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/checkout/index.html)): Hiển thị thông tin học viên nhận bàn học, chọn cổng VNPAY, tích hợp **Khung thông tin thẻ test NCB Sandbox** (`9704198526191432198` / `07/15` / OTP: `123456`) kèm nút copy 1-click trực quan phục vụ hội đồng chấm đồ án.
-  - Giao diện Hóa đơn & Biên lai ([checkout/result.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/checkout/result.html)): Hiển thị mã đơn hàng `#SWM`, mã giao dịch VNPAY, số tiền đã trừ, danh sách khóa học kích hoạt bản quyền, nút "Vào Bàn Học Của Tôi Ngay".
-  - Backend: [PaymentWebController.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/controller/web/PaymentWebController.java), [PaymentApiController.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/controller/api/PaymentApiController.java), [PaymentServiceImpl.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/service/impl/PaymentServiceImpl.java).
-  - Tự động cộng 80% doanh thu bán khóa học vào ví giảng viên (`soDuVi` & `LichSuViTien`).
-  - Kiểm thử tích hợp: [PaymentVnPayIntegrationTest.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/test/java/com/studywithme/PaymentVnPayIntegrationTest.java) (5/5 tests passed).
+  - Giao diện Thanh toán ([checkout/index.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/checkout/index.html)): Hiển thị thông tin học viên nhận bàn học, chọn cổng thanh toán VietQR payOS, quét mã QR thanh toán nhanh qua 40+ app ngân hàng (Vietcombank, MB, Techcombank, Momo, Viettel Money...).
+  - Giao diện Hóa đơn & Biên lai ([checkout/result.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/checkout/result.html)): Hiển thị mã đơn hàng `#SWM`, mã giao dịch payOS, số tiền đã thanh toán, danh sách khóa học kích hoạt bản quyền, nút "Vào Bàn Học Của Tôi Ngay".
 * **Trang S2: Khóa học của tôi (My Enrolled Courses) - ✅ HOÀN THÀNH 100%**: Danh sách khóa học video đã ghi danh ([courses.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/student/courses.html)), thanh tiến độ học tập (% completed), liên kết vào bài giảng, tích hợp sidebar và dashboard.
-* **Trang S3: Trình phát video học tập (Video Learning Player)**: Xem video bài học, đánh dấu hoàn thành, lưu giây dừng lại (`TienDoBaiHoc`).
+* **Trang S3: Phòng học Video Trực Tuyến & Trình phát LMS Player (Video Learning Player) - ✅ HOÀN THÀNH 100%**:
+  - Giao diện học tập chuyên nghiệp ([learning.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/student/learning.html)): Video player 16:9 hỗ trợ YouTube embed an toàn & HTML5 direct video, thanh điều hướng Bài trước/Tiếp theo, nút đánh dấu hoàn thành bài học qua AJAX cập nhật tiến độ tức thì.
+  - Sidebar đề cương: Accordion từng chương, icon trạng thái đã hoàn thành / đang học, thời lượng phút.
+  - Backend: [StudentLearningService.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/service/StudentLearningService.java), [StudentLearningServiceImpl.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/service/impl/StudentLearningServiceImpl.java), [StudentApiController.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/controller/api/StudentApiController.java), lưu tiến độ `TienDoBaiHoc` và tự động cập nhật `% hoàn thành` vào `GhiDanhKhoaHoc`.
+  - Kiểm thử tích hợp: [StudentLearningIntegrationTest.java](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/test/java/com/studywithme/StudentLearningIntegrationTest.java) (PASS 100%).
 * **Trang S4: Lớp học trực tuyến của tôi (My Live Classes) - ✅ HOÀN THÀNH 100%**: Danh sách lớp gia sư kèm trực tiếp, lịch học tuần, nút click mở phòng học ([classes.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/student/classes.html)).
 * **Trang S5: Danh sách yêu thích (Wishlist) - ✅ HOÀN THÀNH 100%**: Quản lý các khóa học và gia sư đã thả tim để theo dõi ([wishlist.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/student/wishlist.html)).
 * **Trang S6: Viết đánh giá & Nhận xét**: Chấm điểm sao và gửi nhận xét sau khi hoàn thành khóa học.
@@ -321,12 +329,16 @@ Trước khi dựng giao diện cho Admin hay Trang chủ, Backend cần có s�
 ---
 
 ## 👨‍🏫 GIAI ĐOẠN 5: PHÂN HỆ GIẢNG VIÊN (TEACHER STUDIO)
-*(Thực hiện sau khi hoàn thành Phân hệ Học viên)*
+*(Đang triển khai)*
 
 * **Trang T1: Nộp hồ sơ xét duyệt giảng viên (Teacher KYC Application)**: Tải ảnh bằng cấp, chứng chỉ ngoại ngữ, upload video tự giới thiệu.
 * **Trang T2: Studio Quản lý Khóa học (Course Management)**: Tạo khóa học mới, thiết lập giáo trình Chương/Bài học, upload video bài giảng, gửi khóa học chờ Admin duyệt.
 * **Trang T3: Quản lý Lớp gia sư dạy kèm (Live Class Management)**: Mở lớp gia sư, thiết lập sĩ số tối đa, thời khóa biểu và học phí.
-* **Trang T4: Thống kê Thu nhập & Ví tiền (Wallet & Earnings)**: Biểu đồ doanh thu từ bán khóa học và dạy gia sư, số dư khả dụng, tạo yêu cầu rút tiền về ngân hàng.
+* **Trang T4: Thống kê Thu nhập & Ví tiền Giảng viên (Wallet & Earnings) - 🎨 ĐÃ HOÀN THIỆN GIAO DIỆN UI**:
+  - Giao diện ví tiền chuyên nghiệp ([tutor/wallet.html](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/resources/templates/tutor/wallet.html)): 3 thẻ KPI (Số dư khả dụng, Doanh thu tích lũy, Lệnh rút chờ duyệt).
+  - Modal "Yêu cầu rút tiền về ngân hàng": Chọn trong 10 ngân hàng TMCP lớn tại Việt Nam, chip chọn nhanh số tiền rút (+500k, +1M, +2M, Rút toàn bộ), tính toán realtime số dư ví còn lại sau rút.
+  - Bảng lịch sử giao dịch kèm hệ thống Tab bộ lọc trực quan (Tất cả, Doanh thu +80%, Rút tiền, Hoàn tiền) và thanh tìm kiếm trực tiếp trên client.
+  - Chuẩn bị kết nối API chi hộ / rút tiền tự động hoặc giải ngân thủ công qua đối soát.
 
 ---
 

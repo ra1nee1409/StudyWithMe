@@ -2,6 +2,7 @@ HELP.md
 *.md
 !KE_HOACH_TRIEN_KHAI_TRANG.md
 !KIEN_TRUC_WORKFLOW_VA_CSDL.md
+!HUONG_DAN_TICH_HOP_PAYOS.md
 *.dll
 
 # Configuration & Sensitive files

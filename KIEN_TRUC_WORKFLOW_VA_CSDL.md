@@ -243,26 +243,27 @@ sequenceDiagram
     autonumber
     actor Student as Học viên
     participant Web as Course Web Controller
-    participant OrderSvc as Đơn hàng & Thanh toán
-    participant VNPAY as Cổng thanh toán VNPAY Sandbox
+    participant OrderSvc as Đơn hàng & Thanh toán (PaymentService)
+    participant payOS as Cổng thanh toán VietQR payOS
     participant DB as SQL Server (DonHang, GhiDanh, ViTien)
 
     Student->>Web: Xem chi tiết khóa học, nhấn "Mua ngay"
-    Web->>OrderSvc: Khởi tạo đơn hàng
+    Web->>OrderSvc: Khởi tạo đơn hàng thanh toán
     OrderSvc->>DB: INSERT DonHang (trangThai = CHO_THANH_TOAN) + ChiTietDonHang
-    OrderSvc->>VNPAY: Tạo URL thanh toán (Mã đơn, Số tiền, Hash checksum)
-    VNPAY-->>Student: Chuyển hướng sang Cổng VNPAY (Quét QR / Thẻ ngân hàng)
-    Student->>VNPAY: Nhập OTP và hoàn tất thanh toán
-    VNPAY->>OrderSvc: Gửi Webhook/IPN trả về kết quả giao dịch (vnp_ResponseCode = 00)
+    OrderSvc->>payOS: Tạo link thanh toán qua SDK (orderCode, amount, description, returnUrl, cancelUrl)
+    payOS-->>Student: Hiển thị trang thanh toán VietQR động chuẩn NAPAS 24/7
+    Student->>payOS: Quét mã QR bằng App Ngân hàng bất kỳ & xác nhận chuyển khoản
+    payOS->>OrderSvc: Bắn Webhook tức thì (payload kèm chữ ký Checksum HMAC-SHA256)
+    OrderSvc->>payOS: Gọi payOS.verifyPaymentWebhookData(body) để xác thực tính toàn vẹn
     
     OrderSvc->>DB: UPDATE DonHang: trangThaiThanhToan = DA_THANH_TOAN
     OrderSvc->>DB: INSERT GhiDanhKhoaHoc (Cấp quyền sở hữu khóa học cho học viên)
-    OrderSvc->>DB: CỘNG TIỀN VÍ GIẢNG VIÊN (Trừ % hoa hồng sàn StudyWithMe)
-    OrderSvc->>DB: INSERT LichSuViTien (Ghi sổ cái biến động số dư)
+    OrderSvc->>DB: CỘNG TIỀN VÍ GIẢNG VIÊN (+80% học phí sau trừ hoa hồng sàn)
+    OrderSvc->>DB: INSERT LichSuViTien (Ghi sổ cái biến động số dư ví giảng viên)
     
-    Student->>Web: Truy cập "Khóa học của tôi" (/student/courses)
-    Web->>DB: Lấy video bài giảng & tiến độ TienDoBaiHoc
-    Student->>Web: Xem video bài học -> Lưu lại số giây dừng lại (giayDungLai)
+    Student->>Web: Chuyển hướng về trang thành công (/student/courses hoặc /student/learn/{slug})
+    Web->>DB: Nạp video bài giảng & tiến độ TienDoBaiHoc
+    Student->>Web: Xem bài học video, đánh dấu hoàn thành & đồng bộ % tiến độ
 ```
 
 ---
@@ -623,13 +624,14 @@ Dưới đây là bảng phân tích chi tiết các điểm cần quy hoạch m
 └───────┴──────────────────────────────┴──────────────────┴──────────────┘
 ```
 
-### 1. Bổ sung trường thông tin phản hồi Cổng VNPAY vào bảng `don_hang`
-* **Vấn đề hiện tại:** Bảng `don_hang` hiện mới chỉ có `ma_don_hang`, `tong_tien_thanh_toan`, `phuong_thuc_thanh_toan`, `trang_thai_thanh_toan`, `ngay_thanh_toan`.
-* **Đề xuất bổ sung (Thêm 3 cột):**
-  - `ma_giao_dich_vnpay` (VARCHAR(50)): Lưu mã `vnp_TransactionNo` từ ngân hàng để đối chiếu khi có khiếu nại.
-  - `ngan_hang_thanh_toan` (VARCHAR(20)): Lưu mã `vnp_BankCode` (NCB, VCB, MB, VISA...).
-  - `ma_phan_hoi_vnpay` (VARCHAR(10)): Lưu `vnp_ResponseCode` (`00` = Thành công).
-* **Đánh giá:** Rất đơn giản, chỉ cần thêm 3 thuộc tính vào Entity [`DonHang.java`](file:///c:/Users/Hieu/Documents/đatn/studywithme/src/main/java/com/studywithme/entity/DonHang.java) khi bắt tay vào làm trang Checkout.
+### 1. Bổ sung trường thông tin phản hồi Cổng payOS vào bảng `don_hang`
+* **Vấn đề hiện tại:** Bảng `don_hang` hiện có `ma_don_hang`, `tong_tien_thanh_toan`, `phuong_thuc_thanh_toan`, `trang_thai_thanh_toan`, `ngay_thanh_toan`.
+* **Đề xuất bổ sung đối soát payOS (Dựa trên payOS Java SDK):**
+  - `order_code_payos` (BIGINT): Lưu mã số đơn hàng `orderCode` nguyên dương sinh ra cho payOS (ví dụ: timestamp hoặc sequence số).
+  - `ma_giao_dich_payos` (VARCHAR(100)): Lưu `paymentLinkId` hoặc mã tham chiếu giao dịch từ payOS/Ngân hàng để đối chiếu.
+  - `ngan_hang_thanh_toan` (VARCHAR(30)): Lưu mã ngân hàng hoặc tài khoản chuyển khoản (VCB, MB, TCB...).
+  - `ma_phan_hoi_payos` (VARCHAR(20)): Lưu mã trạng thái webhook từ payOS (`00` = Thành công).
+* **Đánh giá:** Đồng bộ hoàn hảo với thư viện `vn.payos:payos-java:2.0.1` từ repo chính thức `payOSHQ/payos-demo-java-spring`.
 
 ---
 

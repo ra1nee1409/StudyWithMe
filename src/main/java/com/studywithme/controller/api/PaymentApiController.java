@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vn.payos.model.webhooks.Webhook;
 import vn.payos.model.webhooks.WebhookData;
@@ -125,9 +126,10 @@ public class PaymentApiController {
     }
 
     /**
-     * API Tự động đăng ký Webhook URL với payOS qua SDK
+     * API Tự động đăng ký Webhook URL với payOS qua SDK (Chỉ Quản trị viên hệ thống có quyền)
      */
     @PostMapping("/dang-ky-webhook")
+    @PreAuthorize("hasAuthority('ROLE_QUAN_TRI')")
     public ResponseEntity<ApiResponse<String>> dangKyWebhook(@RequestParam String webhookUrl) {
         try {
             String registeredUrl = payOsService.dangKyWebhook(webhookUrl);

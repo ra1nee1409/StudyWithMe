@@ -146,7 +146,7 @@ class ProfileAndUserManagementIntegrationTest {
         NguoiDung admin = nguoiDungRepository.findByEmail("admin@studywithme.vn").orElseGet(() ->
                 nguoiDungRepository.save(NguoiDung.builder()
                         .email("admin@studywithme.vn")
-                        .matKhau(passwordEncoder.encode("Admin@123456"))
+                        .matKhau(passwordEncoder.encode("dummy_test_pass"))
                         .hoTen("Quản trị viên")
                         .trangThai(TrangThaiNguoiDung.HOAT_DONG)
                         .build())
@@ -163,7 +163,7 @@ class ProfileAndUserManagementIntegrationTest {
         String selfEmail = "active_admin_" + UUID.randomUUID() + "@studywithme.vn";
         NguoiDung admin = nguoiDungRepository.save(NguoiDung.builder()
                 .email(selfEmail)
-                .matKhau(passwordEncoder.encode("Admin@123456"))
+                .matKhau(passwordEncoder.encode("dummy_test_pass"))
                 .hoTen("Admin Đang Đăng Nhập")
                 .trangThai(TrangThaiNguoiDung.HOAT_DONG)
                 .build());

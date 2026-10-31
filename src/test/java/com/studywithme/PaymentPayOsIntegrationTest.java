@@ -117,7 +117,7 @@ class PaymentPayOsIntegrationTest {
         // 1. Tạo học viên
         NguoiDung hocVien = nguoiDungRepository.save(NguoiDung.builder()
                 .email("student_payos_" + UUID.randomUUID() + "@studywithme.vn")
-                .matKhau(passwordEncoder.encode("HocVien@123456"))
+                .matKhau(passwordEncoder.encode("dummy_test_pass"))
                 .hoTen("Học viên Test payOS")
                 .trangThai(TrangThaiNguoiDung.HOAT_DONG)
                 .build());
@@ -125,7 +125,7 @@ class PaymentPayOsIntegrationTest {
         // 2. Tạo giảng viên
         NguoiDung gvUser = nguoiDungRepository.save(NguoiDung.builder()
                 .email("teacher_payos_" + UUID.randomUUID() + "@studywithme.vn")
-                .matKhau(passwordEncoder.encode("Gv@123456"))
+                .matKhau(passwordEncoder.encode("dummy_test_pass"))
                 .hoTen("Thầy Giáo payOS")
                 .trangThai(TrangThaiNguoiDung.HOAT_DONG)
                 .build());

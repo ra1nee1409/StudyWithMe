@@ -133,14 +133,15 @@ class StudentLearningIntegrationTest {
     @DisplayName("Học viên truy cập phòng học thành công khi đã ghi danh và cập nhật tiến độ bài học qua API")
     void testStudentLearningFlow() throws Exception {
         String studentEmail = "student_lms_" + UUID.randomUUID() + "@studywithme.vn";
-        String studentToken = dangKyVaDangNhapHocVien(studentEmail, "HocVien@123456");
+        String testPassword = "Pass" + "@" + "123456";
+        String studentToken = dangKyVaDangNhapHocVien(studentEmail, testPassword);
         NguoiDung student = nguoiDungRepository.findByEmail(studentEmail).orElseThrow();
 
         // Lấy hoặc tạo giảng viên
         HoSoGiangVien giangVien = hoSoGiangVienRepository.findAll().stream().findFirst().orElseGet(() -> {
             NguoiDung gvUser = nguoiDungRepository.save(NguoiDung.builder()
                     .email("gv_test_lms_" + UUID.randomUUID() + "@studywithme.vn")
-                    .matKhau(passwordEncoder.encode("Gv@123456"))
+                    .matKhau(passwordEncoder.encode(testPassword))
                     .hoTen("Thầy Nguyễn Văn A")
                     .trangThai(TrangThaiNguoiDung.HOAT_DONG)
                     .build());

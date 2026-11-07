@@ -681,18 +681,8 @@
             <i class="fa-solid fa-graduation-cap"></i> StudyWithMe
           </div>
           <h1>Tạo Tài Khoản Mới</h1>
+          <p class="text-xs text-slate-500 mt-1">Đăng ký tài khoản thành viên để bắt đầu học tập cùng StudyWithMe</p>
         </div>
-
-        <!-- Role Switcher -->
-        <div class="role-switcher">
-          <button type="button" class="role-btn active" id="btn-role-student" onclick="selectRole('student')">
-            <i class="fa-solid fa-user-graduate"></i> Học viên
-          </button>
-          <button type="button" class="role-btn" id="btn-role-tutor" onclick="selectRole('tutor')">
-            <i class="fa-solid fa-chalkboard-user"></i> Gia sư
-          </button>
-        </div>
-        <input type="hidden" id="reg-dangKyLamGiangVien" value="false">
 
         <!-- Alert Notification Box -->
         <div id="register-alert" class="alert-banner alert-error hidden">
@@ -709,6 +699,7 @@
           <i class="fa-regular fa-envelope input-icon"></i>
           <input type="email" id="reg-email" placeholder="Địa chỉ email (tối đa 50 ký tự)" minlength="5" maxlength="50" required autocomplete="email">
         </div>
+        <div id="reg-email-feedback" class="email-feedback" style="display: none; font-size: 11.5px; margin: -2px 0 6px 4px; font-weight: 500; transition: all 0.2s;"></div>
 
         <div class="input-group">
           <i class="fa-solid fa-phone input-icon"></i>
@@ -994,12 +985,6 @@
             const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
             if (redirectUrl) {
               window.location.href = redirectUrl;
-            } else if (roles.includes('ROLE_QUAN_TRI')) {
-              window.location.href = '/admin/dashboard';
-            } else if (roles.includes('ROLE_GIANG_VIEN')) {
-              window.location.href = '/tutor/dashboard';
-            } else if (roles.includes('ROLE_HOC_VIEN')) {
-              window.location.href = '/student/dashboard';
             } else {
               window.location.href = '/';
             }
@@ -1069,12 +1054,20 @@
         return;
       }
 
+      const emailFb = document.getElementById('reg-email-feedback');
+      if (emailFb && emailFb.dataset.exists === 'true') {
+        alertBox.className = "alert-banner alert-error";
+        alertText.textContent = "Email này đã được đăng ký tài khoản! Mỗi tài khoản chỉ dùng 1 email duy nhất.";
+        alertBox.classList.remove('hidden');
+        document.getElementById('reg-email').focus();
+        return;
+      }
+
       const payload = {
         hoTen: hoTen,
-        email: email,
+        email: email.toLowerCase(),
         soDienThoai: sdt,
-        matKhau: pwd,
-        dangKyLamGiangVien: document.getElementById('reg-dangKyLamGiangVien').value === 'true'
+        matKhau: pwd
       };
 
       btn.disabled = true;
@@ -1091,8 +1084,35 @@
 
         if (response.ok) {
           alertBox.className = "alert-banner alert-success";
-          alertText.textContent = data.thongBao || data.message || "Đăng ký thành công! Đang chuyển sang đăng nhập...";
+          alertText.textContent = "Đăng ký thành công! Đang tự động đăng nhập...";
           alertBox.classList.remove('hidden');
+
+          // Tự động đăng nhập và đưa người dùng về trang chủ
+          try {
+            const loginRes = await fetch('/api/auth/dang-nhap', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: payload.email, matKhau: payload.matKhau })
+            });
+            if (loginRes.ok) {
+              const loginData = await loginRes.json();
+              localStorage.setItem('auth_token', loginData.accessToken);
+              const payloadJwt = JSON.parse(atob(loginData.accessToken.split('.')[1]));
+              localStorage.setItem('user', JSON.stringify({
+                id: payloadJwt.sub,
+                hoTen: payloadJwt.hoTen,
+                email: payloadJwt.email,
+                roles: payloadJwt.roles || []
+              }));
+              setTimeout(() => {
+                const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
+                window.location.href = redirectUrl || '/';
+              }, 800);
+              return;
+            }
+          } catch (e) {
+            console.warn("Tự động đăng nhập lỗi, chuyển sang tab đăng nhập:", e);
+          }
 
           setTimeout(() => {
             switchToLogin();
@@ -1100,9 +1120,23 @@
             document.getElementById('login-matKhau').focus();
           }, 1200);
         } else {
+          const errMsg = data.thongBao || data.message || "Đăng ký thất bại. Email có thể đã tồn tại!";
           alertBox.className = "alert-banner alert-error";
-          alertText.textContent = data.thongBao || data.message || "Đăng ký thất bại. Email có thể đã tồn tại!";
+          alertText.textContent = errMsg;
           alertBox.classList.remove('hidden');
+
+          if (errMsg.toLowerCase().includes('email')) {
+            const emailInput = document.getElementById('reg-email');
+            emailInput.style.borderColor = '#ef4444';
+            if (emailFb) {
+              emailFb.style.display = 'block';
+              emailFb.style.color = '#ef4444';
+              emailFb.dataset.exists = 'true';
+              emailFb.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> ' + errMsg;
+            }
+            emailInput.focus();
+          }
+
           btn.disabled = false;
           btn.innerHTML = '<span>ĐĂNG KÝ NGAY</span> <i class="fa-solid fa-arrow-right"></i>';
         }
@@ -1114,6 +1148,89 @@
         btn.innerHTML = '<span>ĐĂNG KÝ NGAY</span> <i class="fa-solid fa-arrow-right"></i>';
       }
     }
+
+    // Real-time unique email check (Optimized with AbortController, Debounce & Blur check)
+    (function setupEmailValidation() {
+      const emailInput = document.getElementById('reg-email');
+      const emailFeedback = document.getElementById('reg-email-feedback');
+      if (!emailInput || !emailFeedback) return;
+
+      let emailCheckTimer = null;
+      let activeAbortController = null;
+      let lastCheckedEmail = '';
+
+      function isValidEmail(email) {
+        return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63}$/.test(email);
+      }
+
+      function updateUI(status, message, borderColor, textColor) {
+        emailFeedback.style.display = message ? 'block' : 'none';
+        emailFeedback.style.color = textColor;
+        emailFeedback.dataset.exists = status;
+        emailFeedback.innerHTML = message;
+        emailInput.style.borderColor = borderColor;
+      }
+
+      async function performEmailCheck() {
+        const emailVal = emailInput.value.trim().toLowerCase();
+
+        if (!emailVal) {
+          updateUI('false', '', '#e2e8f0', '#64748b');
+          lastCheckedEmail = '';
+          return;
+        }
+
+        if (emailVal.length < 5 || emailVal.length > 50 || !isValidEmail(emailVal)) {
+          updateUI('invalid', '<i class="fa-solid fa-circle-exclamation"></i> Định dạng email chưa hợp lệ (VD: user@example.com)', '#ef4444', '#ef4444');
+          lastCheckedEmail = '';
+          return;
+        }
+
+        if (emailVal === lastCheckedEmail) return;
+
+        if (activeAbortController) {
+          activeAbortController.abort();
+        }
+        activeAbortController = new AbortController();
+
+        updateUI('checking', '<i class="fa-solid fa-spinner fa-spin"></i> Đang kiểm tra tính duy nhất...', '#94a3b8', '#64748b');
+
+        try {
+          const res = await fetch('/api/auth/check-email?email=' + encodeURIComponent(emailVal), {
+            signal: activeAbortController.signal
+          });
+          const data = await res.json();
+          if (emailInput.value.trim().toLowerCase() !== emailVal) return;
+
+          if (data && data.duLieu) {
+            lastCheckedEmail = emailVal;
+            if (data.duLieu.exists) {
+              updateUI('true', '<i class="fa-solid fa-circle-xmark"></i> Email này đã được đăng ký! Mỗi tài khoản chỉ dùng 1 email duy nhất.', '#ef4444', '#ef4444');
+            } else {
+              updateUI('false', '<i class="fa-solid fa-circle-check"></i> Email khả dụng! Bạn có thể sử dụng email này.', '#10b981', '#10b981');
+            }
+          }
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+          updateUI('false', '', '#e2e8f0', '#64748b');
+        }
+      }
+
+      emailInput.addEventListener('input', function() {
+        clearTimeout(emailCheckTimer);
+        const emailVal = this.value.trim().toLowerCase();
+        if (!emailVal) {
+          updateUI('false', '', '#e2e8f0', '#64748b');
+          return;
+        }
+        emailCheckTimer = setTimeout(performEmailCheck, 300);
+      });
+
+      emailInput.addEventListener('blur', function() {
+        clearTimeout(emailCheckTimer);
+        performEmailCheck();
+      });
+    })();
 
     // Forgot password modal
     function openForgotPasswordModal(e) {

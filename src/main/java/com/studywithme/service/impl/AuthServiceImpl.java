@@ -56,8 +56,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtAuthResponse dangNhap(DangNhapRequest request) {
+        String email = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : "";
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getMatKhau())
+                new UsernamePasswordAuthenticationToken(email, request.getMatKhau())
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -78,47 +79,44 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public boolean kiemTraEmailTonTai(String email) {
+        if (email == null || email.isBlank()) {
+            return false;
+        }
+        return nguoiDungRepository.existsByEmailIgnoreCase(email.trim().toLowerCase());
+    }
+
+    @Override
     @Transactional
     public String dangKy(DangKyRequest request) {
-        if (nguoiDungRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email này đã được sử dụng trên hệ thống: " + request.getEmail());
+        String normalizedEmail = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : "";
+        if (normalizedEmail.isBlank()) {
+            throw new IllegalArgumentException("Địa chỉ email không được để trống.");
+        }
+
+        // Kiểm tra chặt chẽ tính duy nhất của email (không phân biệt hoa thường)
+        if (nguoiDungRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            throw new IllegalArgumentException("Email '" + normalizedEmail + "' đã được sử dụng trên hệ thống. Mỗi tài khoản chỉ được dùng 1 email duy nhất!");
         }
 
         Set<VaiTro> danhSachVaiTro = new HashSet<>();
 
-        // Mặc định luôn có vai trò Học viên
+        // Mặc định mọi tài khoản mới đăng ký đều là người dùng/học viên
         VaiTro roleHocVien = vaiTroRepository.findByTenVaiTro(VaiTroName.ROLE_HOC_VIEN)
                 .orElseThrow(() -> new IllegalStateException("Chưa thiết lập vai trò ROLE_HOC_VIEN trong hệ thống"));
         danhSachVaiTro.add(roleHocVien);
 
-        // Nếu đăng ký làm giảng viên
-        if (request.isDangKyLamGiangVien()) {
-            VaiTro roleGiangVien = vaiTroRepository.findByTenVaiTro(VaiTroName.ROLE_GIANG_VIEN)
-                    .orElseThrow(() -> new IllegalStateException("Chưa thiết lập vai trò ROLE_GIANG_VIEN trong hệ thống"));
-            danhSachVaiTro.add(roleGiangVien);
-        }
-
         NguoiDung nguoiDung = NguoiDung.builder()
-                .hoTen(request.getHoTen())
-                .email(request.getEmail())
+                .hoTen(request.getHoTen() != null ? request.getHoTen().trim() : "")
+                .email(normalizedEmail)
                 .matKhau(passwordEncoder.encode(request.getMatKhau()))
-                .soDienThoai(request.getSoDienThoai())
+                .soDienThoai(request.getSoDienThoai() != null ? request.getSoDienThoai().trim() : null)
                 .trangThai(TrangThaiNguoiDung.HOAT_DONG)
                 .danhSachVaiTro(danhSachVaiTro)
                 .build();
 
-        NguoiDung savedUser = nguoiDungRepository.save(nguoiDung);
-
-        // Tạo hồ sơ giảng viên chờ duyệt nếu đăng ký làm gia sư
-        if (request.isDangKyLamGiangVien()) {
-            HoSoGiangVien hoSo = HoSoGiangVien.builder()
-                    .nguoiDung(savedUser)
-                    .tieuDeChuyenMon("Gia sư / Giảng viên mới đăng ký")
-                    .soDuVi(BigDecimal.ZERO)
-                    .trangThaiDuyet(TrangThaiGiangVien.CHO_DUYET)
-                    .build();
-            hoSoGiangVienRepository.save(hoSo);
-        }
+        nguoiDungRepository.save(nguoiDung);
 
         return "Đăng ký tài khoản thành công!";
     }

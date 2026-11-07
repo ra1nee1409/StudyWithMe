@@ -16,6 +16,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -174,6 +175,74 @@ class AuthValidationLimitsIntegrationTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.thongBao", containsString("32 ký tự")));
+    }
+
+    @Test
+    @DisplayName("9. Đăng ký thất bại khi email đã tồn tại (Chính xác chữ thường)")
+    void testDangKyThatBai_EmailDaTonTaiExact() throws Exception {
+        DangKyRequest req = DangKyRequest.builder()
+                .hoTen("Người Dùng Trùng Email")
+                .email("admin@admin.com")
+                .matKhau("123456")
+                .soDienThoai("0987654321")
+                .build();
+
+        mockMvc.perform(post("/api/auth/dang-ky")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.thanhCong").value(false))
+                .andExpect(jsonPath("$.thongBao", containsString("đã được sử dụng")));
+    }
+
+    @Test
+    @DisplayName("10. Đăng ký thất bại khi email đã tồn tại (Không phân biệt chữ hoa thường)")
+    void testDangKyThatBai_EmailDaTonTaiCaseInsensitive() throws Exception {
+        DangKyRequest req = DangKyRequest.builder()
+                .hoTen("Người Dùng Chữ Hoa")
+                .email("ADMIN@ADMIN.COM")
+                .matKhau("123456")
+                .soDienThoai("0987654321")
+                .build();
+
+        mockMvc.perform(post("/api/auth/dang-ky")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.thanhCong").value(false))
+                .andExpect(jsonPath("$.thongBao", containsString("đã được sử dụng")));
+    }
+
+    @Test
+    @DisplayName("11. API /api/auth/check-email kiểm tra tính khả dụng của email")
+    void testCheckEmailEndpoint_DaTonTaiVaKhaDung() throws Exception {
+        // Email đã tồn tại -> exists = true, available = false
+        mockMvc.perform(get("/api/auth/check-email")
+                        .param("email", "Admin@Admin.COM"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.thanhCong").value(true))
+                .andExpect(jsonPath("$.duLieu.exists").value(true))
+                .andExpect(jsonPath("$.duLieu.available").value(false));
+
+        // Email chưa tồn tại -> exists = false, available = true
+        mockMvc.perform(get("/api/auth/check-email")
+                        .param("email", "email_chua_ai_dung_12345@domain.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.thanhCong").value(true))
+                .andExpect(jsonPath("$.duLieu.exists").value(false))
+                .andExpect(jsonPath("$.duLieu.available").value(true));
+
+        // Email sai định dạng -> 400 Bad Request
+        mockMvc.perform(get("/api/auth/check-email")
+                        .param("email", "invalid-email-format"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.thanhCong").value(false));
+
+        // Email để trống -> 400 Bad Request
+        mockMvc.perform(get("/api/auth/check-email")
+                        .param("email", ""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.thanhCong").value(false));
     }
 }
 

@@ -13,7 +13,16 @@ import java.util.Optional;
 public interface NguoiDungRepository extends JpaRepository<NguoiDung, Long> {
     @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"danhSachVaiTro"})
     Optional<NguoiDung> findByEmail(String email);
+
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"danhSachVaiTro"})
+    Optional<NguoiDung> findByEmailIgnoreCase(String email);
+
     boolean existsByEmail(String email);
+
+    boolean existsByEmailIgnoreCase(String email);
+
+    boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
+
     Page<NguoiDung> findByHoTenContainingIgnoreCaseOrEmailContainingIgnoreCase(String hoTen, String email, Pageable pageable);
     List<NguoiDung> findTop5ByOrderByNgayTaoDesc();
     List<NguoiDung> findAllByOrderByNgayTaoDesc();

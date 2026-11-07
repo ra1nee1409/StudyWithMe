@@ -72,6 +72,8 @@ public class SecurityConfig {
                     "/khoa-hoc/**",
                     "/gia-su",
                     "/gia-su/**",
+                    "/tro-thanh-giang-vien",
+                    "/tro-thanh-giang-vien/**",
                     "/cart",
                     "/cart/**",
                     "/checkout",

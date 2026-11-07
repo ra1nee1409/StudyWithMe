@@ -55,6 +55,7 @@ tasks.named('test') {
 	})
 	workingDir = file(workingDir.absolutePath.replace('\u0111atn', 'datn'))
 	jvmArgs = [
+		"-Dfile.encoding=UTF-8",
 		"-Djava.library.path=" + file('.').absolutePath.replace('\u0111atn', 'datn')
 	]
 }
@@ -65,6 +66,7 @@ tasks.named('bootRun') {
 	})
 	workingDir = file(workingDir.absolutePath.replace('\u0111atn', 'datn'))
 	jvmArgs = [
+		"-Dfile.encoding=UTF-8",
 		"-Djava.library.path=" + file('.').absolutePath.replace('\u0111atn', 'datn'),
 		"-Xms256m",
 		"-Xmx512m",

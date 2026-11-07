@@ -30,8 +30,8 @@
         <a class="px-3.5 py-2 rounded-lg text-on-surface-variant font-label-lg text-label-lg whitespace-nowrap hover:text-primary hover:bg-surface-container-low transition-colors"
            th:href="@{/#gia-su}">Gia Sư Nổi Bật</a>
         <a class="px-3.5 py-2 rounded-lg font-label-lg text-label-lg whitespace-nowrap transition-colors"
-           th:classappend="${activePage == 'tutor'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
-           th:href="@{/register}">Trở Thành Gia Sư</a>
+           th:classappend="${activePage == 'tutor-apply'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
+           th:href="@{/tro-thanh-giang-vien}">Trở Thành Giảng Viên</a>
       </nav>
 
       <!-- Auth & Actions -->
@@ -159,6 +159,10 @@
             <a th:href="@{/#gia-su}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
               <span class="material-symbols-outlined text-primary text-[20px]">star</span>
               <span>Gia Sư Tiêu Biểu</span>
+            </a>
+            <a th:href="@{/tro-thanh-giang-vien}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-primary hover:bg-primary/10 transition-colors">
+              <span class="material-symbols-outlined text-primary text-[20px]">co_present</span>
+              <span>Trở Thành Giảng Viên</span>
             </a>
             <a th:href="@{/cart}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
               <span class="material-symbols-outlined text-primary text-[20px]">shopping_cart</span>

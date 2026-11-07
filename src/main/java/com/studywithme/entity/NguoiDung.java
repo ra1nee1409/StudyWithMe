@@ -15,13 +15,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "nguoi_dung")
+@Table(name = "nguoi_dung", uniqueConstraints = {
+    @UniqueConstraint(name = "uq_nguoi_dung_email", columnNames = "email")
+})
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class NguoiDung {
+
+    @PrePersist
+    @PreUpdate
+    public void chuanHoaEmail() {
+        if (this.email != null) {
+            this.email = this.email.trim().toLowerCase();
+        }
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -78,7 +88,7 @@ public class NguoiDung {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email != null ? email.trim().toLowerCase() : null;
     }
 
     public String getMatKhau() {

@@ -7,4 +7,5 @@ import com.studywithme.dto.response.JwtAuthResponse;
 public interface AuthService {
     JwtAuthResponse dangNhap(DangNhapRequest request);
     String dangKy(DangKyRequest request);
+    boolean kiemTraEmailTonTai(String email);
 }

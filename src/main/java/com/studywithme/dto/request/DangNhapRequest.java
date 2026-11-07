@@ -10,31 +10,25 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DangNhapRequest {
 
     @NotBlank(message = "Email không được để trống")
     @Size(min = 5, max = 50, message = "Email phải từ 5 đến 50 ký tự")
-    @Email(message = "Email không đúng định dạng")
+    @Email(message = "Email không đúng định dạng chuẩn")
     private String email;
 
     @NotBlank(message = "Mật khẩu không được để trống")
     @Size(min = 1, max = 32, message = "Mật khẩu không được vượt quá 32 ký tự")
     private String matKhau;
 
-    public DangNhapRequest() {
-    }
-
-    public DangNhapRequest(String email, String matKhau) {
-        this.email = email;
-        this.matKhau = matKhau;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email != null ? email.trim().toLowerCase() : null;
     }
 
     public String getMatKhau() {

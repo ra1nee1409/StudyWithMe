@@ -117,6 +117,8 @@ public class DataSeeder implements CommandLineRunner {
         } else {
             nguoiDungRepository.findByEmail(adminCustomEmail).ifPresent(u -> {
                 u.setMatKhau(passwordEncoder.encode("123456"));
+                u.setHoTen("Quản Trị Viên");
+                u.setSoDienThoai("0912345678");
                 Set<VaiTro> vts = u.getDanhSachVaiTro() != null ? new HashSet<>(u.getDanhSachVaiTro()) : new HashSet<>();
                 vts.add(roleQuanTri);
                 u.setDanhSachVaiTro(vts);

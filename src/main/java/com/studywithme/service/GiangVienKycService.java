@@ -1,10 +1,14 @@
 package com.studywithme.service;
 
+import com.studywithme.dto.request.DangKyGiangVienRequest;
 import com.studywithme.dto.response.HoSoGiangVienKycResponse;
 import com.studywithme.dto.response.ThongKeKycResponse;
+import com.studywithme.entity.HoSoGiangVien;
 import com.studywithme.entity.enums.admin.TrangThaiGiangVien;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface GiangVienKycService {
 
@@ -35,4 +39,14 @@ public interface GiangVienKycService {
      * Lấy thống kê số lượng hồ sơ theo các trạng thái
      */
     ThongKeKycResponse layThongKeKyc();
+
+    /**
+     * Người dùng nộp hồ sơ đăng ký làm giảng viên (kèm CV / chứng chỉ)
+     */
+    HoSoGiangVien nopHoSoGiangVien(String userEmail, DangKyGiangVienRequest request, MultipartFile fileChungChi);
+
+    /**
+     * Lấy thông tin hồ sơ giảng viên của một người dùng theo email
+     */
+    Optional<HoSoGiangVien> layHoSoTheoUserEmail(String userEmail);
 }

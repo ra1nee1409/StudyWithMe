@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DangKyRequest {
 
     @NotBlank(message = "Họ và tên không được để trống")
@@ -19,7 +21,7 @@ public class DangKyRequest {
 
     @NotBlank(message = "Email không được để trống")
     @Size(min = 5, max = 50, message = "Email phải từ 5 đến 50 ký tự")
-    @Email(message = "Email không đúng định dạng")
+    @Email(message = "Email không đúng định dạng chuẩn (ví dụ: user@example.com)")
     private String email;
 
     @NotBlank(message = "Mật khẩu không được để trống")
@@ -33,23 +35,12 @@ public class DangKyRequest {
     @Builder.Default
     private boolean dangKyLamGiangVien = false;
 
-    public DangKyRequest() {
-    }
-
-    public DangKyRequest(String hoTen, String email, String matKhau, String soDienThoai, boolean dangKyLamGiangVien) {
-        this.hoTen = hoTen;
-        this.email = email;
-        this.matKhau = matKhau;
-        this.soDienThoai = soDienThoai;
-        this.dangKyLamGiangVien = dangKyLamGiangVien;
-    }
-
     public String getHoTen() {
         return hoTen;
     }
 
     public void setHoTen(String hoTen) {
-        this.hoTen = hoTen;
+        this.hoTen = hoTen != null ? hoTen.trim() : null;
     }
 
     public String getEmail() {
@@ -57,7 +48,7 @@ public class DangKyRequest {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email != null ? email.trim().toLowerCase() : null;
     }
 
     public String getMatKhau() {
@@ -73,7 +64,7 @@ public class DangKyRequest {
     }
 
     public void setSoDienThoai(String soDienThoai) {
-        this.soDienThoai = soDienThoai;
+        this.soDienThoai = soDienThoai != null ? soDienThoai.trim() : null;
     }
 
     public boolean isDangKyLamGiangVien() {

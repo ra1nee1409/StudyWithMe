@@ -1,6 +1,7 @@
 package com.studywithme.exception;
 
 import com.studywithme.dto.response.ApiResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -52,6 +53,17 @@ public class GlobalExceptionHandler {
                         .thongBao(firstErrorMessage != null ? firstErrorMessage : "Dữ liệu gửi lên không hợp lệ")
                         .duLieu(errors)
                         .build());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<String>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        String cause = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage();
+        if (cause != null && (cause.toLowerCase().contains("email") || cause.contains("uq_nguoi_dung_email"))) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Email này đã được sử dụng trên hệ thống. Mỗi tài khoản chỉ được dùng 1 email duy nhất!"));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("Dữ liệu vi phạm ràng buộc duy nhất trong hệ thống!"));
     }
 
     @ExceptionHandler(Exception.class)

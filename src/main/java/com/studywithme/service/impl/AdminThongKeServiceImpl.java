@@ -32,6 +32,8 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
     private final YeuCauRutTienRepository yeuCauRutTienRepository;
     private final GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository;
     private final DanhMucRepository danhMucRepository;
+    private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
+    private final DangKyLopHocRepository dangKyLopHocRepository;
 
     public AdminThongKeServiceImpl(DonHangRepository donHangRepository,
                                   NguoiDungRepository nguoiDungRepository,
@@ -39,7 +41,9 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
                                   HoSoGiangVienRepository hoSoGiangVienRepository,
                                   YeuCauRutTienRepository yeuCauRutTienRepository,
                                   GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository,
-                                  DanhMucRepository danhMucRepository) {
+                                  DanhMucRepository danhMucRepository,
+                                  LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
+                                  DangKyLopHocRepository dangKyLopHocRepository) {
         this.donHangRepository = donHangRepository;
         this.nguoiDungRepository = nguoiDungRepository;
         this.khoaHocRepository = khoaHocRepository;
@@ -47,6 +51,8 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
         this.yeuCauRutTienRepository = yeuCauRutTienRepository;
         this.ghiDanhKhoaHocRepository = ghiDanhKhoaHocRepository;
         this.danhMucRepository = danhMucRepository;
+        this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
+        this.dangKyLopHocRepository = dangKyLopHocRepository;
     }
 
     @Override
@@ -61,15 +67,86 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
         // 2. KPI Người dùng
         long tongNguoiDung = nguoiDungRepository.count();
 
-        // 3. KPI Khóa học
+        // 3. KPI Khóa học & Ca học 1-1
         long tongKhoaHocDangHoatDong = khoaHocRepository.countByTrangThai(TrangThaiKhoaHoc.DA_XUAT_BAN);
+        long tongCaHoc1k1 = lopHocTrucTuyenRepository.count();
+        long tongGiaSuDaDuyet = hoSoGiangVienRepository.countByTrangThaiDuyet(TrangThaiGiangVien.DA_DUYET);
 
         // 4. KPI Chờ duyệt
         long hoSoChoDuyet = hoSoGiangVienRepository.countByTrangThaiDuyet(TrangThaiGiangVien.CHO_DUYET);
         long lenhRutTienChoDuyet = yeuCauRutTienRepository.countByTrangThai(TrangThaiRutTien.CHO_XU_LY);
         long tongYeuCauChoDuyet = hoSoChoDuyet + lenhRutTienChoDuyet;
 
-        // 5. Top 5 Khóa học bán chạy
+        // 5. Top Gia sư nổi bật & được đặt học nhiều nhất
+        List<HoSoGiangVien> tutors = hoSoGiangVienRepository.findByTrangThaiDuyetOrderByNgayTaoDesc(TrangThaiGiangVien.DA_DUYET);
+        List<TopGiaSuDto> topGiaSuDtos = new ArrayList<>();
+        for (HoSoGiangVien gv : tutors) {
+            long soCaHoc = lopHocTrucTuyenRepository.countByGiangVienId(gv.getId());
+            long soHocVien = dangKyLopHocRepository.countByLopHocGiangVienId(gv.getId());
+            String hoTen = gv.getNguoiDung() != null ? gv.getNguoiDung().getHoTen() : "Gia sư";
+            String email = gv.getNguoiDung() != null ? gv.getNguoiDung().getEmail() : "";
+            String sdt = gv.getNguoiDung() != null ? gv.getNguoiDung().getSoDienThoai() : "";
+            String avatar = gv.getNguoiDung() != null ? gv.getNguoiDung().getAnhDaiDien() : null;
+            BigDecimal thuNhap = gv.getSoDuVi() != null ? gv.getSoDuVi() : BigDecimal.ZERO;
+
+            topGiaSuDtos.add(TopGiaSuDto.builder()
+                    .id(gv.getId())
+                    .nguoiDungId(gv.getNguoiDung() != null ? gv.getNguoiDung().getId() : null)
+                    .hoTen(hoTen)
+                    .email(email)
+                    .soDienThoai(sdt)
+                    .tieuDeChuyenMon(gv.getTieuDeChuyenMon() != null ? gv.getTieuDeChuyenMon() : "Gia sư chuyên môn")
+                    .anhDaiDien(avatar)
+                    .soCaHoc(soCaHoc)
+                    .soHocVienDangKy(soHocVien)
+                    .tongThuNhapUocTinh(thuNhap)
+                    .diemDanhGia(5.0)
+                    .build());
+        }
+        topGiaSuDtos.sort((a, b) -> {
+            int c = Long.compare(b.getSoHocVienDangKy(), a.getSoHocVienDangKy());
+            if (c != 0) return c;
+            return Long.compare(b.getSoCaHoc(), a.getSoCaHoc());
+        });
+        if (topGiaSuDtos.size() > 5) {
+            topGiaSuDtos = new ArrayList<>(topGiaSuDtos.subList(0, 5));
+        }
+
+        // 6. Danh sách Ca học 1-1 mới nhất
+        List<com.studywithme.entity.LopHocTrucTuyen> allLop = lopHocTrucTuyenRepository.findAll();
+        allLop.sort((a, b) -> {
+            if (a.getNgayTao() == null && b.getNgayTao() == null) return 0;
+            if (a.getNgayTao() == null) return 1;
+            if (b.getNgayTao() == null) return -1;
+            return b.getNgayTao().compareTo(a.getNgayTao());
+        });
+        List<CaHoc1k1DashboardDto> caHocDtos = new ArrayList<>();
+        for (int i = 0; i < Math.min(5, allLop.size()); i++) {
+            com.studywithme.entity.LopHocTrucTuyen lop = allLop.get(i);
+            String tenGv = (lop.getGiangVien() != null && lop.getGiangVien().getNguoiDung() != null)
+                    ? lop.getGiangVien().getNguoiDung().getHoTen() : "Gia sư";
+            String emailGv = (lop.getGiangVien() != null && lop.getGiangVien().getNguoiDung() != null)
+                    ? lop.getGiangVien().getNguoiDung().getEmail() : "";
+            String tenDm = lop.getDanhMuc() != null ? lop.getDanhMuc().getTenDanhMuc() : "Tổng hợp";
+            int soHv = (int) dangKyLopHocRepository.countByLopHocId(lop.getId());
+
+            caHocDtos.add(CaHoc1k1DashboardDto.builder()
+                    .id(lop.getId())
+                    .tieuDeLop(lop.getTieuDeLop())
+                    .tenGiaSu(tenGv)
+                    .emailGiaSu(emailGv)
+                    .tenDanhMuc(tenDm)
+                    .hocPhi(lop.getHocPhiMoiHocVien())
+                    .lichHocTrongTuan(lop.getLichHocTrongTuan())
+                    .linkPhongHoc(lop.getLinkPhongHoc())
+                    .trangThai(lop.getTrangThai() != null ? lop.getTrangThai().name() : "DANG_MO_DANG_KY")
+                    .siSoToiDa(lop.getSiSoToiDa())
+                    .soHocVienHienTai(soHv)
+                    .ngayBatDau(lop.getNgayBatDau())
+                    .build());
+        }
+
+        // 7. Top Khóa học (giữ lại hỗ trợ)
         List<KhoaHoc> topKhoaHocEntities = khoaHocRepository.findTop5ByOrderByTongSoHocVienDesc();
         List<TopKhoaHocDto> topKhoaHocDtos = new ArrayList<>();
         for (KhoaHoc k : topKhoaHocEntities) {
@@ -93,7 +170,7 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
                     .build());
         }
 
-        // 6. 5 Hồ sơ giảng viên mới nộp gần nhất
+        // 8. 5 Hồ sơ giảng viên mới nộp gần nhất
         List<HoSoGiangVien> giangVienMoiEntities = hoSoGiangVienRepository.findTop5ByOrderByNgayTaoDesc();
         List<GiangVienMoiDto> giangVienMoiDtos = new ArrayList<>();
         for (HoSoGiangVien gv : giangVienMoiEntities) {
@@ -119,9 +196,13 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
                 .tongDoanhThu(tongDoanhThu)
                 .tongNguoiDung(tongNguoiDung)
                 .tongKhoaHocDangHoatDong(tongKhoaHocDangHoatDong)
+                .tongCaHoc1k1(tongCaHoc1k1)
+                .tongGiaSuDaDuyet(tongGiaSuDaDuyet)
                 .lenhRutTienChoDuyet(lenhRutTienChoDuyet)
                 .hoSoGiangVienChoDuyet(hoSoChoDuyet)
                 .tongYeuCauChoDuyet(tongYeuCauChoDuyet)
+                .topGiaSu(topGiaSuDtos)
+                .caHocGanDay(caHocDtos)
                 .topKhoaHoc(topKhoaHocDtos)
                 .giangVienMoi(giangVienMoiDtos)
                 .build();

@@ -65,6 +65,18 @@ public class AdminGiangVienApiController {
     }
 
     /**
+     * 4.1 Đình chỉ / Thu hồi quyền giảng dạy của gia sư
+     */
+    @PostMapping("/{id}/dinh-chi")
+    public ResponseEntity<ApiResponse<HoSoGiangVienKycResponse>> dinhChiGiaSu(
+            @PathVariable Long id,
+            @Valid @RequestBody(required = false) TuChoiKycRequest request) {
+        String lyDo = request != null ? request.getLyDo() : null;
+        HoSoGiangVienKycResponse data = giangVienKycService.dinhChiQuyenGiangVien(id, lyDo);
+        return ResponseEntity.ok(ApiResponse.success("Đã thu hồi quyền giảng dạy của gia sư", data));
+    }
+
+    /**
      * 5. Lấy số liệu thống kê nhanh hồ sơ KYC
      */
     @GetMapping("/thong-ke")

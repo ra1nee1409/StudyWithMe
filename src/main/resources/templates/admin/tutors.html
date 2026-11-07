@@ -369,7 +369,8 @@
                   <th class="py-3 px-4">Số dư ví</th>
                   <th class="py-3 px-4">Chứng chỉ</th>
                   <th class="py-3 px-4">Trạng thái</th>
-                  <th class="py-3 px-4 text-right">Ngày duyệt</th>
+                  <th class="py-3 px-4">Ngày duyệt</th>
+                  <th class="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-surface-container/30">
@@ -402,7 +403,17 @@
                       Chính thức
                     </span>
                   </td>
-                  <td class="py-3.5 px-4 text-right text-on-surface-variant" th:text="${#temporals.format(tutor.ngayTao, 'dd/MM/yyyy')}">17/10/2026</td>
+                  <td class="py-3.5 px-4 text-on-surface-variant text-[11px]" th:text="${#temporals.format(tutor.ngayTao, 'dd/MM/yyyy')}">17/10/2026</td>
+                  <td class="py-3.5 px-4 text-right">
+                    <div class="flex items-center justify-end gap-1.5">
+                      <button type="button" th:attr="onclick='moModalDinhChi(' + ${tutor.id} + ', \'' + ${tutor.hoTen} + '\')'"
+                              class="px-2.5 py-1.5 rounded-lg bg-error-container/40 text-error hover:bg-error hover:text-white transition-all text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                              title="Đình chỉ quyền giảng dạy">
+                        <span class="material-symbols-outlined text-[15px]">block</span>
+                        <span>Đình chỉ</span>
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -494,6 +505,44 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL ĐÌNH CHỈ QUYỀN GIẢNG DẠY ==================== -->
+  <div id="modal-dinh-chi" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-surface-card w-full max-w-md rounded-2xl shadow-2xl border border-surface-container/60 p-6 flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-error">
+          <span class="material-symbols-outlined text-[24px]">gavel</span>
+          <h3 class="font-bold text-base text-on-surface">Đình Chỉ Quyền Giảng Dạy</h3>
+        </div>
+        <button type="button" onclick="dongModalDinhChi()" class="w-8 h-8 rounded-lg text-on-surface-variant hover:bg-surface-container flex items-center justify-center cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <p class="text-xs text-on-surface-variant">
+        Bạn đang đình chỉ quyền giảng dạy của: <strong id="dinh-chi-tutor-name" class="text-on-surface">Gia sư</strong>.
+        Quyền <code class="text-error font-bold">ROLE_GIANG_VIEN</code> sẽ bị thu hồi ngay lập tức, gia sư sẽ không thể truy cập Studio hoặc tạo thêm ca học.
+      </p>
+
+      <form id="form-dinh-chi" method="post" action="" class="flex flex-col gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-on-surface mb-1">Lý do đình chỉ (Gia sư sẽ xem được lý do này):</label>
+          <textarea name="lyDoDinhChi" rows="3" required placeholder="Ví dụ: Nhận nhiều phản ánh vắng mặt ca dạy, vi phạm điều khoản nền tảng..."
+                    class="w-full p-3 rounded-xl bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-error/40"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-surface-container/40">
+          <button type="button" onclick="dongModalDinhChi()" class="px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-xs font-semibold text-on-surface transition-colors cursor-pointer">
+            Hủy bỏ
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-error hover:bg-red-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">block</span>
+            <span>Xác nhận đình chỉ</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- ==================== MODAL PHÓNG TO ẢNH CHỨNG CHỈ (LIGHTBOX) ==================== -->
   <div id="image-lightbox" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeImagePreview()">
     <div class="relative max-w-4xl max-h-[90vh] flex flex-col items-center" onclick="event.stopPropagation()">
@@ -539,6 +588,16 @@
 
     function closeRejectModal() {
       document.getElementById('reject-modal').classList.add('hidden');
+    }
+
+    function moModalDinhChi(id, tutorName) {
+      document.getElementById('dinh-chi-tutor-name').innerText = tutorName || 'Gia sư';
+      document.getElementById('form-dinh-chi').action = '/admin/dinh-chi-gia-su/' + id;
+      document.getElementById('modal-dinh-chi').classList.remove('hidden');
+    }
+
+    function dongModalDinhChi() {
+      document.getElementById('modal-dinh-chi').classList.add('hidden');
     }
 
     function openImagePreview(url, caption) {

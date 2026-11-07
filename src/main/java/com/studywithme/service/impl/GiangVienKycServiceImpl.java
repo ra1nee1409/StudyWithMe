@@ -121,6 +121,30 @@ public class GiangVienKycServiceImpl implements GiangVienKycService {
     }
 
     @Override
+    @Transactional
+    public HoSoGiangVienKycResponse dinhChiQuyenGiangVien(Long id, String lyDoDinhChi) {
+        HoSoGiangVien hoSo = hoSoGiangVienRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy hồ sơ giảng viên có ID: " + id));
+
+        // 1. Đổi trạng thái hồ sơ sang TU_CHOI kèm lý do đình chỉ
+        hoSo.setTrangThaiDuyet(TrangThaiGiangVien.TU_CHOI);
+        String lyDo = (lyDoDinhChi != null && !lyDoDinhChi.trim().isEmpty())
+                ? "Đình chỉ quyền giảng dạy: " + lyDoDinhChi.trim()
+                : "Đình chỉ quyền giảng dạy do vi phạm quy chế hoặc tạm dừng hợp tác.";
+        hoSo.setLyDoTuChoi(lyDo);
+
+        // 2. Tước quyền ROLE_GIANG_VIEN khỏi người dùng
+        NguoiDung nguoiDung = hoSo.getNguoiDung();
+        if (nguoiDung != null && nguoiDung.getDanhSachVaiTro() != null) {
+            nguoiDung.getDanhSachVaiTro().removeIf(vt -> vt.getTenVaiTro() == VaiTroName.ROLE_GIANG_VIEN);
+            nguoiDungRepository.save(nguoiDung);
+        }
+
+        HoSoGiangVien savedHoSo = hoSoGiangVienRepository.save(hoSo);
+        return mapToResponse(savedHoSo);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ThongKeKycResponse layThongKeKyc() {
         long choDuyet = hoSoGiangVienRepository.countByTrangThaiDuyet(TrangThaiGiangVien.CHO_DUYET);

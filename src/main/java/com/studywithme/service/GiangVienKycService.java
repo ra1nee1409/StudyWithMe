@@ -49,4 +49,11 @@ public interface GiangVienKycService {
      * Lấy thông tin hồ sơ giảng viên của một người dùng theo email
      */
     Optional<HoSoGiangVien> layHoSoTheoUserEmail(String userEmail);
+
+    /**
+     * Đình chỉ / Thu hồi quyền giảng dạy của gia sư:
+     * - Thu hồi vai trò ROLE_GIANG_VIEN khỏi tài khoản người dùng
+     * - Chuyển trạng thái hồ sơ sang TU_CHOI kèm lý do đình chỉ
+     */
+    HoSoGiangVienKycResponse dinhChiQuyenGiangVien(Long id, String lyDoDinhChi);
 }

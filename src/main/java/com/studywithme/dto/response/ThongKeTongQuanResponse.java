@@ -17,10 +17,19 @@ public class ThongKeTongQuanResponse {
     // 4 Thẻ KPI chính
     private BigDecimal tongDoanhThu;
     private long tongNguoiDung;
-    private long tongKhoaHocDangHoatDong;
+    private long tongKhoaHocDangHoatDong; // tương thích ngược
+    private long tongCaHoc1k1;            // KPI 1-1
+    private long tongGiaSuDaDuyet;        // KPI 1-1
     private long lenhRutTienChoDuyet;
     private long hoSoGiangVienChoDuyet;
     private long tongYeuCauChoDuyet;
+
+    // Chi tiết 1-1 cho Dashboard Admin mới
+    @Builder.Default
+    private List<TopGiaSuDto> topGiaSu = new ArrayList<>();
+
+    @Builder.Default
+    private List<CaHoc1k1DashboardDto> caHocGanDay = new ArrayList<>();
 
     // Chi tiết phụ trợ cho Dashboard
     @Builder.Default

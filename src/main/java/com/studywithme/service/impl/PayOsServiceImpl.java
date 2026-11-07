@@ -41,6 +41,7 @@ public class PayOsServiceImpl implements PayOsService {
     private final DangKyLopHocRepository dangKyLopHocRepository;
     private final HoSoGiangVienRepository hoSoGiangVienRepository;
     private final LichSuViTienRepository lichSuViTienRepository;
+    private final com.studywithme.service.CauHinhHeThongService cauHinhHeThongService;
 
     @Override
     @Transactional
@@ -190,10 +191,12 @@ public class PayOsServiceImpl implements PayOsService {
                         khoaHocRepository.save(kh);
                     }
 
-                    // Cộng doanh thu 80% cho Giảng viên
+                    // Cộng doanh thu cho Giảng viên theo tỷ lệ cấu hình hệ thống
                     HoSoGiangVien gv = kh.getGiangVien();
                     if (gv != null) {
-                        BigDecimal tienGiangVien = ct.getDonGia().multiply(BigDecimal.valueOf(0.80));
+                        BigDecimal heSoGv = cauHinhHeThongService.layHeSoGiangVienNhan();
+                        BigDecimal tyLeGv = BigDecimal.valueOf(100).subtract(cauHinhHeThongService.layTyLeHoaHongSan());
+                        BigDecimal tienGiangVien = ct.getDonGia().multiply(heSoGv);
                         BigDecimal soDuTruoc = gv.getSoDuVi() != null ? gv.getSoDuVi() : BigDecimal.ZERO;
                         BigDecimal soDuSau = soDuTruoc.add(tienGiangVien);
 
@@ -207,7 +210,7 @@ public class PayOsServiceImpl implements PayOsService {
                                 .soDuSau(soDuSau)
                                 .loaiGiaoDich(LoaiGiaoDichVi.TIEN_BAN_KHOA_HOC)
                                 .maThamChieu(donHang.getId())
-                                .moTaGiaoDich("Thu nhập 80% bán khóa học (payOS): " + kh.getTieuDe() + " (Đơn #" + donHang.getMaDonHang() + ")")
+                                .moTaGiaoDich("Thu nhập " + tyLeGv + "% bán khóa học (payOS): " + kh.getTieuDe() + " (Đơn #" + donHang.getMaDonHang() + ")")
                                 .build();
                         lichSuViTienRepository.save(ls);
                     }
@@ -226,10 +229,12 @@ public class PayOsServiceImpl implements PayOsService {
                         dangKyLopHocRepository.save(dangKy);
                     }
 
-                    // Cộng doanh thu 80% cho Gia sư của lớp
+                    // Cộng doanh thu cho Gia sư của lớp theo tỷ lệ cấu hình hệ thống
                     HoSoGiangVien gv = lh.getGiangVien();
                     if (gv != null) {
-                        BigDecimal tienGiangVien = ct.getDonGia().multiply(BigDecimal.valueOf(0.80));
+                        BigDecimal heSoGv = cauHinhHeThongService.layHeSoGiangVienNhan();
+                        BigDecimal tyLeGv = BigDecimal.valueOf(100).subtract(cauHinhHeThongService.layTyLeHoaHongSan());
+                        BigDecimal tienGiangVien = ct.getDonGia().multiply(heSoGv);
                         BigDecimal soDuTruoc = gv.getSoDuVi() != null ? gv.getSoDuVi() : BigDecimal.ZERO;
                         BigDecimal soDuSau = soDuTruoc.add(tienGiangVien);
 
@@ -243,7 +248,7 @@ public class PayOsServiceImpl implements PayOsService {
                                 .soDuSau(soDuSau)
                                 .loaiGiaoDich(LoaiGiaoDichVi.TIEN_BAN_LOP_HOC)
                                 .maThamChieu(donHang.getId())
-                                .moTaGiaoDich("Thu nhập 80% lớp học gia sư (payOS): " + lh.getTieuDeLop() + " (Đơn #" + donHang.getMaDonHang() + ")")
+                                .moTaGiaoDich("Thu nhập " + tyLeGv + "% lớp học gia sư (payOS): " + lh.getTieuDeLop() + " (Đơn #" + donHang.getMaDonHang() + ")")
                                 .build();
                         lichSuViTienRepository.save(ls);
                     }

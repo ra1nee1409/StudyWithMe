@@ -60,6 +60,7 @@ public class AdminWebController {
     private final AdminNguoiDungService adminNguoiDungService;
     private final ProfileService profileService;
     private final YeuCauRutTienRepository yeuCauRutTienRepository;
+    private final com.studywithme.service.CauHinhHeThongService cauHinhHeThongService;
 
     @ModelAttribute
     public void loadAdminCommonData(Model model, Principal principal) {
@@ -83,9 +84,13 @@ public class AdminWebController {
         model.addAttribute("tongDoanhThu", thongKe.getTongDoanhThu());
         model.addAttribute("tongNguoiDung", thongKe.getTongNguoiDung());
         model.addAttribute("tongKhoaHoc", thongKe.getTongKhoaHocDangHoatDong());
+        model.addAttribute("tongCaHoc1k1", thongKe.getTongCaHoc1k1());
+        model.addAttribute("tongGiaSuDaDuyet", thongKe.getTongGiaSuDaDuyet());
         model.addAttribute("lenhRutTienChoDuyet", thongKe.getLenhRutTienChoDuyet());
         model.addAttribute("hoSoChoDuyet", thongKe.getHoSoGiangVienChoDuyet());
         model.addAttribute("tongChoDuyet", thongKe.getTongYeuCauChoDuyet());
+        model.addAttribute("topGiaSu", thongKe.getTopGiaSu());
+        model.addAttribute("caHocGanDay", thongKe.getCaHocGanDay());
         model.addAttribute("topKhoaHoc", thongKe.getTopKhoaHoc());
         model.addAttribute("giangVienMoi", thongKe.getGiangVienMoi());
         return "admin/dashboard";
@@ -135,6 +140,19 @@ public class AdminWebController {
                                    RedirectAttributes redirectAttributes) {
         giangVienKycService.tuChoiHoSo(id, lyDoTuChoi);
         redirectAttributes.addFlashAttribute("message", "Đã từ chối hồ sơ gia sư và lưu lý do thành công!");
+        return "redirect:/admin/duyet-gia-su";
+    }
+
+    @PostMapping({"/dinh-chi-gia-su/{id}", "/tutors/{id}/revoke"})
+    public String dinhChiGiaSuAction(@PathVariable Long id,
+                                     @RequestParam(name = "lyDoDinhChi", required = false) String lyDoDinhChi,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+            giangVienKycService.dinhChiQuyenGiangVien(id, lyDoDinhChi);
+            redirectAttributes.addFlashAttribute("message", "Đã thu hồi quyền giảng dạy của gia sư và chuyển hồ sơ sang trạng thái đình chỉ!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể đình chỉ gia sư: " + e.getMessage());
+        }
         return "redirect:/admin/duyet-gia-su";
     }
 
@@ -254,11 +272,24 @@ public class AdminWebController {
                                Model model) {
         model.addAttribute("thongKeDongTien", adminTaiChinhService.layThongKeDongTien());
         model.addAttribute("danhSachDongTien", adminTaiChinhService.layDanhSachDongTien(loai, phanLoai, keyword));
+        model.addAttribute("tyLeHoaHongSan", cauHinhHeThongService.layTyLeHoaHongSan());
         model.addAttribute("currentLoai", loai != null ? loai : "TAT_CA");
         model.addAttribute("currentPhanLoai", phanLoai != null ? phanLoai : "TAT_CA");
         model.addAttribute("keyword", keyword != null ? keyword : "");
         model.addAttribute("activeTab", "transactions");
         return "admin/transactions";
+    }
+
+    @PostMapping("/tai-chinh/cau-hinh-hoa-hong")
+    public String capNhatCauHinhHoaHongAction(@RequestParam("tyLeHoaHong") java.math.BigDecimal tyLeHoaHong,
+                                             RedirectAttributes redirectAttributes) {
+        try {
+            cauHinhHeThongService.capNhatTyLeHoaHongSan(tyLeHoaHong);
+            redirectAttributes.addFlashAttribute("message", "Đã cập nhật tỷ lệ chiết khấu hoa hồng nền tảng thành công sang " + tyLeHoaHong + "%!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể cập nhật tỷ lệ hoa hồng: " + e.getMessage());
+        }
+        return "redirect:/admin/tai-chinh/dong-tien";
     }
 
     // ==========================================

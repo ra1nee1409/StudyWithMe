@@ -100,26 +100,26 @@
           </div>
         </a>
 
-        <!-- KPI 3: Tổng khóa học đang hoạt động -->
-        <div class="bg-surface-card p-5 rounded-2xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 relative overflow-hidden group hover:border-status-success transition-all">
+        <!-- KPI 3: Tổng ca học & lớp kèm 1-1 -->
+        <a th:href="@{/admin/lop-hoc}" class="bg-surface-card p-5 rounded-2xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 relative overflow-hidden group hover:border-status-success transition-all">
           <div class="flex items-center justify-between">
-            <span class="text-xs text-on-surface-variant font-semibold">Khóa học đang hoạt động</span>
-            <div class="w-11 h-11 rounded-xl bg-surface-container text-status-success flex items-center justify-center group-hover:scale-105 transition-transform">
-              <span class="material-symbols-outlined text-[24px]">menu_book</span>
+            <span class="text-xs text-on-surface-variant font-semibold group-hover:text-status-success transition-colors">Ca học 1-1 & Lớp học</span>
+            <div class="w-11 h-11 rounded-xl bg-accent-cyan-subtle text-status-success flex items-center justify-center group-hover:scale-105 transition-transform">
+              <span class="material-symbols-outlined text-[24px]">co_present</span>
             </div>
           </div>
           <div>
             <div class="flex items-baseline gap-2">
               <span class="text-2xl xl:text-3xl font-black text-on-surface tracking-tight" id="kpi-khoa-hoc"
-                    th:text="${tongKhoaHoc ?: 0}">0</span>
-              <span class="text-xs text-on-surface-variant font-medium">khóa học</span>
+                    th:text="${tongCaHoc1k1 ?: 0}">0</span>
+              <span class="text-xs text-on-surface-variant font-medium">ca học</span>
             </div>
             <p class="text-[11px] text-status-success mt-1 flex items-center gap-1">
-              <span class="material-symbols-outlined text-[14px]">check_circle</span>
-              <span>Đang mở bán & ghi danh trên sàn</span>
+              <span class="material-symbols-outlined text-[14px]">verified</span>
+              <span><strong th:text="${tongGiaSuDaDuyet ?: 0}">0</strong> gia sư đã duyệt quyền dạy</span>
             </p>
           </div>
-        </div>
+        </a>
 
         <!-- KPI 4: Lệnh rút tiền / Hồ sơ giảng viên chờ duyệt -->
         <a th:href="@{/admin/duyet-gia-su}" class="bg-surface-card p-5 rounded-2xl shadow-sm border border-surface-container/30 flex flex-col justify-between gap-3 relative overflow-hidden group hover:border-tertiary-container transition-all">
@@ -214,55 +214,58 @@
       <!-- 4. HAI BẢNG NHỎ: TOP 5 KHÓA HỌC BÁN CHẠY & 5 HỒ SƠ GIẢNG VIÊN MỚI -->
       <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        <!-- BẢNG 1: TOP 5 KHÓA HỌC BÁN CHẠY NHẤT -->
+        <!-- BẢNG 1: TOP GIA SƯ KÈM 1-1 NỔI BẬT -->
         <div class="bg-surface-card rounded-2xl p-6 shadow-sm border border-surface-container/30 flex flex-col justify-between gap-4">
           <div>
             <div class="flex items-center justify-between mb-4 pb-3 border-b border-surface-container/40">
               <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary text-[22px]">military_tech</span>
-                <h2 class="text-base font-bold text-on-surface">Top 5 Khóa Học Bán Chạy Nhất</h2>
+                <span class="material-symbols-outlined text-primary text-[22px]">workspace_premium</span>
+                <h2 class="text-base font-bold text-on-surface">Top Gia Sư Kèm 1-1 Nổi Bật</h2>
               </div>
-              <span class="px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-primary text-xs font-bold">Xếp theo học viên</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-primary text-xs font-bold">Xếp theo học viên & ca dạy</span>
             </div>
 
-            <!-- Trường hợp chưa có khóa học -->
-            <div th:if="${#lists.isEmpty(topKhoaHoc)}" class="p-8 text-center bg-surface-container-low/40 rounded-xl border border-dashed border-surface-container">
-              <span class="material-symbols-outlined text-3xl text-outline mb-1">auto_stories</span>
-              <p class="text-xs font-semibold text-on-surface">Chưa có dữ liệu khóa học bán chạy.</p>
-              <p class="text-[11px] text-on-surface-variant mt-0.5">Dữ liệu sẽ tự động cập nhật khi học viên ghi danh.</p>
+            <!-- Trường hợp chưa có gia sư -->
+            <div th:if="${#lists.isEmpty(topGiaSu)}" class="p-8 text-center bg-surface-container-low/40 rounded-xl border border-dashed border-surface-container">
+              <span class="material-symbols-outlined text-3xl text-outline mb-1">co_present</span>
+              <p class="text-xs font-semibold text-on-surface">Chưa có dữ liệu gia sư nổi bật.</p>
+              <p class="text-[11px] text-on-surface-variant mt-0.5">Dữ liệu sẽ tự động cập nhật khi gia sư mở ca học và có học viên đặt lịch.</p>
             </div>
 
-            <!-- Danh sách Top 5 Khóa học -->
-            <div th:if="${!#lists.isEmpty(topKhoaHoc)}" class="space-y-3">
-              <div th:each="kh, stat : ${topKhoaHoc}" class="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container/60 transition-colors flex items-center justify-between gap-3">
+            <!-- Danh sách Top Gia Sư -->
+            <div th:if="${!#lists.isEmpty(topGiaSu)}" class="space-y-3">
+              <div th:each="gs, stat : ${topGiaSu}" class="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container/60 transition-colors flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3 min-w-0">
                   <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0"
                         th:classappend="${stat.index == 0 ? 'bg-status-warning text-white' : (stat.index == 1 ? 'bg-secondary text-white' : (stat.index == 2 ? 'bg-tertiary-container text-white' : 'bg-surface-container text-on-surface-variant'))}"
                         th:text="${stat.count}">1</span>
                   
-                  <div class="w-12 h-10 rounded-lg bg-surface-container overflow-hidden shrink-0">
-                    <img th:if="${kh.anhDaiDien != null}" th:src="${kh.anhDaiDien}" alt="Course" class="w-full h-full object-cover">
-                    <div th:if="${kh.anhDaiDien == null}" class="w-full h-full flex items-center justify-center bg-accent-cyan-subtle text-primary font-bold text-xs">KH</div>
+                  <div class="w-10 h-10 rounded-full bg-primary/10 overflow-hidden shrink-0 border border-primary/20 flex items-center justify-center">
+                    <img th:if="${gs.anhDaiDien != null}" th:src="${gs.anhDaiDien}" alt="Avatar" class="w-full h-full object-cover">
+                    <span th:if="${gs.anhDaiDien == null}" class="text-primary font-bold text-xs" th:text="${gs.hoTen != null ? #strings.substring(gs.hoTen.trim(), 0, 1).toUpperCase() : 'G'}">G</span>
                   </div>
 
                   <div class="min-w-0 flex-1">
-                    <h4 class="font-bold text-xs text-on-surface truncate" th:text="${kh.tieuDe}">Tên khóa học</h4>
-                    <p class="text-[11px] text-on-surface-variant truncate" th:text="'GV: ' + ${kh.tenGiangVien}">Giảng viên</p>
+                    <h4 class="font-bold text-xs text-on-surface truncate flex items-center gap-1.5">
+                      <span th:text="${gs.hoTen}">Họ tên gia sư</span>
+                      <span class="material-symbols-outlined text-status-success text-[14px]" title="Đã xác thực KYC">verified</span>
+                    </h4>
+                    <p class="text-[11px] text-on-surface-variant truncate" th:text="${gs.tieuDeChuyenMon}">Chuyên môn</p>
                   </div>
                 </div>
 
                 <div class="text-right shrink-0">
-                  <div class="text-xs font-bold text-primary" th:text="${#numbers.formatDecimal(kh.giaHienTai ?: 0, 0, 'POINT', 0, 'COMMA')} + ' ₫'">0 ₫</div>
-                  <div class="text-[10px] text-on-surface-variant font-medium" th:text="${kh.soHocVien ?: 0} + ' học viên'">0 học viên</div>
+                  <div class="text-xs font-bold text-primary" th:text="${gs.soHocVienDangKy ?: 0} + ' học viên'">0 học viên</div>
+                  <div class="text-[10px] text-on-surface-variant font-medium" th:text="${gs.soCaHoc ?: 0} + ' ca học mở'">0 ca học mở</div>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="pt-3 border-t border-surface-container/30">
-            <div class="text-[11px] text-on-surface-variant text-center">
-              Dữ liệu được tổng hợp tự động từ các đơn hàng hoàn tất thanh toán
-            </div>
+            <a th:href="@{/admin/duyet-gia-su}" class="text-[11px] text-primary hover:underline text-center block font-semibold">
+              Quản lý và thẩm định toàn bộ danh sách gia sư &rarr;
+            </a>
           </div>
         </div>
 
@@ -322,6 +325,76 @@
           </div>
         </div>
 
+      </section>
+
+      <!-- 5. CA HỌC 1-1 TRỰC TUYẾN MỚI NHẤT -->
+      <section class="bg-surface-card rounded-2xl p-6 shadow-sm border border-surface-container/30">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-surface-container/40">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[22px]">calendar_month</span>
+            <h2 class="text-base font-bold text-on-surface">Ca Học 1-1 & Lớp Kèm Mới Mở Gần Đây</h2>
+          </div>
+          <a th:href="@{/admin/lop-hoc}" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+            <span>Xem tất cả ca học</span>
+            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+          </a>
+        </div>
+
+        <!-- Trống -->
+        <div th:if="${#lists.isEmpty(caHocGanDay)}" class="p-8 text-center bg-surface-container-low/40 rounded-xl border border-dashed border-surface-container">
+          <span class="material-symbols-outlined text-3xl text-outline mb-1">school</span>
+          <p class="text-xs font-semibold text-on-surface">Chưa có ca học trực tuyến nào được khởi tạo.</p>
+          <p class="text-[11px] text-on-surface-variant mt-0.5">Các ca dạy do gia sư tạo sẽ xuất hiện tại đây.</p>
+        </div>
+
+        <!-- Bảng danh sách ca học -->
+        <div th:if="${!#lists.isEmpty(caHocGanDay)}" class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-surface-container/60 text-on-surface-variant uppercase font-semibold text-[11px]">
+                <th class="py-3 px-3">Ca học / Môn học</th>
+                <th class="py-3 px-3">Gia sư phụ trách</th>
+                <th class="py-3 px-3">Lịch học trong tuần</th>
+                <th class="py-3 px-3 text-right">Học phí</th>
+                <th class="py-3 px-3 text-center">Học viên / Sĩ số</th>
+                <th class="py-3 px-3 text-center">Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-container/30">
+              <tr th:each="ch : ${caHocGanDay}" class="hover:bg-surface-container-low/60 transition-colors">
+                <td class="py-3.5 px-3">
+                  <div class="font-bold text-on-surface" th:text="${ch.tieuDeLop}">Toán học lớp 12</div>
+                  <span class="inline-block px-2 py-0.5 mt-0.5 rounded-md bg-surface-container text-[10px] text-on-surface-variant font-medium" th:text="${ch.tenDanhMuc}">Toán học</span>
+                </td>
+                <td class="py-3.5 px-3">
+                  <div class="font-semibold text-on-surface" th:text="${ch.tenGiaSu}">Thầy Nguyễn Văn A</div>
+                  <div class="text-[11px] text-on-surface-variant" th:text="${ch.emailGiaSu}">gia_su@test.vn</div>
+                </td>
+                <td class="py-3.5 px-3">
+                  <span class="inline-flex items-center gap-1 text-[11px] text-on-surface-variant font-medium">
+                    <span class="material-symbols-outlined text-[14px] text-primary">schedule</span>
+                    <span th:text="${ch.lichHocTrongTuan ?: 'Lịch linh hoạt'}">T2-T4 19:30</span>
+                  </span>
+                </td>
+                <td class="py-3.5 px-3 text-right">
+                  <span class="font-bold text-primary" th:text="${#numbers.formatDecimal(ch.hocPhi ?: 0, 0, 'POINT', 0, 'COMMA')} + ' ₫'">150.000 ₫</span>
+                  <span class="block text-[10px] text-on-surface-variant">/ buổi</span>
+                </td>
+                <td class="py-3.5 px-3 text-center">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold"
+                        th:classappend="${ch.soHocVienHienTai >= ch.siSoToiDa ? 'bg-status-success/10 text-status-success' : 'bg-surface-container text-on-surface-variant'}"
+                        th:text="${ch.soHocVienHienTai} + '/' + ${ch.siSoToiDa} + ' HV'">1/1 HV</span>
+                </td>
+                <td class="py-3.5 px-3 text-center">
+                  <span th:if="${ch.trangThai == 'DANG_MO_DANG_KY'}" class="px-2.5 py-0.5 rounded-full bg-status-success/10 text-status-success text-[11px] font-bold">Đang mở</span>
+                  <span th:if="${ch.trangThai == 'DA_DU_SI_SO'}" class="px-2.5 py-0.5 rounded-full bg-accent-navy-subtle text-secondary text-[11px] font-bold">Đã đủ HV</span>
+                  <span th:if="${ch.trangThai == 'DANG_DIEN_RA'}" class="px-2.5 py-0.5 rounded-full bg-accent-cyan-subtle text-primary text-[11px] font-bold">Đang học</span>
+                  <span th:if="${ch.trangThai == 'DA_KET_THUC'}" class="px-2.5 py-0.5 rounded-full bg-surface-container text-outline text-[11px] font-bold">Kết thúc</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
     </main>

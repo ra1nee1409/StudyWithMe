@@ -29,7 +29,7 @@
            th:href="@{/#lop-1-kem-1}">Các Cấp Học</a>
         <a class="px-3.5 py-2 rounded-lg text-on-surface-variant font-label-lg text-label-lg whitespace-nowrap hover:text-primary hover:bg-surface-container-low transition-colors"
            th:href="@{/#gia-su}">Gia Sư Nổi Bật</a>
-        <a class="px-3.5 py-2 rounded-lg font-label-lg text-label-lg whitespace-nowrap transition-colors"
+        <a id="nav-become-tutor-link" class="px-3.5 py-2 rounded-lg font-label-lg text-label-lg whitespace-nowrap transition-colors"
            th:classappend="${activePage == 'tutor-apply'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
            th:href="@{/tro-thanh-giang-vien}">Trở Thành Giảng Viên</a>
       </nav>
@@ -160,7 +160,7 @@
               <span class="material-symbols-outlined text-primary text-[20px]">star</span>
               <span>Gia Sư Tiêu Biểu</span>
             </a>
-            <a th:href="@{/tro-thanh-giang-vien}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-primary hover:bg-primary/10 transition-colors">
+            <a id="drawer-become-tutor-link" th:href="@{/tro-thanh-giang-vien}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-primary hover:bg-primary/10 transition-colors">
               <span class="material-symbols-outlined text-primary text-[20px]">co_present</span>
               <span>Trở Thành Giảng Viên</span>
             </a>
@@ -237,6 +237,8 @@
         const drawerStudentLink = document.getElementById('drawer-student-link');
         const drawerGuestActions = document.getElementById('drawer-guest-actions');
         const drawerUserActions = document.getElementById('drawer-user-actions');
+        const navBecomeTutorLink = document.getElementById('nav-become-tutor-link');
+        const drawerBecomeTutorLink = document.getElementById('drawer-become-tutor-link');
 
         function setGuestUI() {
           if (guestBox) guestBox.classList.remove('hidden');
@@ -250,6 +252,8 @@
           if (adminLink) adminLink.classList.add('hidden');
           if (tutorLink) tutorLink.classList.add('hidden');
           if (studentLink) studentLink.classList.add('hidden');
+          if (navBecomeTutorLink) navBecomeTutorLink.classList.remove('hidden');
+          if (drawerBecomeTutorLink) drawerBecomeTutorLink.classList.remove('hidden');
         }
 
         try {
@@ -310,20 +314,37 @@
                 const isTutor = hasRole('ROLE_GIANG_VIEN');
 
                 if (isAdmin) {
+                  // Admin quản trị tối cao: chỉ hiện cổng Quản Trị, ẩn triệt để cổng Giảng viên và nút Trở thành gia sư
                   if (adminLink) {
                     adminLink.classList.remove('hidden');
                     adminLink.classList.add('lg:inline-flex');
                   }
                   if (drawerAdminLink) drawerAdminLink.classList.remove('hidden');
+                  if (tutorLink) tutorLink.classList.add('hidden');
+                  if (drawerTutorLink) drawerTutorLink.classList.add('hidden');
+                  if (navBecomeTutorLink) navBecomeTutorLink.classList.add('hidden');
+                  if (drawerBecomeTutorLink) drawerBecomeTutorLink.classList.add('hidden');
                   if (drawerUserRole) drawerUserRole.textContent = "Quản trị viên hệ thống";
                 } else if (isTutor) {
+                  // Giảng viên: hiện cổng Giảng viên, ẩn nút Đăng ký làm gia sư
+                  if (adminLink) adminLink.classList.add('hidden');
+                  if (drawerAdminLink) drawerAdminLink.classList.add('hidden');
                   if (tutorLink) {
                     tutorLink.classList.remove('hidden');
                     tutorLink.classList.add('lg:inline-flex');
                   }
                   if (drawerTutorLink) drawerTutorLink.classList.remove('hidden');
+                  if (navBecomeTutorLink) navBecomeTutorLink.classList.add('hidden');
+                  if (drawerBecomeTutorLink) drawerBecomeTutorLink.classList.add('hidden');
                   if (drawerUserRole) drawerUserRole.textContent = "Gia sư / Giảng viên";
                 } else {
+                  // Học viên bình thường: có thể thấy nút Trở thành gia sư
+                  if (adminLink) adminLink.classList.add('hidden');
+                  if (drawerAdminLink) drawerAdminLink.classList.add('hidden');
+                  if (tutorLink) tutorLink.classList.add('hidden');
+                  if (drawerTutorLink) drawerTutorLink.classList.add('hidden');
+                  if (navBecomeTutorLink) navBecomeTutorLink.classList.remove('hidden');
+                  if (drawerBecomeTutorLink) drawerBecomeTutorLink.classList.remove('hidden');
                   if (drawerUserRole) drawerUserRole.textContent = "Học viên";
                 }
 

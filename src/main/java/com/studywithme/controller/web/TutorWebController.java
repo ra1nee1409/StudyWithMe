@@ -40,7 +40,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/tutor")
-@PreAuthorize("hasAnyAuthority('ROLE_GIANG_VIEN', 'ROLE_QUAN_TRI')")
+@PreAuthorize("hasAuthority('ROLE_GIANG_VIEN')")
 @RequiredArgsConstructor
 public class TutorWebController {
 

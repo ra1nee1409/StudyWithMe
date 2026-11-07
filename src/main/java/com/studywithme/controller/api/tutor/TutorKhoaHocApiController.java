@@ -23,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/giang-vien/khoa-hoc")
-@PreAuthorize("hasAnyAuthority('ROLE_GIANG_VIEN', 'ROLE_QUAN_TRI')")
+@PreAuthorize("hasAuthority('ROLE_GIANG_VIEN')")
 @RequiredArgsConstructor
 @Slf4j
 public class TutorKhoaHocApiController {

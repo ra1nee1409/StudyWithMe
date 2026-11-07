@@ -94,7 +94,7 @@ public class SecurityConfig {
                     "/v3/api-docs/**"
                 ).permitAll()
                 .requestMatchers("/admin", "/admin/**", "/api/admin/**").hasAuthority("ROLE_QUAN_TRI")
-                .requestMatchers("/tutor", "/tutor/**", "/api/giang-vien/**").hasAnyAuthority("ROLE_GIANG_VIEN", "ROLE_QUAN_TRI")
+                .requestMatchers("/tutor", "/tutor/**", "/api/giang-vien/**").hasAuthority("ROLE_GIANG_VIEN")
                 .requestMatchers("/student", "/student/**", "/api/hoc-vien/**").authenticated()
                 .anyRequest().authenticated()
             );

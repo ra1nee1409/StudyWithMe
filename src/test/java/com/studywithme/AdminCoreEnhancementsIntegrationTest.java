@@ -275,4 +275,24 @@ class AdminCoreEnhancementsIntegrationTest {
                 .andExpect(jsonPath("$.thanhCong").value(true))
                 .andExpect(jsonPath("$.duLieu.trangThaiDuyet").value("TU_CHOI"));
     }
+
+    // =========================================================================
+    // 4. TEST PHÂN QUYỀN: ADMIN KHÔNG ĐƯỢC PHÉP TRUY CẬP CỔNG GIẢNG VIÊN
+    // =========================================================================
+
+    @Test
+    @WithMockUser(username = "admin@studywithme.vn", authorities = {"ROLE_QUAN_TRI"})
+    @DisplayName("Phân quyền: Admin (ROLE_QUAN_TRI) bị từ chối truy cập (403 Forbidden) khi vào cổng web giảng viên /tutor/**")
+    void testAdminKhongDuocVaoCongGiangVienWeb() throws Exception {
+        mockMvc.perform(get("/tutor/dashboard"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "admin@studywithme.vn", authorities = {"ROLE_QUAN_TRI"})
+    @DisplayName("Phân quyền: Admin (ROLE_QUAN_TRI) bị từ chối truy cập (403 Forbidden) khi gọi API giảng viên /api/giang-vien/**")
+    void testAdminKhongDuocGoiApiGiangVien() throws Exception {
+        mockMvc.perform(get("/api/giang-vien/khoa-hoc/danh-sach"))
+                .andExpect(status().isForbidden());
+    }
 }

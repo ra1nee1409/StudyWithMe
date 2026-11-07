@@ -84,6 +84,9 @@ class PaymentPayOsIntegrationTest {
     private PayOsService payOsService;
 
     @Autowired
+    private com.studywithme.service.CauHinhHeThongService cauHinhHeThongService;
+
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     private MockMvc mockMvc;
@@ -94,6 +97,10 @@ class PaymentPayOsIntegrationTest {
                 .webAppContextSetup(this.context)
                 .apply(springSecurity())
                 .build();
+
+        try {
+            this.cauHinhHeThongService.capNhatTyLeHoaHongSan(BigDecimal.valueOf(20.0));
+        } catch (Exception ignored) {}
 
         try {
             jdbcTemplate.execute("""

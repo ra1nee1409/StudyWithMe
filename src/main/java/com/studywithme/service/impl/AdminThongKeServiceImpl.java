@@ -36,14 +36,14 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
     private final DangKyLopHocRepository dangKyLopHocRepository;
 
     public AdminThongKeServiceImpl(DonHangRepository donHangRepository,
-                                  NguoiDungRepository nguoiDungRepository,
-                                  KhoaHocRepository khoaHocRepository,
-                                  HoSoGiangVienRepository hoSoGiangVienRepository,
-                                  YeuCauRutTienRepository yeuCauRutTienRepository,
-                                  GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository,
-                                  DanhMucRepository danhMucRepository,
-                                  LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
-                                  DangKyLopHocRepository dangKyLopHocRepository) {
+            NguoiDungRepository nguoiDungRepository,
+            KhoaHocRepository khoaHocRepository,
+            HoSoGiangVienRepository hoSoGiangVienRepository,
+            YeuCauRutTienRepository yeuCauRutTienRepository,
+            GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository,
+            DanhMucRepository danhMucRepository,
+            LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
+            DangKyLopHocRepository dangKyLopHocRepository) {
         this.donHangRepository = donHangRepository;
         this.nguoiDungRepository = nguoiDungRepository;
         this.khoaHocRepository = khoaHocRepository;
@@ -78,7 +78,8 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
         long tongYeuCauChoDuyet = hoSoChoDuyet + lenhRutTienChoDuyet;
 
         // 5. Top Gia sư nổi bật & được đặt học nhiều nhất
-        List<HoSoGiangVien> tutors = hoSoGiangVienRepository.findByTrangThaiDuyetOrderByNgayTaoDesc(TrangThaiGiangVien.DA_DUYET);
+        List<HoSoGiangVien> tutors = hoSoGiangVienRepository
+                .findByTrangThaiDuyetOrderByNgayTaoDesc(TrangThaiGiangVien.DA_DUYET);
         List<TopGiaSuDto> topGiaSuDtos = new ArrayList<>();
         for (HoSoGiangVien gv : tutors) {
             long soCaHoc = lopHocTrucTuyenRepository.countByGiangVienId(gv.getId());
@@ -105,7 +106,8 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
         }
         topGiaSuDtos.sort((a, b) -> {
             int c = Long.compare(b.getSoHocVienDangKy(), a.getSoHocVienDangKy());
-            if (c != 0) return c;
+            if (c != 0)
+                return c;
             return Long.compare(b.getSoCaHoc(), a.getSoCaHoc());
         });
         if (topGiaSuDtos.size() > 5) {
@@ -115,18 +117,23 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
         // 6. Danh sách Ca học 1-1 mới nhất
         List<com.studywithme.entity.LopHocTrucTuyen> allLop = lopHocTrucTuyenRepository.findAll();
         allLop.sort((a, b) -> {
-            if (a.getNgayTao() == null && b.getNgayTao() == null) return 0;
-            if (a.getNgayTao() == null) return 1;
-            if (b.getNgayTao() == null) return -1;
+            if (a.getNgayTao() == null && b.getNgayTao() == null)
+                return 0;
+            if (a.getNgayTao() == null)
+                return 1;
+            if (b.getNgayTao() == null)
+                return -1;
             return b.getNgayTao().compareTo(a.getNgayTao());
         });
         List<CaHoc1k1DashboardDto> caHocDtos = new ArrayList<>();
         for (int i = 0; i < Math.min(5, allLop.size()); i++) {
             com.studywithme.entity.LopHocTrucTuyen lop = allLop.get(i);
             String tenGv = (lop.getGiangVien() != null && lop.getGiangVien().getNguoiDung() != null)
-                    ? lop.getGiangVien().getNguoiDung().getHoTen() : "Gia sư";
+                    ? lop.getGiangVien().getNguoiDung().getHoTen()
+                    : "Gia sư";
             String emailGv = (lop.getGiangVien() != null && lop.getGiangVien().getNguoiDung() != null)
-                    ? lop.getGiangVien().getNguoiDung().getEmail() : "";
+                    ? lop.getGiangVien().getNguoiDung().getEmail()
+                    : "";
             String tenDm = lop.getDanhMuc() != null ? lop.getDanhMuc().getTenDanhMuc() : "Tổng hợp";
             int soHv = (int) dangKyLopHocRepository.countByLopHocId(lop.getId());
 
@@ -155,7 +162,8 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
             BigDecimal doanhThuUocTinh = giaHienTai.multiply(BigDecimal.valueOf(soHocVien));
 
             String tenGV = (k.getGiangVien() != null && k.getGiangVien().getNguoiDung() != null)
-                    ? k.getGiangVien().getNguoiDung().getHoTen() : "Giảng viên";
+                    ? k.getGiangVien().getNguoiDung().getHoTen()
+                    : "Giảng viên";
 
             topKhoaHocDtos.add(TopKhoaHocDto.builder()
                     .id(k.getId())
@@ -256,9 +264,11 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
         List<KhoaHoc> allKhoaHoc = khoaHocRepository.findAll();
         for (KhoaHoc k : allKhoaHoc) {
             int students = (k.getTongSoHocVien() != null && k.getTongSoHocVien() > 0) ? k.getTongSoHocVien() : 1;
-            String textToSearch = (k.getTieuDe() + " " + (k.getThePhanLoai() != null ? k.getThePhanLoai() : "")).toLowerCase();
+            String textToSearch = (k.getTieuDe() + " " + (k.getThePhanLoai() != null ? k.getThePhanLoai() : ""))
+                    .toLowerCase();
             if (k.getDanhMuc() != null) {
-                textToSearch += " " + (k.getDanhMuc().getTenDanhMuc() != null ? k.getDanhMuc().getTenDanhMuc() : "") + " "
+                textToSearch += " " + (k.getDanhMuc().getTenDanhMuc() != null ? k.getDanhMuc().getTenDanhMuc() : "")
+                        + " "
                         + (k.getDanhMuc().getDuongDanSlug() != null ? k.getDanhMuc().getDuongDanSlug() : "");
                 if (k.getDanhMuc().getLoaiDanhMuc() == LoaiDanhMuc.CHUNG_CHI_NGOAI_NGU) {
                     countNgoaiNgu += students;
@@ -266,13 +276,17 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
                 }
             }
 
-            if (textToSearch.contains("ielts") || textToSearch.contains("toeic") || textToSearch.contains("tiếng anh") || textToSearch.contains("ngoại ngữ")) {
+            if (textToSearch.contains("ielts") || textToSearch.contains("toeic") || textToSearch.contains("tiếng anh")
+                    || textToSearch.contains("ngoại ngữ")) {
                 countNgoaiNgu += students;
-            } else if (textToSearch.contains("tiểu học") || textToSearch.contains("lớp 1") || textToSearch.contains("lớp 2")
-                    || textToSearch.contains("lớp 3") || textToSearch.contains("lớp 4") || textToSearch.contains("lớp 5") || textToSearch.contains("cấp 1")) {
+            } else if (textToSearch.contains("tiểu học") || textToSearch.contains("lớp 1")
+                    || textToSearch.contains("lớp 2")
+                    || textToSearch.contains("lớp 3") || textToSearch.contains("lớp 4")
+                    || textToSearch.contains("lớp 5") || textToSearch.contains("cấp 1")) {
                 countCap1 += students;
             } else if (textToSearch.contains("thcs") || textToSearch.contains("lớp 6") || textToSearch.contains("lớp 7")
-                    || textToSearch.contains("lớp 8") || textToSearch.contains("lớp 9") || textToSearch.contains("cấp 2") || textToSearch.contains("vào 10")) {
+                    || textToSearch.contains("lớp 8") || textToSearch.contains("lớp 9")
+                    || textToSearch.contains("cấp 2") || textToSearch.contains("vào 10")) {
                 countCap2 += students;
             } else {
                 // Mặc định hoặc Cấp 3 / THPT

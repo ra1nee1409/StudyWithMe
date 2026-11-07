@@ -28,19 +28,22 @@ public class AdminTaiChinhServiceImpl implements AdminTaiChinhService {
     private final DonHangRepository donHangRepository;
     private final KhoaHocRepository khoaHocRepository;
     private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
+    private final com.studywithme.service.CauHinhHeThongService cauHinhHeThongService;
 
     public AdminTaiChinhServiceImpl(YeuCauRutTienRepository yeuCauRutTienRepository,
                                     HoSoGiangVienRepository hoSoGiangVienRepository,
                                     LichSuViTienRepository lichSuViTienRepository,
                                     DonHangRepository donHangRepository,
                                     KhoaHocRepository khoaHocRepository,
-                                    LopHocTrucTuyenRepository lopHocTrucTuyenRepository) {
+                                    LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
+                                    com.studywithme.service.CauHinhHeThongService cauHinhHeThongService) {
         this.yeuCauRutTienRepository = yeuCauRutTienRepository;
         this.hoSoGiangVienRepository = hoSoGiangVienRepository;
         this.lichSuViTienRepository = lichSuViTienRepository;
         this.donHangRepository = donHangRepository;
         this.khoaHocRepository = khoaHocRepository;
         this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
+        this.cauHinhHeThongService = cauHinhHeThongService;
     }
 
     @Override
@@ -200,8 +203,9 @@ public class AdminTaiChinhServiceImpl implements AdminTaiChinhService {
             }
         }
 
-        // 3. Phí nền tảng 20% giữ lại
-        BigDecimal loiNhuanSan = tongTienVao.multiply(BigDecimal.valueOf(0.20));
+        // 3. Phí nền tảng giữ lại (theo cấu hình động)
+        BigDecimal heSoSan = cauHinhHeThongService.layHeSoHoaHongSan();
+        BigDecimal loiNhuanSan = tongTienVao.multiply(heSoSan);
 
         // 4. Tổng số dư ví hiện có của các giảng viên
         List<HoSoGiangVien> allTutors = hoSoGiangVienRepository.findAll();
@@ -234,6 +238,11 @@ public class AdminTaiChinhServiceImpl implements AdminTaiChinhService {
         Map<Long, String> tenLopHocMap = new HashMap<>();
         lopHocTrucTuyenRepository.findAll().forEach(lop -> tenLopHocMap.put(lop.getId(), lop.getTieuDeLop()));
 
+        BigDecimal heSoSan = cauHinhHeThongService.layHeSoHoaHongSan();
+        BigDecimal heSoGv = cauHinhHeThongService.layHeSoGiangVienNhan();
+        BigDecimal tyLeSan = cauHinhHeThongService.layTyLeHoaHongSan();
+        BigDecimal tyLeGv = BigDecimal.valueOf(100).subtract(tyLeSan);
+
         // 1. Thu thập TIỀN VÀO từ Đơn Hàng (Orders)
         List<DonHang> allOrders = donHangRepository.findAllByOrderByNgayTaoDonDesc();
         for (DonHang dh : allOrders) {
@@ -255,8 +264,8 @@ public class AdminTaiChinhServiceImpl implements AdminTaiChinhService {
             }
 
             BigDecimal tongTien = dh.getTongTienThanhToan() != null ? dh.getTongTienThanhToan() : BigDecimal.ZERO;
-            BigDecimal phiSan = tongTien.multiply(BigDecimal.valueOf(0.20));
-            BigDecimal tienGiangVien = tongTien.multiply(BigDecimal.valueOf(0.80));
+            BigDecimal phiSan = tongTien.multiply(heSoSan);
+            BigDecimal tienGiangVien = tongTien.multiply(heSoGv);
 
             DongTienGiaoDichDto dto = DongTienGiaoDichDto.builder()
                     .maGiaoDich(dh.getMaDonHang())
@@ -272,7 +281,7 @@ public class AdminTaiChinhServiceImpl implements AdminTaiChinhService {
                     .phuongThuc(dh.getPhuongThucThanhToan() != null ? dh.getPhuongThucThanhToan().name() : "PAYOS")
                     .trangThai(dh.getTrangThaiThanhToan() != null ? dh.getTrangThaiThanhToan().name() : "CHO_THANH_TOAN")
                     .thoiGian(dh.getNgayThanhToan() != null ? dh.getNgayThanhToan() : dh.getNgayTaoDon())
-                    .moTa("Học viên nộp tiền mua " + (phanLoai.equals("KHOA_HOC") ? "khóa học" : "lớp gia sư") + " (Sàn nhận 20%, GV nhận 80%)")
+                    .moTa("Học viên nộp tiền mua " + (phanLoai.equals("KHOA_HOC") ? "khóa học" : "lớp gia sư") + " (Sàn nhận " + tyLeSan + "%, GV nhận " + tyLeGv + "%)")
                     .build();
 
             danhSach.add(dto);

@@ -21,6 +21,7 @@ import com.studywithme.service.AdminNguoiDungService;
 import com.studywithme.service.AdminTaiChinhService;
 import com.studywithme.service.AdminThongKeService;
 import com.studywithme.service.BannerService;
+import com.studywithme.service.CauHinhHeThongService;
 import com.studywithme.service.DanhMucService;
 import com.studywithme.service.GiangVienKycService;
 import com.studywithme.service.ProfileService;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 
@@ -60,7 +62,7 @@ public class AdminWebController {
     private final AdminNguoiDungService adminNguoiDungService;
     private final ProfileService profileService;
     private final YeuCauRutTienRepository yeuCauRutTienRepository;
-    private final com.studywithme.service.CauHinhHeThongService cauHinhHeThongService;
+    private final CauHinhHeThongService cauHinhHeThongService;
 
     @ModelAttribute
     public void loadAdminCommonData(Model model, Principal principal) {
@@ -281,7 +283,7 @@ public class AdminWebController {
     }
 
     @PostMapping("/tai-chinh/cau-hinh-hoa-hong")
-    public String capNhatCauHinhHoaHongAction(@RequestParam("tyLeHoaHong") java.math.BigDecimal tyLeHoaHong,
+    public String capNhatCauHinhHoaHongAction(@RequestParam("tyLeHoaHong") BigDecimal tyLeHoaHong,
                                              RedirectAttributes redirectAttributes) {
         try {
             cauHinhHeThongService.capNhatTyLeHoaHongSan(tyLeHoaHong);

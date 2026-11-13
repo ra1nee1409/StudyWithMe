@@ -12,6 +12,8 @@ import com.studywithme.entity.enums.shared.TrangThaiThanhToan;
 import com.studywithme.exception.ResourceNotFoundException;
 import com.studywithme.repository.*;
 import com.studywithme.service.AdminTaiChinhService;
+import com.studywithme.service.CauHinhHeThongService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class AdminTaiChinhServiceImpl implements AdminTaiChinhService {
 
     private final YeuCauRutTienRepository yeuCauRutTienRepository;
@@ -28,23 +31,7 @@ public class AdminTaiChinhServiceImpl implements AdminTaiChinhService {
     private final DonHangRepository donHangRepository;
     private final KhoaHocRepository khoaHocRepository;
     private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
-    private final com.studywithme.service.CauHinhHeThongService cauHinhHeThongService;
-
-    public AdminTaiChinhServiceImpl(YeuCauRutTienRepository yeuCauRutTienRepository,
-                                    HoSoGiangVienRepository hoSoGiangVienRepository,
-                                    LichSuViTienRepository lichSuViTienRepository,
-                                    DonHangRepository donHangRepository,
-                                    KhoaHocRepository khoaHocRepository,
-                                    LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
-                                    com.studywithme.service.CauHinhHeThongService cauHinhHeThongService) {
-        this.yeuCauRutTienRepository = yeuCauRutTienRepository;
-        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
-        this.lichSuViTienRepository = lichSuViTienRepository;
-        this.donHangRepository = donHangRepository;
-        this.khoaHocRepository = khoaHocRepository;
-        this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
-        this.cauHinhHeThongService = cauHinhHeThongService;
-    }
+    private final CauHinhHeThongService cauHinhHeThongService;
 
     @Override
     @Transactional(readOnly = true)

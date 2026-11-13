@@ -4,6 +4,7 @@ import com.studywithme.dto.response.*;
 import com.studywithme.entity.DanhMuc;
 import com.studywithme.entity.HoSoGiangVien;
 import com.studywithme.entity.KhoaHoc;
+import com.studywithme.entity.LopHocTrucTuyen;
 import com.studywithme.entity.enums.shared.LoaiDanhMuc;
 import com.studywithme.entity.enums.admin.TrangThaiGiangVien;
 import com.studywithme.entity.enums.admin.TrangThaiKhoaHoc;
@@ -11,6 +12,7 @@ import com.studywithme.entity.enums.admin.TrangThaiRutTien;
 import com.studywithme.entity.enums.shared.TrangThaiThanhToan;
 import com.studywithme.repository.*;
 import com.studywithme.service.AdminThongKeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +22,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class AdminThongKeServiceImpl implements AdminThongKeService {
 
     private final DonHangRepository donHangRepository;
@@ -34,26 +38,6 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
     private final DanhMucRepository danhMucRepository;
     private final LopHocTrucTuyenRepository lopHocTrucTuyenRepository;
     private final DangKyLopHocRepository dangKyLopHocRepository;
-
-    public AdminThongKeServiceImpl(DonHangRepository donHangRepository,
-            NguoiDungRepository nguoiDungRepository,
-            KhoaHocRepository khoaHocRepository,
-            HoSoGiangVienRepository hoSoGiangVienRepository,
-            YeuCauRutTienRepository yeuCauRutTienRepository,
-            GhiDanhKhoaHocRepository ghiDanhKhoaHocRepository,
-            DanhMucRepository danhMucRepository,
-            LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
-            DangKyLopHocRepository dangKyLopHocRepository) {
-        this.donHangRepository = donHangRepository;
-        this.nguoiDungRepository = nguoiDungRepository;
-        this.khoaHocRepository = khoaHocRepository;
-        this.hoSoGiangVienRepository = hoSoGiangVienRepository;
-        this.yeuCauRutTienRepository = yeuCauRutTienRepository;
-        this.ghiDanhKhoaHocRepository = ghiDanhKhoaHocRepository;
-        this.danhMucRepository = danhMucRepository;
-        this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
-        this.dangKyLopHocRepository = dangKyLopHocRepository;
-    }
 
     @Override
     @Transactional(readOnly = true)
@@ -104,30 +88,19 @@ public class AdminThongKeServiceImpl implements AdminThongKeService {
                     .diemDanhGia(5.0)
                     .build());
         }
-        topGiaSuDtos.sort((a, b) -> {
-            int c = Long.compare(b.getSoHocVienDangKy(), a.getSoHocVienDangKy());
-            if (c != 0)
-                return c;
-            return Long.compare(b.getSoCaHoc(), a.getSoCaHoc());
-        });
+        topGiaSuDtos.sort(Comparator.comparingLong(TopGiaSuDto::getSoHocVienDangKy)
+                .thenComparingLong(TopGiaSuDto::getSoCaHoc)
+                .reversed());
         if (topGiaSuDtos.size() > 5) {
             topGiaSuDtos = new ArrayList<>(topGiaSuDtos.subList(0, 5));
         }
 
         // 6. Danh sách Ca học 1-1 mới nhất
-        List<com.studywithme.entity.LopHocTrucTuyen> allLop = lopHocTrucTuyenRepository.findAll();
-        allLop.sort((a, b) -> {
-            if (a.getNgayTao() == null && b.getNgayTao() == null)
-                return 0;
-            if (a.getNgayTao() == null)
-                return 1;
-            if (b.getNgayTao() == null)
-                return -1;
-            return b.getNgayTao().compareTo(a.getNgayTao());
-        });
+        List<LopHocTrucTuyen> allLop = lopHocTrucTuyenRepository.findAll();
+        allLop.sort(Comparator.comparing(LopHocTrucTuyen::getNgayTao, Comparator.nullsLast(Comparator.reverseOrder())));
         List<CaHoc1k1DashboardDto> caHocDtos = new ArrayList<>();
         for (int i = 0; i < Math.min(5, allLop.size()); i++) {
-            com.studywithme.entity.LopHocTrucTuyen lop = allLop.get(i);
+            LopHocTrucTuyen lop = allLop.get(i);
             String tenGv = (lop.getGiangVien() != null && lop.getGiangVien().getNguoiDung() != null)
                     ? lop.getGiangVien().getNguoiDung().getHoTen()
                     : "Gia sư";

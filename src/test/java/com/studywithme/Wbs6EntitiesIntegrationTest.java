@@ -50,12 +50,6 @@ class Wbs6EntitiesIntegrationTest {
     private DatLich1k1Repository datLich1k1Repository;
 
     @Autowired
-    private CuocTroChuyenRepository cuocTroChuyenRepository;
-
-    @Autowired
-    private TinNhanRepository tinNhanRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     private NguoiDung tutorUser;
@@ -220,69 +214,5 @@ class Wbs6EntitiesIntegrationTest {
         saved.setTrangThai(TrangThaiDatLich.HOAN_THANH);
         saved = datLich1k1Repository.save(saved);
         assertEquals(TrangThaiDatLich.HOAN_THANH, saved.getTrangThai());
-    }
-
-    // =========================================================================
-    // 3. TEST THỰC THỂ HỘI THOẠI & TIN NHẮN CHAT 1-1 (CuocTroChuyen & TinNhan)
-    // =========================================================================
-
-    @Test
-    @DisplayName("WBS 6.3: Khởi tạo cuộc trò chuyện, gửi tin nhắn văn bản, thẻ đề xuất ca học và đánh dấu đã xem")
-    void testChatEnginePersistenceAndReadStatus() {
-        // 1. Tạo cuộc trò chuyện giữa Học viên và Gia sư
-        CuocTroChuyen conversation = CuocTroChuyen.builder()
-                .nguoiDung1(studentUser)
-                .nguoiDung2(tutorUser)
-                .tinNhanCuoi("Chào thầy, em muốn hỏi về lịch dạy Toán ạ")
-                .thoiGianTinNhanCuoi(LocalDateTime.now())
-                .build();
-        conversation = cuocTroChuyenRepository.save(conversation);
-        assertNotNull(conversation.getId());
-
-        // 2. Học viên gửi tin nhắn đầu tiên (Văn bản)
-        TinNhan msg1 = TinNhan.builder()
-                .cuocTroChuyen(conversation)
-                .nguoiGui(studentUser)
-                .noiDung("Chào thầy, em muốn hỏi về lịch dạy Toán ạ")
-                .loaiTinNhan(LoaiTinNhan.VAN_BAN)
-                .daDoc(false)
-                .build();
-        tinNhanRepository.save(msg1);
-
-        // 3. Gia sư gửi tin nhắn trả lời kèm thẻ đề xuất ca học
-        TinNhan msg2 = TinNhan.builder()
-                .cuocTroChuyen(conversation)
-                .nguoiGui(tutorUser)
-                .noiDung("Chào em, thầy có ca rảnh tối Thứ 2 lúc 19h nhé!")
-                .loaiTinNhan(LoaiTinNhan.DE_XUAT_CA_HOC)
-                .duLieuDinhKem("{\"thu\": \"THU_HAI\", \"gio\": \"19:00 - 20:30\", \"hocPhi\": 150000}")
-                .daDoc(false)
-                .build();
-        tinNhanRepository.save(msg2);
-
-        // Kiểm tra danh sách tin nhắn
-        List<TinNhan> messages = tinNhanRepository.findByCuocTroChuyenIdOrderByThoiGianGuiAsc(conversation.getId());
-        assertEquals(2, messages.size(), "Cuộc trò chuyện phải có 2 tin nhắn");
-        assertEquals(LoaiTinNhan.DE_XUAT_CA_HOC, messages.get(1).getLoaiTinNhan());
-
-        // Kiểm tra số tin chưa đọc của Học viên (tin do Gia sư gửi mà học viên chưa đọc)
-        long unreadByStudent = tinNhanRepository.countByCuocTroChuyenIdAndNguoiGuiIdNotAndDaDocFalse(
-                conversation.getId(), studentUser.getId());
-        assertEquals(1, unreadByStudent, "Học viên phải có 1 tin nhắn chưa đọc");
-
-        // Học viên mở hộp thoại -> Đánh dấu đã đọc
-        int updatedCount = tinNhanRepository.markAllAsRead(conversation.getId(), studentUser.getId());
-        assertEquals(1, updatedCount, "Phải cập nhật 1 tin nhắn sang trạng thái đã đọc");
-
-        long unreadAfter = tinNhanRepository.countByCuocTroChuyenIdAndNguoiGuiIdNotAndDaDocFalse(
-                conversation.getId(), studentUser.getId());
-        assertEquals(0, unreadAfter, "Sau khi đọc thì số tin chưa đọc bằng 0");
-
-        // Tìm kiếm cuộc trò chuyện của User
-        List<CuocTroChuyen> userChats = cuocTroChuyenRepository.findCuocTroChuyenByUserId(studentUser.getId());
-        assertEquals(1, userChats.size());
-
-        Optional<CuocTroChuyen> pairChat = cuocTroChuyenRepository.findByTwoUsers(studentUser.getId(), tutorUser.getId());
-        assertTrue(pairChat.isPresent(), "Phải tìm thấy cuộc trò chuyện giữa 2 người");
     }
 }

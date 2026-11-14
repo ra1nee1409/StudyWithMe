@@ -13,7 +13,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "lich_day_gia_su")
+@Table(name = "lich_day_gia_su", indexes = {
+        @Index(name = "idx_lich_day_gv_thu", columnList = "giang_vien_id, thu_trong_tuan"),
+        @Index(name = "idx_lich_day_gv_trang_thai", columnList = "giang_vien_id, trang_thai")
+})
 @Getter
 @Setter
 @Builder

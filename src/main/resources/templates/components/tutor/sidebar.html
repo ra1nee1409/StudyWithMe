@@ -64,7 +64,15 @@
            th:classappend="${activeTab == 'schedule'} ? 'bg-tertiary-container text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
           <span class="material-symbols-outlined text-[20px]">calendar_month</span>
-          <span>Lịch giảng dạy</span>
+          <span>Lịch giảng dạy & Slot rảnh</span>
+        </a>
+
+        <!-- 3b. Ca học kèm 1-1 -->
+        <a th:href="@{/tutor/ca-hoc}"
+           th:classappend="${activeTab == 'ca-hoc'} ? 'bg-tertiary-container text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all">
+          <span class="material-symbols-outlined text-[20px]">handshake</span>
+          <span>Ca học kèm 1-1</span>
         </a>
 
         <!-- 4. Học viên & Đăng ký -->

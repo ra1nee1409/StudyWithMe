@@ -1,5 +1,7 @@
 package com.studywithme.controller.web;
 
+import com.studywithme.dto.tutor.DatLich1k1Dto;
+import com.studywithme.dto.tutor.LichDaySlotDto;
 import com.studywithme.dto.user.CapNhatHoSoRequest;
 import com.studywithme.dto.user.DoiMatKhauRequest;
 import com.studywithme.entity.ChungChiGiangVien;
@@ -11,6 +13,9 @@ import com.studywithme.entity.LichSuViTien;
 import com.studywithme.entity.LopHocTrucTuyen;
 import com.studywithme.entity.NguoiDung;
 import com.studywithme.entity.enums.admin.TrangThaiKhoaHoc;
+import com.studywithme.entity.enums.giaovien.LoaiLichDay;
+import com.studywithme.entity.enums.giaovien.ThuTrongTuan;
+import com.studywithme.entity.enums.hocvien.TrangThaiDatLich;
 import com.studywithme.repository.ChungChiGiangVienRepository;
 import com.studywithme.repository.DangKyLopHocRepository;
 import com.studywithme.repository.DanhMucRepository;
@@ -18,6 +23,8 @@ import com.studywithme.repository.HoSoGiangVienRepository;
 import com.studywithme.repository.LichSuViTienRepository;
 import com.studywithme.repository.LopHocTrucTuyenRepository;
 import com.studywithme.repository.NguoiDungRepository;
+import com.studywithme.service.DatLich1k1Service;
+import com.studywithme.service.LichDayGiaSuService;
 import com.studywithme.service.ProfileService;
 import com.studywithme.service.TutorKhoaHocService;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +60,8 @@ public class TutorWebController {
     private final ProfileService profileService;
     private final TutorKhoaHocService tutorKhoaHocService;
     private final DanhMucRepository danhMucRepository;
+    private final LichDayGiaSuService lichDayGiaSuService;
+    private final DatLich1k1Service datLich1k1Service;
 
     private Optional<HoSoGiangVien> getHoSoByPrincipal(Principal principal) {
         if (principal == null) return Optional.empty();
@@ -158,8 +167,33 @@ public class TutorWebController {
                 .map(hoSo -> lopHocTrucTuyenRepository.findByGiangVienIdOrderByNgayTaoDesc(hoSo.getId()))
                 .orElse(new ArrayList<>());
 
+        List<LichDaySlotDto> danhSachLichDay = hoSoOpt
+                .map(hoSo -> lichDayGiaSuService.layDanhSachLichDay(hoSo.getId()))
+                .orElse(new ArrayList<>());
+
         model.addAttribute("danhSachLop", danhSachLop);
+        model.addAttribute("danhSachLichDay", danhSachLichDay);
+        model.addAttribute("cacThuTrongTuan", ThuTrongTuan.values());
+        model.addAttribute("cacLoaiLich", LoaiLichDay.values());
         return "tutor/schedule";
+    }
+
+    @GetMapping({"/ca-hoc", "/sessions"})
+    public String caHoc(Model model, Principal principal) {
+        Optional<HoSoGiangVien> hoSoOpt = getHoSoByPrincipal(principal);
+        List<DatLich1k1Dto> danhSachCaHoc = hoSoOpt
+                .map(hoSo -> datLich1k1Service.layDanhSachCaHocCuaGiaSu(hoSo.getId(), null))
+                .orElse(new ArrayList<>());
+
+        long soCaChoXacNhan = danhSachCaHoc.stream().filter(c -> c.getTrangThai() == TrangThaiDatLich.CHO_XAC_NHAN).count();
+        long soCaSapDienRa = danhSachCaHoc.stream().filter(c -> c.getTrangThai() == TrangThaiDatLich.DA_THANH_TOAN_KY_QUY || c.getTrangThai() == TrangThaiDatLich.DANG_DIEN_RA).count();
+        long soCaHoanThanh = danhSachCaHoc.stream().filter(c -> c.getTrangThai() == TrangThaiDatLich.HOAN_THANH).count();
+
+        model.addAttribute("danhSachCaHoc", danhSachCaHoc);
+        model.addAttribute("soCaChoXacNhan", soCaChoXacNhan);
+        model.addAttribute("soCaSapDienRa", soCaSapDienRa);
+        model.addAttribute("soCaHoanThanh", soCaHoanThanh);
+        return "tutor/ca-hoc";
     }
 
     @GetMapping({"/hoc-vien", "/students"})

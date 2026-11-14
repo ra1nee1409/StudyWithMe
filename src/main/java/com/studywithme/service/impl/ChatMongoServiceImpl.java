@@ -41,7 +41,8 @@ public class ChatMongoServiceImpl implements ChatMongoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người gửi với ID: " + nguoiGuiId));
 
         NguoiDung nguoiNhan = nguoiDungRepository.findById(request.getNguoiNhanId())
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người nhận với ID: " + request.getNguoiNhanId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Không tìm thấy người nhận với ID: " + request.getNguoiNhanId()));
 
         // 1. Tìm hoặc tạo cuộc trò chuyện
         CuocTroChuyenMongo cuocTroChuyen = cuocTroChuyenMongoRepository
@@ -118,9 +119,12 @@ public class ChatMongoServiceImpl implements ChatMongoService {
         }
 
         dtos.sort((a, b) -> {
-            if (a.getThoiGianTinNhanCuoi() == null && b.getThoiGianTinNhanCuoi() == null) return 0;
-            if (a.getThoiGianTinNhanCuoi() == null) return 1;
-            if (b.getThoiGianTinNhanCuoi() == null) return -1;
+            if (a.getThoiGianTinNhanCuoi() == null && b.getThoiGianTinNhanCuoi() == null)
+                return 0;
+            if (a.getThoiGianTinNhanCuoi() == null)
+                return 1;
+            if (b.getThoiGianTinNhanCuoi() == null)
+                return -1;
             return b.getThoiGianTinNhanCuoi().compareTo(a.getThoiGianTinNhanCuoi());
         });
 
@@ -132,11 +136,13 @@ public class ChatMongoServiceImpl implements ChatMongoService {
         CuocTroChuyenMongo conv = cuocTroChuyenMongoRepository.findById(cuocTroChuyenId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy cuộc trò chuyện"));
 
-        if (!Objects.equals(conv.getNguoiDung1Id(), currentUserId) && !Objects.equals(conv.getNguoiDung2Id(), currentUserId)) {
+        if (!Objects.equals(conv.getNguoiDung1Id(), currentUserId)
+                && !Objects.equals(conv.getNguoiDung2Id(), currentUserId)) {
             throw new IllegalArgumentException("Bạn không có quyền truy cập cuộc trò chuyện này.");
         }
 
-        List<TinNhanMongo> messages = tinNhanMongoRepository.findByCuocTroChuyenIdOrderByThoiGianGuiAsc(cuocTroChuyenId);
+        List<TinNhanMongo> messages = tinNhanMongoRepository
+                .findByCuocTroChuyenIdOrderByThoiGianGuiAsc(cuocTroChuyenId);
         return messages.stream().map(m -> mapToTinNhanDto(m, currentUserId)).toList();
     }
 

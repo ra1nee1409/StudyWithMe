@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{components/common/head :: common-head('Lịch Giảng Dạy - StudyWithMe')}"></head>
+<head th:replace="~{components/common/head :: common-head('Quản lý Lịch Giảng Dạy & Slot 1-1 - StudyWithMe')}"></head>
 
 <body class="bg-surface-canvas font-body-md text-on-surface antialiased">
 
@@ -13,45 +13,154 @@
     <header th:replace="~{components/tutor/header :: tutor-header}"></header>
 
     <!-- Page Body -->
-    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+    <main class="relative pt-20 px-8 pb-16 bg-surface-canvas min-h-screen flex flex-col gap-6">
 
+      <!-- Header & Action -->
       <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
         <div>
-          <h1 class="text-2xl font-bold text-on-surface tracking-tight">Thời Khóa Biểu Giảng Dạy Tuần</h1>
-          <p class="text-xs text-on-surface-variant">Lịch các ca học trực tuyến trong tuần. Nhấn vào ca dạy để vào phòng học hoặc điểm danh.</p>
+          <div class="flex items-center gap-2 mb-1">
+            <h1 class="text-2xl font-bold text-on-surface tracking-tight">Bộ Chọn Lịch Dạy & Slot Rảnh Hàng Tuần</h1>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-tertiary-container/15 text-tertiary border border-tertiary-container/30">
+              Kèm 1-1 Theo Khung Giờ
+            </span>
+          </div>
+          <p class="text-xs text-on-surface-variant">Thiết lập các khung giờ rảnh hàng tuần để học viên dễ dàng đặt ca học kèm 1-1 với bạn. Học viên có thể nhắn tin trao đổi trước khi chốt lịch.</p>
         </div>
-        <div class="flex items-center gap-2">
-          <button class="px-3 py-2 rounded-xl bg-surface-container-low text-xs font-bold text-on-surface hover:bg-surface-container border border-surface-container flex items-center gap-1">
-            <span class="material-symbols-outlined text-[16px]">chevron_left</span>
-            <span>Tuần trước</span>
-          </button>
-          <span class="px-3 py-2 rounded-xl bg-accent-coral-subtle text-tertiary-container font-bold text-xs">Tuần này (Hiện tại)</span>
-          <button class="px-3 py-2 rounded-xl bg-surface-container-low text-xs font-bold text-on-surface hover:bg-surface-container border border-surface-container flex items-center gap-1">
-            <span>Tuần sau</span>
-            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+        <div class="flex items-center gap-3">
+          <a th:href="@{/tutor/ca-hoc}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface text-xs font-bold hover:bg-surface-container border border-surface-container transition-all">
+            <span class="material-symbols-outlined text-[18px]">handshake</span>
+            <span>Xem Các Ca Học Đã Nhận</span>
+          </a>
+          <button type="button" onclick="openAddSlotModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-sm transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">add_circle</span>
+            <span>Mở Khung Giờ Mới</span>
           </button>
         </div>
       </section>
 
-      <!-- Empty State when no classes -->
-      <div th:if="${#lists.isEmpty(danhSachLop)}" class="p-12 text-center bg-surface-card rounded-2xl border border-dashed border-surface-container/60 shadow-sm">
-        <span class="material-symbols-outlined text-4xl text-outline mb-2">calendar_month</span>
-        <h3 class="text-base font-bold text-on-surface">Chưa có lịch giảng dạy nào trong tuần</h3>
-        <p class="text-xs text-on-surface-variant max-w-md mx-auto mt-1 mb-4">Khi bạn tạo lớp học trực tuyến và thiết lập thời khóa biểu hàng tuần, các ca dạy học sẽ hiển thị tại đây.</p>
-        <a th:href="@{/tutor/lop-hoc}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-sm transition-all">
-          <span class="material-symbols-outlined text-[18px]">add_circle</span>
-          <span>Tạo Lớp & Xếp Lịch Học</span>
-        </a>
+      <!-- KPI Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-surface-card p-5 rounded-2xl border border-surface-container/40 shadow-xs flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-semibold text-on-surface-variant uppercase tracking-wider">Tổng khung giờ rảnh</p>
+            <h3 class="text-2xl font-extrabold text-on-surface mt-1" th:text="${#lists.size(danhSachLichDay)}">0</h3>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-surface-container-low text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">calendar_month</span>
+          </div>
+        </div>
+
+        <div class="bg-surface-card p-5 rounded-2xl border border-surface-container/40 shadow-xs flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-semibold text-status-success uppercase tracking-wider">Đang sẵn sàng nhận</p>
+            <h3 class="text-2xl font-extrabold text-status-success mt-1" 
+                th:text="${#lists.size(danhSachLichDay.?[trangThai.name() == 'CON_TRONG'])}">0</h3>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-status-success/10 text-status-success flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">check_circle</span>
+          </div>
+        </div>
+
+        <div class="bg-surface-card p-5 rounded-2xl border border-surface-container/40 shadow-xs flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-semibold text-status-warning uppercase tracking-wider">Đang tạm khóa</p>
+            <h3 class="text-2xl font-extrabold text-status-warning mt-1" 
+                th:text="${#lists.size(danhSachLichDay.?[trangThai.name() == 'TAM_KHOA'])}">0</h3>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-status-warning/10 text-status-warning flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">lock</span>
+          </div>
+        </div>
+
+        <div class="bg-surface-card p-5 rounded-2xl border border-surface-container/40 shadow-xs flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-semibold text-tertiary uppercase tracking-wider">Lớp Trực Tuyến Định Kỳ</p>
+            <h3 class="text-2xl font-extrabold text-tertiary mt-1" th:text="${#lists.size(danhSachLop)}">0</h3>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-accent-coral-subtle text-tertiary-container flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">video_camera_front</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Schedule Classes List when classes exist -->
-      <div th:unless="${#lists.isEmpty(danhSachLop)}" class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 flex flex-col gap-4">
+      <!-- WEEKLY SLOT MATRIX (7 CỘT THỨ TRONG TUẦN) -->
+      <section class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 flex flex-col gap-6">
+        <div class="flex items-center justify-between pb-4 border-b border-surface-container/40">
+          <div>
+            <h2 class="text-base font-bold text-on-surface flex items-center gap-2">
+              <span class="material-symbols-outlined text-tertiary text-[22px]">view_week</span>
+              <span>Ma Trận Lịch Rảnh Trong Tuần (Weekly Slot Picker)</span>
+            </h2>
+            <p class="text-xs text-on-surface-variant mt-0.5">Các khung giờ này sẽ hiển thị trực tiếp trên trang hồ sơ gia sư của bạn để học viên chọn và đặt lịch kèm 1-1.</p>
+          </div>
+          <button type="button" onclick="openAddSlotModal()" class="text-xs font-bold text-tertiary hover:underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            <span>Thêm khung giờ</span>
+          </button>
+        </div>
+
+        <!-- 7-Day Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3">
+          <div th:each="thu : ${cacThuTrongTuan}" class="flex flex-col bg-surface-container-low/50 rounded-xl border border-surface-container/60 p-3 min-h-[300px]">
+            <!-- Day Header -->
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-surface-container/60">
+              <span class="font-bold text-xs text-on-surface uppercase tracking-wider" th:text="${thu.moTa}">Thứ 2</span>
+              <button type="button" th:onclick="'openAddSlotModalForDay(\'' + ${thu.name()} + '\')'" class="w-6 h-6 rounded-md hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-all" title="Thêm slot cho ngày này">
+                <span class="material-symbols-outlined text-[16px]">add</span>
+              </button>
+            </div>
+
+            <!-- Slots for this day -->
+            <div class="flex-1 space-y-2">
+              <div th:each="slot : ${danhSachLichDay}" th:if="${slot.thuTrongTuan == thu}" 
+                   class="p-2.5 rounded-lg border transition-all flex flex-col gap-1.5 shadow-2xs"
+                   th:classappend="${slot.trangThai.name() == 'CON_TRONG'} ? 'bg-surface-card border-status-success/30 hover:border-status-success' : 'bg-surface-container/70 border-surface-container opacity-70'">
+                
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-on-surface flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px] text-tertiary">schedule</span>
+                    <span th:text="${slot.gioBatDau} + ' - ' + ${slot.gioKetThuc}">19:30 - 21:00</span>
+                  </span>
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                        th:classappend="${slot.trangThai.name() == 'CON_TRONG'} ? 'bg-status-success/15 text-status-success' : 'bg-status-warning/15 text-status-warning'"
+                        th:text="${slot.trangThai.moTa}">Còn trống</span>
+                </div>
+
+                <div class="flex items-center justify-between text-[11px] text-on-surface-variant">
+                  <span class="font-medium" th:text="${slot.loaiLich.name() == 'CO_DINH' ? 'Cố định' : 'Linh hoạt'}">Cố định</span>
+                  <span class="font-bold text-on-surface" th:text="${#numbers.formatDecimal(slot.hocPhiMoiGio, 0, 'COMMA', 0, 'POINT')} + 'đ/h'">150,000đ/h</span>
+                </div>
+
+                <p th:if="${slot.ghiChu != null && !slot.ghiChu.isEmpty()}" class="text-[10px] text-on-surface-variant italic truncate" th:text="${slot.ghiChu}"></p>
+
+                <div class="flex items-center justify-end gap-1 pt-1 border-t border-surface-container/30">
+                  <button type="button" th:onclick="'toggleSlot(' + ${slot.id} + ')'" class="p-1 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-all" th:title="${slot.trangThai.name() == 'CON_TRONG'} ? 'Tạm khóa' : 'Mở lại'">
+                    <span class="material-symbols-outlined text-[15px]" th:text="${slot.trangThai.name() == 'CON_TRONG'} ? 'lock' : 'lock_open'">lock</span>
+                  </button>
+                  <button type="button" th:onclick="'deleteSlot(' + ${slot.id} + ')'" class="p-1 rounded hover:bg-status-error/10 text-on-surface-variant hover:text-status-error transition-all" title="Xóa slot này">
+                    <span class="material-symbols-outlined text-[15px]">delete</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Day has no slots -->
+              <div th:if="${#lists.isEmpty(danhSachLichDay.?[thuTrongTuan == #root.thu])}" class="h-28 flex flex-col items-center justify-center text-center p-2 text-outline">
+                <span class="material-symbols-outlined text-xl opacity-40 mb-1">free_cancellation</span>
+                <span class="text-[11px] opacity-60">Chưa mở slot</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LEGACY ONLINE CLASSES LIST (Nếu có) -->
+      <section th:if="${!#lists.isEmpty(danhSachLop)}" class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 flex flex-col gap-4">
         <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
           <div>
-            <h2 class="text-base font-bold text-on-surface">Danh Sách Ca Học Trực Tuyến Trong Tuần</h2>
-            <p class="text-xs text-on-surface-variant">Lịch giảng dạy định kỳ của các lớp bạn đang phụ trách</p>
+            <h2 class="text-base font-bold text-on-surface">Danh Sách Lớp Học Trực Tuyến Định Kỳ</h2>
+            <p class="text-xs text-on-surface-variant">Lịch giảng dạy định kỳ của các lớp online nhiều học viên</p>
           </div>
-          <span class="px-2.5 py-1 rounded-full bg-accent-coral-subtle text-tertiary-container font-bold text-xs" th:text="${#lists.size(danhSachLop)} + ' lớp đang dạy'">0 lớp</span>
+          <span class="px-2.5 py-1 rounded-full bg-accent-coral-subtle text-tertiary-container font-bold text-xs" th:text="${#lists.size(danhSachLop)} + ' lớp đang mở'">0 lớp</span>
         </div>
 
         <div class="space-y-3">
@@ -66,7 +175,7 @@
                   <span class="material-symbols-outlined text-[16px]">calendar_today</span>
                   <span th:text="${lop.lichHocTrongTuan ?: 'Lịch dạy thỏa thuận với học sinh'}">Lịch học</span>
                 </p>
-                <p class="text-[11px] text-on-surface-variant mt-1" th:text="'Sĩ số hiện tại: ' + ${#lists.size(lop.danhSachHocVien)} + '/' + ${lop.siSoToiDa} + ' học sinh'"></p>
+                <p class="text-[11px] text-on-surface-variant mt-1" th:text="'Sĩ số: ' + ${#lists.size(lop.danhSachHocVien)} + '/' + ${lop.siSoToiDa} + ' học sinh'"></p>
               </div>
             </div>
             <div class="flex items-center gap-2 shrink-0">
@@ -77,10 +186,150 @@
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
     </main>
   </div>
+
+  <!-- ==================== MODAL THÊM SLOT RẢNH ==================== -->
+  <div id="addSlotModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center hidden p-4">
+    <div class="bg-surface-card rounded-2xl shadow-xl border border-surface-container max-w-md w-full p-6 animate-scale-in">
+      <div class="flex items-center justify-between pb-3 border-b border-surface-container/60 mb-4">
+        <h3 class="text-base font-bold text-on-surface flex items-center gap-2">
+          <span class="material-symbols-outlined text-tertiary">add_circle</span>
+          <span>Mở Khung Giờ Rảnh Mới</span>
+        </h3>
+        <button type="button" onclick="closeAddSlotModal()" class="text-on-surface-variant hover:text-on-surface">
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+      </div>
+
+      <form id="slotForm" onsubmit="handleSaveSlot(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-on-surface mb-1">Thứ trong tuần <span class="text-status-error">*</span></label>
+          <select id="modalThuTrongTuan" required class="w-full px-3 py-2 rounded-xl bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-none focus:border-tertiary">
+            <option th:each="thu : ${cacThuTrongTuan}" th:value="${thu.name()}" th:text="${thu.moTa}">Thứ Hai</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1">Giờ bắt đầu <span class="text-status-error">*</span></label>
+            <input type="time" id="modalGioBatDau" required value="19:30" class="w-full px-3 py-2 rounded-xl bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-none focus:border-tertiary">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1">Giờ kết thúc <span class="text-status-error">*</span></label>
+            <input type="time" id="modalGioKetThuc" required value="21:00" class="w-full px-3 py-2 rounded-xl bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-none focus:border-tertiary">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1">Loại lịch dạy</label>
+            <select id="modalLoaiLich" class="w-full px-3 py-2 rounded-xl bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-none focus:border-tertiary">
+              <option value="CO_DINH">Cố định hàng tuần</option>
+              <option value="LINH_HOAT">Linh hoạt theo tuần</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1">Học phí mỗi giờ (VNĐ)</label>
+            <input type="number" id="modalHocPhi" step="10000" min="0" value="150000" class="w-full px-3 py-2 rounded-xl bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-none focus:border-tertiary">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-on-surface mb-1">Ghi chú (Tùy chọn)</label>
+          <input type="text" id="modalGhiChu" placeholder="Ví dụ: Ưu tiên ôn thi môn Toán 12, Luyện phát âm IELTS..." class="w-full px-3 py-2 rounded-xl bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-none focus:border-tertiary">
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-surface-container/60">
+          <button type="button" onclick="closeAddSlotModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-on-surface-variant hover:bg-surface-container transition-all">Hủy</button>
+          <button type="submit" id="btnSubmitSlot" class="px-5 py-2 rounded-xl bg-tertiary-container text-white text-xs font-bold hover:bg-tertiary shadow-sm transition-all">Lưu Khung Giờ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script>
+    function openAddSlotModal() {
+      document.getElementById('addSlotModal').classList.remove('hidden');
+    }
+
+    function openAddSlotModalForDay(dayName) {
+      document.getElementById('modalThuTrongTuan').value = dayName;
+      openAddSlotModal();
+    }
+
+    function closeAddSlotModal() {
+      document.getElementById('addSlotModal').classList.add('hidden');
+    }
+
+    async function handleSaveSlot(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitSlot');
+      btn.disabled = true;
+      btn.innerText = 'Đang lưu...';
+
+      const payload = {
+        thuTrongTuan: document.getElementById('modalThuTrongTuan').value,
+        gioBatDau: document.getElementById('modalGioBatDau').value,
+        gioKetThuc: document.getElementById('modalGioKetThuc').value,
+        loaiLich: document.getElementById('modalLoaiLich').value,
+        hocPhiMoiGio: parseFloat(document.getElementById('modalHocPhi').value) || 150000,
+        ghiChu: document.getElementById('modalGhiChu').value
+      };
+
+      try {
+        const res = await fetch('/api/tutor/lich-day', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          alert('Mở khung giờ thành công!');
+          window.location.reload();
+        } else {
+          alert('Lỗi: ' + (data.message || 'Không thể lưu khung giờ!'));
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Lưu Khung Giờ';
+      }
+    }
+
+    async function toggleSlot(slotId) {
+      try {
+        const res = await fetch('/api/tutor/lich-day/' + slotId + '/toggle', { method: 'PUT' });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          window.location.reload();
+        } else {
+          alert('Lỗi: ' + (data.message || 'Không thể đổi trạng thái!'));
+        }
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    async function deleteSlot(slotId) {
+      if (!confirm('Bạn có chắc chắn muốn xóa khung giờ rảnh này?')) return;
+      try {
+        const res = await fetch('/api/tutor/lich-day/' + slotId, { method: 'DELETE' });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          window.location.reload();
+        } else {
+          alert('Lỗi: ' + (data.message || 'Không thể xóa slot!'));
+        }
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+  </script>
 
 </body>
 </html>

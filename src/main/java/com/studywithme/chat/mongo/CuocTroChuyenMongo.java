@@ -1,4 +1,4 @@
-package com.studywithme.document;
+package com.studywithme.chat.mongo;
 
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

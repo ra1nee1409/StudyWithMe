@@ -1,4 +1,4 @@
-package com.studywithme.document;
+package com.studywithme.chat.mongo;
 
 import com.studywithme.entity.enums.shared.LoaiTinNhan;
 import lombok.*;

@@ -1,7 +1,7 @@
 package com.studywithme;
 
-import com.studywithme.document.CuocTroChuyenMongo;
-import com.studywithme.document.TinNhanMongo;
+import com.studywithme.chat.mongo.CuocTroChuyenMongo;
+import com.studywithme.chat.mongo.TinNhanMongo;
 import com.studywithme.dto.chat.CuocTroChuyenDto;
 import com.studywithme.dto.chat.GuiTinNhanRequest;
 import com.studywithme.dto.chat.TinNhanDto;

@@ -22,6 +22,9 @@ public class DatLich1k1Dto {
     private String sdtHocVien;
     private Long giangVienId;
     private String tenGiangVien;
+    private String avatarGiangVien;
+    private String tieuDeChuyenMonGiangVien;
+    private String sdtGiangVien;
     private Long monHocId;
     private String tenMonHoc;
     private LocalDateTime thoiGianBatDau;
@@ -35,6 +38,9 @@ public class DatLich1k1Dto {
     private String linkPhongHoc;
     private String ghiChuHocVien;
     private String lyDoHuy;
+    private Long orderCodePayos;
+    private Integer danhGiaSao;
+    private String nhanXetHocVien;
     private LocalDateTime ngayTao;
 
     public static DatLich1k1Dto fromEntity(DatLich1k1 entity) {
@@ -47,9 +53,14 @@ public class DatLich1k1Dto {
             sdtHv = entity.getHocVien().getSoDienThoai();
         }
 
-        String tenGv = null;
-        if (entity.getGiangVien() != null && entity.getGiangVien().getNguoiDung() != null) {
-            tenGv = entity.getGiangVien().getNguoiDung().getHoTen();
+        String tenGv = null, avatarGv = null, chuyenMonGv = null, sdtGv = null;
+        if (entity.getGiangVien() != null) {
+            chuyenMonGv = entity.getGiangVien().getTieuDeChuyenMon();
+            if (entity.getGiangVien().getNguoiDung() != null) {
+                tenGv = entity.getGiangVien().getNguoiDung().getHoTen();
+                avatarGv = entity.getGiangVien().getNguoiDung().getAnhDaiDien();
+                sdtGv = entity.getGiangVien().getNguoiDung().getSoDienThoai();
+            }
         }
 
         String tenMon = null;
@@ -68,6 +79,9 @@ public class DatLich1k1Dto {
                 .sdtHocVien(sdtHv)
                 .giangVienId(entity.getGiangVien() != null ? entity.getGiangVien().getId() : null)
                 .tenGiangVien(tenGv)
+                .avatarGiangVien(avatarGv)
+                .tieuDeChuyenMonGiangVien(chuyenMonGv)
+                .sdtGiangVien(sdtGv)
                 .monHocId(monId)
                 .tenMonHoc(tenMon)
                 .thoiGianBatDau(entity.getThoiGianBatDau())
@@ -81,6 +95,9 @@ public class DatLich1k1Dto {
                 .linkPhongHoc(entity.getLinkPhongHoc())
                 .ghiChuHocVien(entity.getGhiChuHocVien())
                 .lyDoHuy(entity.getLyDoHuy())
+                .orderCodePayos(entity.getOrderCodePayos())
+                .danhGiaSao(entity.getDanhGiaSao())
+                .nhanXetHocVien(entity.getNhanXetHocVien())
                 .ngayTao(entity.getNgayTao())
                 .build();
     }

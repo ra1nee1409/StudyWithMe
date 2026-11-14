@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{components/common/head :: common-head('Quản lý Ca Học Kèm 1-1 - StudyWithMe')}"></head>
+
+<body class="bg-surface-canvas font-body-md text-on-surface antialiased">
+
+  <!-- ==================== STUDENT SIDEBAR ==================== -->
+  <aside th:replace="~{components/student/sidebar :: student-sidebar('1k1')}"></aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="pl-72">
+    <!-- Top Header Bar -->
+    <header th:replace="~{components/student/header :: student-header}"></header>
+
+    <!-- Page Body -->
+    <main class="relative pt-20 px-8 pb-12 bg-surface-canvas min-h-screen flex flex-col gap-6">
+
+      <!-- Flash Messages -->
+      <div th:if="${successMessage != null}" class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+        <span class="material-symbols-outlined text-base text-emerald-600">check_circle</span>
+        <span th:text="${successMessage}">Thao tác thành công!</span>
+      </div>
+      <div th:if="${errorMessage != null}" class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+        <span class="material-symbols-outlined text-base text-rose-600">error</span>
+        <span th:text="${errorMessage}">Đã xảy ra lỗi!</span>
+      </div>
+
+      <!-- Header Banner -->
+      <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl shadow-sm border border-surface-container/40">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary mb-2">
+            <span class="material-symbols-outlined text-xs">shield</span>
+            <span>Cơ Chế Ký Quỹ Escrow An Toàn 100%</span>
+          </div>
+          <h1 class="text-2xl font-bold text-on-surface tracking-tight">Quản Lý Ca Học Kèm 1-1</h1>
+          <p class="text-xs text-on-surface-variant mt-1">Theo dõi tiến trình xác nhận từ gia sư, thanh toán ký quỹ bảo đảm và tham gia học tập trực tuyến 2 chiều.</p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <a th:href="@{/gia-su}" class="px-4 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container shadow-sm transition flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">person_search</span>
+            <span>Đặt thêm ca học</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- 4 KPI Cards -->
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Tổng ca -->
+        <div class="bg-surface-card p-4 rounded-2xl border border-surface-container/40 shadow-xs flex items-center justify-between">
+          <div>
+            <div class="text-[11px] font-semibold text-on-surface-variant uppercase tracking-wider">Tổng số ca học</div>
+            <div class="text-2xl font-extrabold text-on-surface mt-1" th:text="${tongCaHoc}">0</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-xl">calendar_month</span>
+          </div>
+        </div>
+
+        <!-- Chờ gia sư xác nhận -->
+        <div class="bg-surface-card p-4 rounded-2xl border border-surface-container/40 shadow-xs flex items-center justify-between">
+          <div>
+            <div class="text-[11px] font-semibold text-on-surface-variant uppercase tracking-wider">Chờ gia sư duyệt</div>
+            <div class="text-2xl font-extrabold text-amber-600 mt-1" th:text="${choXacNhan}">0</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-xl">hourglass_top</span>
+          </div>
+        </div>
+
+        <!-- Chờ thanh toán -->
+        <div class="bg-surface-card p-4 rounded-2xl border border-surface-container/40 shadow-xs flex items-center justify-between">
+          <div>
+            <div class="text-[11px] font-semibold text-on-surface-variant uppercase tracking-wider">Chờ bạn ký quỹ</div>
+            <div class="text-2xl font-extrabold text-indigo-600 mt-1" th:text="${choThanhToan}">0</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-xl">payments</span>
+          </div>
+        </div>
+
+        <!-- Đã ký quỹ / Hoàn thành -->
+        <div class="bg-surface-card p-4 rounded-2xl border border-surface-container/40 shadow-xs flex items-center justify-between">
+          <div>
+            <div class="text-[11px] font-semibold text-on-surface-variant uppercase tracking-wider">Đã ký quỹ / Xong</div>
+            <div class="text-2xl font-extrabold text-emerald-600 mt-1" th:text="${daKyQuy + hoanThanh}">0</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-xl">verified</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filter Tabs -->
+      <section class="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none" id="statusFilterBar">
+        <button type="button" onclick="locCaHoc('all', this)"
+                class="filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary text-white shadow-xs">
+          Tất cả (<span th:text="${tongCaHoc}">0</span>)
+        </button>
+        <button type="button" onclick="locCaHoc('CHO_XAC_NHAN', this)"
+                class="filter-btn px-4 py-2 rounded-xl text-xs font-medium text-on-surface-variant bg-surface-card hover:bg-surface-container border border-surface-container/40 transition-all">
+          Chờ xác nhận (<span th:text="${choXacNhan}">0</span>)
+        </button>
+        <button type="button" onclick="locCaHoc('CHO_THANH_TOAN', this)"
+                class="filter-btn px-4 py-2 rounded-xl text-xs font-medium text-on-surface-variant bg-surface-card hover:bg-surface-container border border-surface-container/40 transition-all">
+          Cần thanh toán ký quỹ (<span th:text="${choThanhToan}">0</span>)
+        </button>
+        <button type="button" onclick="locCaHoc('DA_THANH_TOAN_KY_QUY', this)"
+                class="filter-btn px-4 py-2 rounded-xl text-xs font-medium text-on-surface-variant bg-surface-card hover:bg-surface-container border border-surface-container/40 transition-all">
+          Đã ký quỹ (<span th:text="${daKyQuy}">0</span>)
+        </button>
+        <button type="button" onclick="locCaHoc('HOAN_THANH', this)"
+                class="filter-btn px-4 py-2 rounded-xl text-xs font-medium text-on-surface-variant bg-surface-card hover:bg-surface-container border border-surface-container/40 transition-all">
+          Hoàn thành (<span th:text="${hoanThanh}">0</span>)
+        </button>
+      </section>
+
+      <!-- Empty State -->
+      <div th:if="${#lists.isEmpty(danhSachCaHoc)}" class="p-12 text-center bg-surface-card rounded-2xl border border-dashed border-surface-container/60 shadow-sm">
+        <span class="material-symbols-outlined text-4xl text-outline mb-2">event_busy</span>
+        <h3 class="text-base font-bold text-on-surface">Bạn chưa có ca học kèm 1-1 nào</h3>
+        <p class="text-xs text-on-surface-variant max-w-md mx-auto mt-1 mb-5">
+          Khám phá danh sách các gia sư hàng đầu, xem khung giờ rảnh trong tuần và đặt lịch học riêng để nhận được sự hỗ trợ tận tình.
+        </p>
+        <a th:href="@{/gia-su}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container shadow-sm transition">
+          <span class="material-symbols-outlined text-sm">search</span>
+          <span>Khám Phá Danh Sách Gia Sư</span>
+        </a>
+      </div>
+
+      <!-- Booking Cards List -->
+      <div th:if="${!#lists.isEmpty(danhSachCaHoc)}" class="space-y-4" id="caHocListContainer">
+        <div th:each="ca : ${danhSachCaHoc}"
+             th:attr="data-status=${ca.trangThai != null ? ca.trangThai.name() : ''}"
+             class="ca-hoc-card bg-surface-card rounded-2xl border border-surface-container/50 shadow-xs hover:shadow-md transition-all p-5 flex flex-col justify-between gap-4">
+
+          <!-- Card Header: Code & Status Badge -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-surface-container/40 gap-2">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <span class="font-bold text-sm text-on-surface" th:text="${ca.maDatLich}">DL1K1-123456</span>
+              <span class="text-xs text-on-surface-variant" th:if="${ca.ngayTao != null}" 
+                    th:text="'Đặt lúc: ' + ${#temporals.format(ca.ngayTao, 'dd/MM/yyyy HH:mm')}">14/11/2026</span>
+              <span th:if="${ca.tenMonHoc != null}" 
+                    class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-50 text-brand-700 border border-indigo-100" 
+                    th:text="${ca.tenMonHoc}">Môn Toán</span>
+            </div>
+
+            <!-- Status Pill -->
+            <div>
+              <span th:if="${ca.trangThai?.name() == 'CHO_XAC_NHAN'}" 
+                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                <span class="material-symbols-outlined text-xs">hourglass_top</span>
+                <span>Chờ gia sư xác nhận</span>
+              </span>
+
+              <span th:if="${ca.trangThai?.name() == 'CHO_THANH_TOAN'}" 
+                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                <span class="material-symbols-outlined text-xs">credit_card</span>
+                <span>Gia sư đã duyệt - Chờ bạn ký quỹ</span>
+              </span>
+
+              <span th:if="${ca.trangThai?.name() == 'DA_THANH_TOAN_KY_QUY'}" 
+                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="material-symbols-outlined text-xs">verified</span>
+                <span>Đã ký quỹ (Sàn bảo đảm 100%)</span>
+              </span>
+
+              <span th:if="${ca.trangThai?.name() == 'DANG_DIEN_RA'}" 
+                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                <span class="material-symbols-outlined text-xs animate-pulse">radio_button_checked</span>
+                <span>Ca học đang diễn ra</span>
+              </span>
+
+              <span th:if="${ca.trangThai?.name() == 'HOAN_THANH'}" 
+                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                <span class="material-symbols-outlined text-xs">task_alt</span>
+                <span>Hoàn thành buổi học</span>
+              </span>
+
+              <span th:if="${ca.trangThai?.name() == 'DA_HUY'}" 
+                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                <span class="material-symbols-outlined text-xs">cancel</span>
+                <span>Đã hủy</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Card Body: Details Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <!-- Tutor Info Column -->
+            <div class="flex items-start gap-3">
+              <img th:src="${ca.avatarGiangVien ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400'}"
+                   class="w-12 h-12 rounded-xl object-cover ring-1 ring-surface-container shrink-0">
+              <div class="min-w-0 flex-1">
+                <div class="text-[11px] text-on-surface-variant font-medium">Gia sư hướng dẫn</div>
+                <div class="font-bold text-sm text-on-surface truncate" th:text="${ca.tenGiangVien}">Thầy Hoàng Văn Nam</div>
+                <div class="text-xs text-primary font-medium truncate" th:text="${ca.tieuDeChuyenMonGiangVien ?: 'Giảng viên chuyên môn'}">Thạc sĩ Sư Phạm</div>
+                <div class="text-[11px] text-on-surface-variant mt-1 flex items-center gap-1" th:if="${ca.sdtGiangVien != null}">
+                  <span class="material-symbols-outlined text-xs">call</span>
+                  <span th:text="${ca.sdtGiangVien}">0912 345 678</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Time Column -->
+            <div class="space-y-1">
+              <div class="text-[11px] text-on-surface-variant font-medium">Thời gian ca học</div>
+              <div class="text-sm font-bold text-on-surface flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-base text-primary">calendar_month</span>
+                <span th:text="${#temporals.format(ca.thoiGianBatDau, 'dd/MM/yyyy')}">15/11/2026</span>
+              </div>
+              <div class="text-xs text-on-surface-variant flex items-center gap-1.5 font-medium">
+                <span class="material-symbols-outlined text-base text-slate-400">alarm</span>
+                <span th:text="${#temporals.format(ca.thoiGianBatDau, 'HH:mm') + ' - ' + #temporals.format(ca.thoiGianKetThuc, 'HH:mm')}">19:00 - 21:00</span>
+              </div>
+              <!-- Google Meet Link Preview -->
+              <div th:if="${ca.linkPhongHoc != null and !ca.linkPhongHoc.isBlank()}" class="pt-1.5">
+                <a th:href="${ca.linkPhongHoc}" target="_blank"
+                   class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 hover:bg-emerald-100 transition">
+                  <span class="material-symbols-outlined text-sm">videocam</span>
+                  <span>Phòng học Google Meet</span>
+                  <span class="material-symbols-outlined text-xs">open_in_new</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Fee & Escrow Column -->
+            <div class="space-y-1">
+              <div class="text-[11px] text-on-surface-variant font-medium">Học phí ca học</div>
+              <div class="text-xl font-extrabold text-primary"
+                   th:text="${#numbers.formatDecimal(ca.hocPhiCaHoc, 0, 'COMMA', 0, 'POINT') + ' đ'}">
+                250.000 đ
+              </div>
+              <div class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">verified_user</span>
+                <span>Ký quỹ qua StudyWithMe</span>
+              </div>
+              <!-- Rating Stars if rated -->
+              <div th:if="${ca.danhGiaSao != null}" class="pt-1 text-xs text-amber-500 font-bold flex items-center gap-0.5">
+                <span th:text="${ca.danhGiaSao + ' ⭐ '}">5 ⭐</span>
+                <span class="text-on-surface-variant font-normal italic" th:text="${ca.nhanXetHocVien}">Bài giảng rất hay</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Note snippet if present -->
+          <div th:if="${ca.ghiChuHocVien != null and !ca.ghiChuHocVien.isBlank()}" 
+               class="p-2.5 rounded-xl bg-surface-container-low/60 border border-surface-container text-xs text-on-surface-variant flex items-start gap-1.5">
+            <span class="material-symbols-outlined text-sm text-primary shrink-0 mt-0.5">notes</span>
+            <div>
+              <span class="font-semibold text-on-surface">Mục tiêu bạn đã ghi chú:</span>
+              <span th:text="${ca.ghiChuHocVien}">Ôn tập kiến thức hình học</span>
+            </div>
+          </div>
+
+          <!-- Rejection reason if cancelled -->
+          <div th:if="${ca.lyDoHuy != null and !ca.lyDoHuy.isBlank()}" 
+               class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-1.5">
+            <span class="material-symbols-outlined text-sm text-rose-600 shrink-0 mt-0.5">info</span>
+            <div>
+              <span class="font-semibold">Lý do hủy / từ chối:</span>
+              <span th:text="${ca.lyDoHuy}">Gia sư bận đột xuất</span>
+            </div>
+          </div>
+
+          <!-- Card Actions Bottom Bar -->
+          <div class="pt-3 border-t border-surface-container/40 flex flex-wrap items-center justify-between gap-3">
+            
+            <div class="flex items-center gap-2">
+              <a th:href="@{'/gia-su/' + ${ca.giangVienId}}" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">badge</span>
+                <span>Xem hồ sơ gia sư</span>
+              </a>
+              <span class="text-outline">•</span>
+              <a th:href="@{'/gia-su/' + ${ca.giangVienId} + '#lich-day-1k1'}" class="text-xs font-medium text-on-surface-variant hover:text-primary transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">calendar_month</span>
+                <span>Xem lịch rảnh tuần</span>
+              </a>
+            </div>
+
+            <!-- Action Buttons based on status -->
+            <div class="flex items-center gap-2">
+              
+              <!-- When CHO_XAC_NHAN: Cancel booking button -->
+              <button th:if="${ca.trangThai?.name() == 'CHO_XAC_NHAN'}"
+                      type="button"
+                      th:attr="data-id=${ca.id}, data-code=${ca.maDatLich}"
+                      onclick="openCancelModal(this.getAttribute('data-id'), this.getAttribute('data-code'))"
+                      class="px-4 py-2 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-semibold transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">close</span>
+                <span>Hủy yêu cầu</span>
+              </button>
+
+              <!-- When CHO_THANH_TOAN: PayOS VietQR & Quick Escrow -->
+              <div th:if="${ca.trangThai?.name() == 'CHO_THANH_TOAN'}" class="flex items-center gap-2">
+                <button type="button"
+                        th:attr="data-id=${ca.id}"
+                        onclick="payWithPayOs(this.getAttribute('data-id'))"
+                        class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-sm">qr_code_2</span>
+                  <span>Thanh Toán Ký Quỹ VietQR</span>
+                </button>
+
+                <button type="button"
+                        th:attr="data-id=${ca.id}"
+                        onclick="payQuickEscrow(this.getAttribute('data-id'))"
+                        class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">shield</span>
+                  <span>Ký Quỹ Ngay</span>
+                </button>
+              </div>
+
+              <!-- When DA_THANH_TOAN_KY_QUY or DANG_DIEN_RA: Enter Meeting -->
+              <a th:if="${(ca.trangThai?.name() == 'DA_THANH_TOAN_KY_QUY' or ca.trangThai?.name() == 'DANG_DIEN_RA') and ca.linkPhongHoc != null and !ca.linkPhongHoc.isBlank()}"
+                 th:href="${ca.linkPhongHoc}" target="_blank"
+                 class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 animate-bounce-subtle">
+                <span class="material-symbols-outlined text-base">videocam</span>
+                <span>Vào Lớp Học Google Meet</span>
+                <span class="material-symbols-outlined text-xs">arrow_forward</span>
+              </a>
+
+              <!-- When HOAN_THANH: Review Button -->
+              <button th:if="${ca.trangThai?.name() == 'HOAN_THANH' and ca.danhGiaSao == null}"
+                      type="button"
+                      th:attr="data-id=${ca.id}, data-tutor=${ca.tenGiangVien}"
+                      onclick="openReviewModal(this.getAttribute('data-id'), this.getAttribute('data-tutor'))"
+                      class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">star</span>
+                <span>Đánh Giá Gia Sư</span>
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Modal Hủy Ca Học -->
+  <div id="cancelModal" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl overflow-hidden max-w-md w-full shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      <div class="p-5 bg-rose-600 text-white flex items-center justify-between">
+        <h4 class="font-bold text-base flex items-center gap-2">
+          <span class="material-symbols-outlined">cancel</span>
+          <span>Xác Nhận Hủy Ca Học</span>
+        </h4>
+        <button type="button" onclick="closeCancelModal()" class="text-rose-100 hover:text-white transition">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form onsubmit="handleCancelSubmit(event)" class="p-6 space-y-4">
+        <input type="hidden" id="cancelBookingId" value="">
+        <p class="text-xs text-slate-600">
+          Bạn có chắc chắn muốn hủy yêu cầu đặt ca học <strong id="cancelBookingCode">DL1K1</strong>?
+        </p>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Lý do hủy (tùy chọn)</label>
+          <textarea id="cancelReason" rows="3" placeholder="Ví dụ: Thay đổi lịch trình bận đột xuất..."
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-rose-500"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeCancelModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
+            Đóng
+          </button>
+          <button type="submit" id="btnSubmitCancel" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition">
+            Xác Nhận Hủy
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Đánh Giá Gia Sư -->
+  <div id="reviewModal" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl overflow-hidden max-w-md w-full shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      <div class="p-5 bg-gradient-to-r from-amber-500 to-amber-600 text-white flex items-center justify-between">
+        <h4 class="font-bold text-base flex items-center gap-2">
+          <span class="material-symbols-outlined">reviews</span>
+          <span>Đánh Giá Buổi Học</span>
+        </h4>
+        <button type="button" onclick="closeReviewModal()" class="text-amber-100 hover:text-white transition">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form onsubmit="handleReviewSubmit(event)" class="p-6 space-y-4">
+        <input type="hidden" id="reviewBookingId" value="">
+        <p class="text-xs text-slate-600">
+          Chia sẻ trải nghiệm học cùng gia sư <strong id="reviewTutorName">Thầy/Cô</strong>:
+        </p>
+
+        <!-- Star Rating -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-2">Chấm điểm chất lượng giảng dạy *</label>
+          <div class="flex items-center gap-2" id="starContainer">
+            <button type="button" onclick="setStars(1)" class="star-btn text-2xl text-amber-400">★</button>
+            <button type="button" onclick="setStars(2)" class="star-btn text-2xl text-amber-400">★</button>
+            <button type="button" onclick="setStars(3)" class="star-btn text-2xl text-amber-400">★</button>
+            <button type="button" onclick="setStars(4)" class="star-btn text-2xl text-amber-400">★</button>
+            <button type="button" onclick="setStars(5)" class="star-btn text-2xl text-amber-400">★</button>
+            <span class="text-xs font-bold text-slate-700 ml-2" id="starLabel">5/5 Tuyệt vời</span>
+          </div>
+          <input type="hidden" id="reviewStarValue" value="5">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Nhận xét chi tiết</label>
+          <textarea id="reviewComment" rows="3" required placeholder="Gia sư dạy rất dễ hiểu, giải đáp tận tình các thắc mắc..."
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-amber-500"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeReviewModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
+            Đóng
+          </button>
+          <button type="submit" id="btnSubmitReview" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition">
+            Gửi Đánh Giá
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function locCaHoc(status, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.remove('bg-primary', 'text-white');
+        b.classList.add('bg-surface-card', 'text-on-surface-variant');
+      });
+      btn.classList.remove('bg-surface-card', 'text-on-surface-variant');
+      btn.classList.add('bg-primary', 'text-white');
+
+      const cards = document.querySelectorAll('.ca-hoc-card');
+      cards.forEach(c => {
+        const cStatus = c.getAttribute('data-status');
+        if (status === 'all' || cStatus === status) {
+          c.classList.remove('hidden');
+        } else {
+          c.classList.add('hidden');
+        }
+      });
+    }
+
+    /* Thanh toán VietQR PayOS */
+    async function payWithPayOs(bookingId) {
+      try {
+        const res = await fetch('/api/hoc-vien/dat-lich-1k1/' + bookingId + '/thanh-toan-payos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const result = await res.json();
+        if (res.ok && result.success && result.data && result.data.checkoutUrl) {
+          window.location.href = result.data.checkoutUrl;
+        } else {
+          alert('Lỗi tạo liên kết thanh toán: ' + (result.message || 'Vui lòng thử lại'));
+        }
+      } catch (e) {
+        alert('Lỗi mạng khi kết nối cổng thanh toán PayOS.');
+      }
+    }
+
+    /* Xác nhận Ký quỹ ngay (Demo/Ví) */
+    async function payQuickEscrow(bookingId) {
+      if (!confirm('Bạn có muốn xác nhận ký quỹ học phí cho ca học này ngay bây giờ không?')) return;
+      try {
+        const res = await fetch('/api/hoc-vien/dat-lich-1k1/' + bookingId + '/thanh-toan-ky-quy-ngay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert('🎉 ' + result.message);
+          window.location.reload();
+        } else {
+          alert('Lỗi ký quỹ: ' + (result.message || 'Không thể thực hiện'));
+        }
+      } catch (e) {
+        alert('Lỗi kết nối máy chủ.');
+      }
+    }
+
+    /* Modal Hủy Ca Học */
+    function openCancelModal(id, code) {
+      document.getElementById('cancelBookingId').value = id;
+      document.getElementById('cancelBookingCode').textContent = code;
+      document.getElementById('cancelReason').value = '';
+      document.getElementById('cancelModal').classList.remove('hidden');
+    }
+
+    function closeCancelModal() {
+      document.getElementById('cancelModal').classList.add('hidden');
+    }
+
+    async function handleCancelSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('cancelBookingId').value;
+      const reason = document.getElementById('cancelReason').value.trim();
+      const btn = document.getElementById('btnSubmitCancel');
+      btn.disabled = true;
+
+      try {
+        const url = '/api/hoc-vien/dat-lich-1k1/' + id + '/huy' + (reason ? '?lyDoHuy=' + encodeURIComponent(reason) : '');
+        const res = await fetch(url, { method: 'PUT' });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert('Hủy ca học thành công!');
+          window.location.reload();
+        } else {
+          alert('Lỗi hủy ca học: ' + (result.message || 'Không thể hủy'));
+        }
+      } catch (err) {
+        alert('Lỗi mạng kết nối.');
+      } finally {
+        btn.disabled = false;
+        closeCancelModal();
+      }
+    }
+
+    /* Modal Đánh Giá */
+    function openReviewModal(id, tutorName) {
+      document.getElementById('reviewBookingId').value = id;
+      document.getElementById('reviewTutorName').textContent = tutorName || 'Gia sư';
+      document.getElementById('reviewComment').value = '';
+      setStars(5);
+      document.getElementById('reviewModal').classList.remove('hidden');
+    }
+
+    function closeReviewModal() {
+      document.getElementById('reviewModal').classList.add('hidden');
+    }
+
+    function setStars(star) {
+      document.getElementById('reviewStarValue').value = star;
+      const btns = document.querySelectorAll('.star-btn');
+      btns.forEach((b, idx) => {
+        if (idx < star) {
+          b.classList.remove('text-slate-300');
+          b.classList.add('text-amber-400');
+        } else {
+          b.classList.remove('text-amber-400');
+          b.classList.add('text-slate-300');
+        }
+      });
+      const labels = ['', '1/5 Cần cải thiện', '2/5 Tạm được', '3/5 Khá tốt', '4/5 Rất tốt', '5/5 Tuyệt vời'];
+      document.getElementById('starLabel').textContent = labels[star] || (star + '/5');
+    }
+
+    async function handleReviewSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('reviewBookingId').value;
+      const soSao = parseInt(document.getElementById('reviewStarValue').value);
+      const nhanXet = document.getElementById('reviewComment').value.trim();
+      const btn = document.getElementById('btnSubmitReview');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/hoc-vien/dat-lich-1k1/' + id + '/danh-gia', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ soSao: soSao, nhanXet: nhanXet })
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert('⭐ ' + result.message);
+          window.location.reload();
+        } else {
+          alert('Lỗi đánh giá: ' + (result.message || 'Không thể gửi đánh giá'));
+        }
+      } catch (err) {
+        alert('Lỗi kết nối khi gửi đánh giá.');
+      } finally {
+        btn.disabled = false;
+        closeReviewModal();
+      }
+    }
+  </script>
+</body>
+</html>

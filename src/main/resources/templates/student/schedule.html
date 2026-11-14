@@ -33,19 +33,78 @@
         </div>
       </section>
 
-      <!-- Empty State when no classes -->
-      <div th:if="${#lists.isEmpty(danhSachDangKy)}" class="p-12 text-center bg-surface-card rounded-2xl border border-dashed border-surface-container/60 shadow-sm">
+      <!-- Empty State when no classes and no 1k1 sessions -->
+      <div th:if="${#lists.isEmpty(danhSachDangKy) and #lists.isEmpty(danhSachCaHoc1k1)}" class="p-12 text-center bg-surface-card rounded-2xl border border-dashed border-surface-container/60 shadow-sm">
         <span class="material-symbols-outlined text-4xl text-outline mb-2">calendar_month</span>
         <h3 class="text-base font-bold text-on-surface">Chưa có thời khóa biểu học tập</h3>
-        <p class="text-xs text-on-surface-variant max-w-md mx-auto mt-1 mb-4">Khi bạn đăng ký tham gia các lớp học trực tuyến, thời khóa biểu và ca học hàng tuần sẽ xuất hiện tại đây.</p>
-        <a th:href="@{/#tim-gia-su}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container shadow-sm transition-all">
-          <span class="material-symbols-outlined text-[18px]">search</span>
-          <span>Tìm & Đăng Ký Lớp Học</span>
-        </a>
+        <p class="text-xs text-on-surface-variant max-w-md mx-auto mt-1 mb-4">Khi bạn đặt ca học kèm 1-1 hoặc đăng ký lớp học trực tuyến, lịch học sẽ tự động đồng bộ tại đây.</p>
+        <div class="flex items-center justify-center gap-2">
+          <a th:href="@{/gia-su}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container shadow-sm transition-all">
+            <span class="material-symbols-outlined text-[18px]">person_search</span>
+            <span>Đặt Ca Học Kèm 1-1</span>
+          </a>
+        </div>
       </div>
 
-      <!-- Schedule Classes List when classes exist -->
-      <div th:unless="${#lists.isEmpty(danhSachDangKy)}" class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 flex flex-col gap-4">
+      <!-- Section 1: Ca Học Kèm 1-1 (WBS 3.2) -->
+      <div th:if="${!#lists.isEmpty(danhSachCaHoc1k1)}" class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mb-1">
+              <span class="material-symbols-outlined text-xs">verified</span>
+              <span>Kèm Riêng 1-Kèm-1</span>
+            </div>
+            <h2 class="text-base font-bold text-on-surface">Lịch Ca Học Kèm 1-1 Với Gia Sư</h2>
+            <p class="text-xs text-on-surface-variant">Các buổi học kèm riêng cá nhân hóa đã được gia sư xác nhận</p>
+          </div>
+          <a th:href="@{/student/ca-hoc}" class="text-xs text-primary font-bold hover:underline flex items-center gap-1">
+            <span>Quản lý ca học</span>
+            <span class="material-symbols-outlined text-xs">arrow_forward</span>
+          </a>
+        </div>
+
+        <div class="space-y-3">
+          <div th:each="ca : ${danhSachCaHoc1k1}" class="p-4 rounded-xl bg-surface-container-low/60 border border-surface-container/50 hover:border-primary/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+              <img th:src="${ca.avatarGiangVien ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400'}"
+                   class="w-12 h-12 rounded-xl object-cover ring-1 ring-surface-container shrink-0">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-sm font-bold text-on-surface" th:text="${ca.tenGiangVien}">Thầy Hoàng Văn Nam</h3>
+                  <span th:if="${ca.trangThai?.name() == 'DA_THANH_TOAN_KY_QUY'}" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Đã ký quỹ</span>
+                  <span th:if="${ca.trangThai?.name() == 'CHO_THANH_TOAN'}" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">Cần ký quỹ</span>
+                  <span th:if="${ca.trangThai?.name() == 'CHO_XAC_NHAN'}" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Chờ duyệt</span>
+                </div>
+                <p class="text-xs text-primary font-bold mt-1 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                  <span th:text="${#temporals.format(ca.thoiGianBatDau, 'dd/MM/yyyy (HH:mm') + ' - ' + #temporals.format(ca.thoiGianKetThuc, 'HH:mm)')}">15/11/2026 (19:00 - 21:00)</span>
+                </p>
+                <p class="text-[11px] text-on-surface-variant mt-0.5" th:text="'Mã ca: ' + ${ca.maDatLich}"></p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <!-- If paid and has meet link: Enter Meet -->
+              <a th:if="${ca.linkPhongHoc != null and !ca.linkPhongHoc.isBlank()}"
+                 th:href="${ca.linkPhongHoc}" target="_blank"
+                 class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                <span class="material-symbols-outlined text-base">videocam</span>
+                <span>Vào Google Meet</span>
+              </a>
+              <!-- If awaiting payment: Go to ca hoc page -->
+              <a th:if="${ca.trangThai?.name() == 'CHO_THANH_TOAN'}"
+                 th:href="@{/student/ca-hoc}"
+                 class="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">payments</span>
+                <span>Thanh Toán Ký Quỹ</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Lớp Học Trực Tuyến Đã Đăng Ký -->
+      <div th:if="${!#lists.isEmpty(danhSachDangKy)}" class="bg-surface-card rounded-2xl shadow-sm border border-surface-container/40 p-6 flex flex-col gap-4">
         <div class="flex items-center justify-between pb-3 border-b border-surface-container/40">
           <div>
             <h2 class="text-base font-bold text-on-surface">Thời Khóa Biểu Các Ca Học Trực Tuyến</h2>

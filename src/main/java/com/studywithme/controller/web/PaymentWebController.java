@@ -4,8 +4,10 @@ import com.studywithme.dto.cart.CheckoutRequest;
 import com.studywithme.dto.cart.PaymentResultDto;
 import com.studywithme.entity.KhoaHoc;
 import com.studywithme.entity.NguoiDung;
+import com.studywithme.repository.DatLich1k1Repository;
 import com.studywithme.repository.KhoaHocRepository;
 import com.studywithme.repository.NguoiDungRepository;
+import com.studywithme.service.DatLich1k1Service;
 import com.studywithme.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,8 @@ public class PaymentWebController {
     private final PaymentService paymentService;
     private final KhoaHocRepository khoaHocRepository;
     private final NguoiDungRepository nguoiDungRepository;
+    private final DatLich1k1Service datLich1k1Service;
+    private final DatLich1k1Repository datLich1k1Repository;
 
     private Optional<NguoiDung> getUserFromPrincipal(Principal principal) {
         if (principal == null) return Optional.empty();
@@ -139,9 +143,35 @@ public class PaymentWebController {
     public String payosCallback(@RequestParam(name = "orderCode", required = false) Long orderCode,
                                 @RequestParam(name = "status", required = false) String status,
                                 @RequestParam(name = "cancel", required = false) Boolean cancel,
+                                @RequestParam(name = "type", required = false) String type,
+                                @RequestParam(name = "id", required = false) Long id,
                                 Model model,
-                                Principal principal) {
-        log.info("Nhận callback từ payOS: orderCode={}, status={}, cancel={}", orderCode, status, cancel);
+                                Principal principal,
+                                RedirectAttributes redirectAttributes) {
+        log.info("Nhận callback từ payOS: orderCode={}, status={}, cancel={}, type={}, id={}", orderCode, status, cancel, type, id);
+
+        // Xử lý riêng cho ca học 1-1 ký quỹ
+        if ("1k1".equalsIgnoreCase(type) || (id != null && "1k1".equalsIgnoreCase(type))) {
+            if (Boolean.TRUE.equals(cancel)) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Bạn đã hủy thao tác thanh toán ký quỹ ca học 1-1.");
+                return "redirect:/student/ca-hoc";
+            }
+            try {
+                if (id != null) {
+                    datLich1k1Service.xacNhanThanhToanKyQuy(id);
+                } else if (orderCode != null) {
+                    datLich1k1Repository.findByOrderCodePayos(orderCode).ifPresent(c -> {
+                        datLich1k1Service.xacNhanThanhToanKyQuy(c.getId());
+                    });
+                }
+                redirectAttributes.addFlashAttribute("successMessage", "🎉 Thanh toán ký quỹ ca học 1-1 thành công! Sàn StudyWithMe đang giữ bảo đảm học phí của bạn.");
+            } catch (Exception e) {
+                log.error("Lỗi xác nhận ký quỹ ca học 1-1: {}", e.getMessage());
+                redirectAttributes.addFlashAttribute("errorMessage", "Lỗi xác nhận ký quỹ: " + e.getMessage());
+            }
+            return "redirect:/student/ca-hoc";
+        }
+
         PaymentResultDto result = paymentService.xuLyPayOsCallback(orderCode);
 
         Optional<NguoiDung> userOpt = getUserFromPrincipal(principal);

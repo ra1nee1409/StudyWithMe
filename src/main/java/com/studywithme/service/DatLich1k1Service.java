@@ -19,6 +19,12 @@ public interface DatLich1k1Service {
 
     DatLich1k1 xacNhanThanhToanKyQuy(Long datLichId);
 
+    String taoLinkThanhToanPayOs(Long hocVienId, Long datLichId, String baseUrl);
+
+    DatLich1k1 xacNhanThanhToanKyQuyNgay(Long hocVienId, Long datLichId);
+
+    DatLich1k1 danhGiaCaHoc(Long hocVienId, Long datLichId, int soSao, String nhanXet);
+
     DatLich1k1 hoanTatCaHoc(Long giangVienId, Long datLichId);
 
     DatLich1k1 hocVienHuyCaHoc(Long hocVienId, Long datLichId, String lyDoHuy);

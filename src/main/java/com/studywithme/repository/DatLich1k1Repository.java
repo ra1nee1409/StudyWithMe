@@ -17,6 +17,8 @@ public interface DatLich1k1Repository extends JpaRepository<DatLich1k1, Long> {
 
     Optional<DatLich1k1> findByMaDatLich(String maDatLich);
 
+    Optional<DatLich1k1> findByOrderCodePayos(Long orderCodePayos);
+
     @EntityGraph(attributePaths = {"hocVien", "giangVien", "giangVien.nguoiDung", "monHoc"})
     List<DatLich1k1> findByHocVienIdOrderByThoiGianBatDauDesc(Long hocVienId);
 
@@ -32,6 +34,8 @@ public interface DatLich1k1Repository extends JpaRepository<DatLich1k1, Long> {
     long countByGiangVienId(Long giangVienId);
 
     long countByHocVienId(Long hocVienId);
+
+    long countByHocVienIdAndTrangThai(Long hocVienId, TrangThaiDatLich trangThai);
 
     long countByTrangThai(TrangThaiDatLich trangThai);
 

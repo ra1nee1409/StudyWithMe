@@ -80,6 +80,15 @@ public class DatLich1k1 {
     @Column(name = "ly_do_huy", columnDefinition = "NVARCHAR(MAX)")
     private String lyDoHuy;
 
+    @Column(name = "order_code_payos")
+    private Long orderCodePayos;
+
+    @Column(name = "danh_gia_sao")
+    private Integer danhGiaSao;
+
+    @Column(name = "nhan_xet_hoc_vien", columnDefinition = "NVARCHAR(MAX)")
+    private String nhanXetHocVien;
+
     @CreationTimestamp
     @Column(name = "ngay_tao", updatable = false)
     private LocalDateTime ngayTao;

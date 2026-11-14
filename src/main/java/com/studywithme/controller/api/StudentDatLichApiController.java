@@ -10,6 +10,7 @@ import com.studywithme.exception.ResourceNotFoundException;
 import com.studywithme.repository.NguoiDungRepository;
 import com.studywithme.service.DatLich1k1Service;
 import com.studywithme.service.LichDayGiaSuService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -74,6 +76,60 @@ public class StudentDatLichApiController {
         NguoiDung student = getUserFromPrincipal(principal);
         DatLich1k1 caHoc = datLich1k1Service.hocVienHuyCaHoc(student.getId(), id, lyDoHuy);
         return ResponseEntity.ok(ApiResponse.success("Hủy ca học thành công", DatLich1k1Dto.fromEntity(caHoc)));
+    }
+
+    /**
+     * Tạo liên kết thanh toán VietQR PayOS để ký quỹ ca học 1-1
+     */
+    @PostMapping("/api/hoc-vien/dat-lich-1k1/{id}/thanh-toan-payos")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<Map<String, String>>> thanhToanPayOs(
+            @PathVariable Long id,
+            HttpServletRequest request,
+            Principal principal) {
+        NguoiDung student = getUserFromPrincipal(principal);
+        String baseUrl = getBaseUrl(request);
+        String checkoutUrl = datLich1k1Service.taoLinkThanhToanPayOs(student.getId(), id, baseUrl);
+        return ResponseEntity.ok(ApiResponse.success("Khởi tạo liên kết thanh toán ký quỹ PayOS thành công", Map.of("checkoutUrl", checkoutUrl)));
+    }
+
+    /**
+     * Xác nhận thanh toán ký quỹ ngay (mô phỏng hoặc trừ từ số dư ví)
+     */
+    @PostMapping("/api/hoc-vien/dat-lich-1k1/{id}/thanh-toan-ky-quy-ngay")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<DatLich1k1Dto>> thanhToanKyQuyNgay(
+            @PathVariable Long id,
+            Principal principal) {
+        NguoiDung student = getUserFromPrincipal(principal);
+        DatLich1k1 caHoc = datLich1k1Service.xacNhanThanhToanKyQuyNgay(student.getId(), id);
+        return ResponseEntity.ok(ApiResponse.success("Ký quỹ ca học thành công! Sàn đang đóng băng giữ tiền đảm bảo quyền lợi.", DatLich1k1Dto.fromEntity(caHoc)));
+    }
+
+    /**
+     * Đánh giá buổi học sau khi gia sư hoàn tất
+     */
+    @PostMapping("/api/hoc-vien/dat-lich-1k1/{id}/danh-gia")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<DatLich1k1Dto>> danhGiaCaHoc(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> body,
+            Principal principal) {
+        NguoiDung student = getUserFromPrincipal(principal);
+        int soSao = body.containsKey("soSao") ? Integer.parseInt(body.get("soSao").toString()) : 5;
+        String nhanXet = body.containsKey("nhanXet") ? body.get("nhanXet").toString() : "";
+        DatLich1k1 caHoc = datLich1k1Service.danhGiaCaHoc(student.getId(), id, soSao, nhanXet);
+        return ResponseEntity.ok(ApiResponse.success("Cảm ơn bạn đã gửi đánh giá buổi học!", DatLich1k1Dto.fromEntity(caHoc)));
+    }
+
+    private String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+        int serverPort = request.getServerPort();
+        if ((scheme.equals("http") && serverPort == 80) || (scheme.equals("https") && serverPort == 443)) {
+            return scheme + "://" + serverName;
+        }
+        return scheme + "://" + serverName + ":" + serverPort;
     }
 
     /**

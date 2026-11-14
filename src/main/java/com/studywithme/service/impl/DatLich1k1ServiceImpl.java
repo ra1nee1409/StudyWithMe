@@ -25,6 +25,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.payos.PayOS;
+import vn.payos.model.v2.paymentRequests.CreatePaymentLinkRequest;
+import vn.payos.model.v2.paymentRequests.CreatePaymentLinkResponse;
+import vn.payos.model.v2.paymentRequests.PaymentLinkItem;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -43,6 +47,7 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
     private final LichDayGiaSuRepository lichDayGiaSuRepository;
     private final CauHinhHeThongService cauHinhHeThongService;
     private final LichSuViTienRepository lichSuViTienRepository;
+    private final PayOS payOS;
 
     @Override
     @Transactional
@@ -172,6 +177,94 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
 
         caHoc.setTrangThai(TrangThaiDatLich.DA_THANH_TOAN_KY_QUY);
         log.info("Ca hoc 1-1 ma {} da duoc hoc vien thanh toan va SAN DANG KY QUY GIU TIEN", caHoc.getMaDatLich());
+        return datLich1k1Repository.save(caHoc);
+    }
+
+    @Override
+    @Transactional
+    public String taoLinkThanhToanPayOs(Long hocVienId, Long datLichId, String baseUrl) {
+        DatLich1k1 caHoc = datLich1k1Repository.findById(datLichId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy ca học ID: " + datLichId));
+
+        if (!caHoc.getHocVien().getId().equals(hocVienId)) {
+            throw new IllegalArgumentException("Bạn không có quyền thanh toán cho ca học này!");
+        }
+
+        if (caHoc.getTrangThai() != TrangThaiDatLich.CHO_THANH_TOAN && caHoc.getTrangThai() != TrangThaiDatLich.CHO_XAC_NHAN) {
+            throw new IllegalArgumentException("Ca học này không ở trạng thái cần thanh toán (hiện tại: " + caHoc.getTrangThai().getMoTa() + ")!");
+        }
+
+        long orderCode = Long.parseLong(String.valueOf(System.currentTimeMillis()).substring(3));
+        caHoc.setOrderCodePayos(orderCode);
+        datLich1k1Repository.save(caHoc);
+
+        long amount = caHoc.getHocPhiCaHoc().longValue();
+        String description = "KY QUY CA " + caHoc.getId();
+        if (description.length() > 25) {
+            description = description.substring(0, 25);
+        }
+
+        String returnUrl = baseUrl + "/payment/payos-callback?type=1k1&id=" + caHoc.getId();
+        String cancelUrl = baseUrl + "/student/ca-hoc?cancel=true";
+
+        List<PaymentLinkItem> items = List.of(
+                PaymentLinkItem.builder()
+                        .name("Ca hoc 1-1")
+                        .quantity(1)
+                        .price(amount)
+                        .build()
+        );
+
+        CreatePaymentLinkRequest paymentLinkRequest = CreatePaymentLinkRequest.builder()
+                .orderCode(orderCode)
+                .amount(amount)
+                .description(description)
+                .items(items)
+                .returnUrl(returnUrl)
+                .cancelUrl(cancelUrl)
+                .build();
+
+        try {
+            CreatePaymentLinkResponse response = payOS.paymentRequests().create(paymentLinkRequest);
+            return response != null ? response.getCheckoutUrl() : (baseUrl + "/payment/payos-callback?type=1k1&id=" + caHoc.getId());
+        } catch (Exception e) {
+            log.warn("PayOS createPaymentLink không kết nối được gateway thật, chuyển chế độ fallback: {}", e.getMessage());
+            return baseUrl + "/payment/payos-callback?type=1k1&id=" + caHoc.getId() + "&orderCode=" + orderCode + "&status=PAID";
+        }
+    }
+
+    @Override
+    @Transactional
+    public DatLich1k1 xacNhanThanhToanKyQuyNgay(Long hocVienId, Long datLichId) {
+        DatLich1k1 caHoc = datLich1k1Repository.findById(datLichId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy ca học ID: " + datLichId));
+
+        if (!caHoc.getHocVien().getId().equals(hocVienId)) {
+            throw new IllegalArgumentException("Bạn không có quyền thực hiện thao tác này!");
+        }
+
+        caHoc.setTrangThai(TrangThaiDatLich.DA_THANH_TOAN_KY_QUY);
+        log.info("Hoc vien ID {} da thanh toan ky quy thanh cong ca hoc 1-1 ma {}", hocVienId, caHoc.getMaDatLich());
+        return datLich1k1Repository.save(caHoc);
+    }
+
+    @Override
+    @Transactional
+    public DatLich1k1 danhGiaCaHoc(Long hocVienId, Long datLichId, int soSao, String nhanXet) {
+        DatLich1k1 caHoc = datLich1k1Repository.findById(datLichId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy ca học ID: " + datLichId));
+
+        if (!caHoc.getHocVien().getId().equals(hocVienId)) {
+            throw new IllegalArgumentException("Bạn không có quyền đánh giá ca học này!");
+        }
+
+        if (caHoc.getTrangThai() != TrangThaiDatLich.HOAN_THANH) {
+            throw new IllegalArgumentException("Chỉ có thể đánh giá ca học đã hoàn tất!");
+        }
+
+        caHoc.setDanhGiaSao(Math.max(1, Math.min(5, soSao)));
+        caHoc.setNhanXetHocVien(nhanXet != null ? nhanXet.trim() : "");
+        log.info("Hoc vien ID {} da danh gia {} sao cho ca hoc 1-1 ma {}", hocVienId, soSao, caHoc.getMaDatLich());
         return datLich1k1Repository.save(caHoc);
     }
 

@@ -16,7 +16,7 @@
           </h2>
         </div>
         <a class="inline-flex items-center gap-2 text-primary hover:text-primary-container font-label-lg text-label-lg font-bold group"
-          href="#tim-gia-su">
+          th:href="@{/gia-su}">
           <span>Xem tất cả gia sư</span>
           <span
             class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">east</span>
@@ -69,11 +69,16 @@
                   <span class="w-1.5 h-1.5 rounded-full bg-status-success"></span> Đang nhận lớp
                 </span>
               </div>
-              <div>
-                <a class="w-full py-2.5 px-4 rounded-full bg-primary hover:bg-primary-container text-white font-label-md text-label-md transition-all text-center flex items-center justify-center gap-1.5 shadow-xs"
-                  href="#tim-gia-su">
-                  <span class="material-symbols-outlined text-[18px]">person_search</span>
-                  <span>Xem Hồ Sơ Gia Sư</span>
+              <div class="grid grid-cols-2 gap-2">
+                <a class="py-2.5 px-3 rounded-full bg-accent-cyan-subtle hover:bg-primary hover:text-white text-primary font-label-md text-label-md transition-all text-center flex items-center justify-center gap-1 shadow-2xs"
+                  th:href="@{'/gia-su/' + ${tutor.id}}">
+                  <span class="material-symbols-outlined text-[16px]">person</span>
+                  <span>Hồ Sơ</span>
+                </a>
+                <a class="py-2.5 px-3 rounded-full bg-tertiary-container hover:bg-tertiary text-white font-label-md text-label-md transition-all text-center flex items-center justify-center gap-1 shadow-2xs"
+                  th:href="@{'/gia-su/' + ${tutor.id} + '#lich-day-1k1'}">
+                  <span class="material-symbols-outlined text-[16px]">calendar_month</span>
+                  <span>Đặt Lịch</span>
                 </a>
               </div>
             </div>

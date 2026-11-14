@@ -39,19 +39,18 @@
           <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Tìm Gia Sư Theo Yêu Cầu Của Bạn</h2>
         </div>
 
-        <form class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end"
-          onsubmit="event.preventDefault(); window.location.href='#gia-su';">
+        <form th:action="@{/gia-su}" method="get" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
           <!-- Step 1: Grade Selection -->
           <div class="lg:col-span-3 space-y-1.5">
-            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">1. Khối Lớp
-              Học</label>
+            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">1. Khối Lớp Học</label>
             <div class="relative">
-              <select
+              <select name="grade"
                 class="w-full h-12 pl-10 pr-8 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container appearance-none transition-all cursor-pointer">
-                <option value="cap-1">Tiểu học (Lớp 1 - 5)</option>
-                <option selected value="cap-2">THCS (Lớp 6 - 9)</option>
-                <option value="cap-3">THPT (Lớp 10 - 12)</option>
-                <option value="luyen-thi">Luyện thi ĐH / IELTS</option>
+                <option value="">Tất cả các khối lớp</option>
+                <option value="Tiểu học">Tiểu học (Lớp 1 - 5)</option>
+                <option selected value="THCS">THCS (Lớp 6 - 9)</option>
+                <option value="THPT">THPT (Lớp 10 - 12)</option>
+                <option value="Luyện thi">Luyện thi ĐH / IELTS</option>
               </select>
               <span
                 class="material-symbols-outlined text-secondary absolute left-3 top-1/2 -translate-y-1/2 text-[20px] pointer-events-none">school</span>
@@ -62,18 +61,17 @@
 
           <!-- Step 2: Subject -->
           <div class="lg:col-span-3 space-y-1.5">
-            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">2. Môn Cần Bổ
-              Trợ</label>
+            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">2. Môn Cần Bổ Trợ</label>
             <div class="relative">
-              <select
+              <select name="keyword"
                 class="w-full h-12 pl-10 pr-8 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container appearance-none transition-all cursor-pointer">
-                <option selected value="toan">Toán học</option>
-                <option value="anh">Tiếng Anh & IELTS</option>
-                <option value="van">Ngữ Văn</option>
-                <option value="ly">Vật Lý</option>
-                <option value="hoa">Hóa Học</option>
-                <option value="sinh">Sinh Học</option>
-                <option value="it">Lập trình Scratch/Python</option>
+                <option selected value="Toán">Toán học</option>
+                <option value="Tiếng Anh">Tiếng Anh & IELTS</option>
+                <option value="Ngữ Văn">Ngữ Văn</option>
+                <option value="Vật Lý">Vật Lý</option>
+                <option value="Hóa Học">Hóa Học</option>
+                <option value="Sinh Học">Sinh Học</option>
+                <option value="Tin Học">Lập trình / Tin học</option>
               </select>
               <span
                 class="material-symbols-outlined text-secondary absolute left-3 top-1/2 -translate-y-1/2 text-[20px] pointer-events-none">menu_book</span>
@@ -84,14 +82,13 @@
 
           <!-- Step 3: Format -->
           <div class="lg:col-span-3 space-y-1.5">
-            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">3. Hình Thức
-              Học</label>
+            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">3. Hình Thức Học</label>
             <div class="relative">
-              <select
+              <select name="format"
                 class="w-full h-12 pl-10 pr-8 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container appearance-none transition-all cursor-pointer">
-                <option selected value="online">Online 1-kèm-1 (Bảng số)</option>
-                <option value="offline">Gia sư tại nhà riêng</option>
-                <option value="hybrid">Kết hợp linh hoạt</option>
+                <option selected value="online">Online 1-kèm-1 (Google Meet)</option>
+                <option value="offline">Gia sư tại nhà</option>
+                <option value="hybrid">Linh hoạt theo ca</option>
               </select>
               <span
                 class="material-symbols-outlined text-secondary absolute left-3 top-1/2 -translate-y-1/2 text-[20px] pointer-events-none">devices</span>
@@ -115,18 +112,14 @@
         <div
           class="mt-5 pt-4 flex flex-wrap items-center gap-2 text-body-sm font-body-sm text-on-surface-variant border-t border-surface-container">
           <span class="font-bold text-on-surface text-label-md font-label-md">Gợi ý phổ biến:</span>
-          <button
-            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors"
-            type="button">Toán 9 Luyện thi vào 10</button>
-          <button
-            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors"
-            type="button">IELTS Cấp tốc 6.5+</button>
-          <button
-            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors"
-            type="button">Lấy gốc Hóa 10 & 11</button>
-          <button
-            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors"
-            type="button">Tiếng Anh Tiểu học Cambridge</button>
+          <a th:href="@{/gia-su(keyword='Toán')}"
+            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">Toán 9 Luyện thi vào 10</a>
+          <a th:href="@{/gia-su(keyword='IELTS', chungChi='IELTS')}"
+            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">IELTS Cấp tốc 6.5+</a>
+          <a th:href="@{/gia-su(keyword='Hóa')}"
+            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">Lấy gốc Hóa 10 & 11</a>
+          <a th:href="@{/gia-su(keyword='Tiếng Anh')}"
+            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">Tiếng Anh Tiểu học Cambridge</a>
         </div>
       </div>
 

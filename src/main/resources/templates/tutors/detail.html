@@ -66,11 +66,18 @@
                 </div>
 
                 <!-- Quick Action Buttons -->
-                <div class="flex md:flex-col items-center gap-3 shrink-0 w-full md:w-auto">
-                    <a href="#lop-hoc-truc-tuyen" class="w-full md:w-auto px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl text-center text-xs md:text-sm shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2">
+                <div class="flex flex-wrap md:flex-col items-center gap-3 shrink-0 w-full md:w-auto">
+                    <a href="#lich-day-1k1" class="w-full md:w-auto px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl text-center text-xs md:text-sm shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined text-base">calendar_month</span>
-                        <span>Đăng Ký Học Kèm</span>
+                        <span>Xem Lịch & Đặt Ca 1-1</span>
                     </a>
+                    <button type="button" 
+                            th:attr="data-partner-id=${tutor.nguoiDung.id}, data-partner-name=${tutor.nguoiDung.hoTen}"
+                            onclick="openChatModal(this.getAttribute('data-partner-id'), this.getAttribute('data-partner-name'))"
+                            class="w-full md:w-auto px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl text-center text-xs md:text-sm shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-base">chat</span>
+                        <span>Nhắn Tin Tư Vấn 1-1</span>
+                    </button>
                     <button th:if="${tutor.linkVideoDayThu != null and !tutor.linkVideoDayThu.isBlank()}"
                             type="button" 
                             th:attr="data-video=${tutor.linkVideoDayThu}"
@@ -164,6 +171,66 @@
                                 </button>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- 3.5. Lịch Rảnh Dạy Kèm 1-1 Trong Tuần (Weekly Slot Picker - WBS 2.0) -->
+                <div id="lich-day-1k1" class="bg-white rounded-2xl border border-slate-200/80 p-6 md:p-8 shadow-sm scroll-mt-24">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                        <div>
+                            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 mb-2">
+                                <span class="material-symbols-outlined text-xs">event_available</span>
+                                <span>Lịch Rảnh Dạy Kèm 1-Kèm-1</span>
+                            </div>
+                            <h2 class="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-brand-600">schedule</span>
+                                <span>Khung Giờ Rảnh Dạy Kèm 1-1 Cố Định</span>
+                            </h2>
+                            <p class="text-xs text-slate-500 mt-1">Chọn ca học rảnh để đặt lịch riêng 1-1. Học phí được sàn StudyWithMe ký quỹ đảm bảo 100% quyền lợi.</p>
+                        </div>
+                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-brand-50 text-brand-700 border border-brand-200 self-start sm:self-auto"
+                              th:text="${#lists.size(lichDaySlots) + ' khung giờ rảnh'}">3 khung giờ</span>
+                    </div>
+
+                    <!-- Danh sách khung giờ rảnh -->
+                    <div th:if="${!#lists.isEmpty(lichDaySlots)}" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div th:each="slot : ${lichDaySlots}" 
+                             class="p-4 rounded-2xl border border-slate-200 hover:border-brand-400 bg-slate-50/50 hover:bg-white hover:shadow-md transition duration-200 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-2">
+                                    <span class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-lg bg-indigo-50 text-brand-700 border border-indigo-100"
+                                          th:text="${slot.thuTrongTuanMoTa}">Thứ 2</span>
+                                    <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                                          th:classappend="${slot.loaiLich != null and slot.loaiLich.name() == 'ONLINE_1K1' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}"
+                                          th:text="${slot.loaiLich != null ? slot.loaiLich.moTa : 'Online 1-1'}">Online 1-1</span>
+                                </div>
+                                <div class="text-base font-bold text-slate-800 flex items-center gap-1.5 my-2">
+                                    <span class="material-symbols-outlined text-base text-brand-600">alarm</span>
+                                    <span th:text="${slot.gioBatDau + ' - ' + slot.gioKetThuc}">19:00 - 21:00</span>
+                                </div>
+                                <p th:if="${slot.ghiChu != null and !slot.ghiChu.isBlank()}" 
+                                   class="text-xs text-slate-500 mb-2 italic" th:text="${slot.ghiChu}">Dạy kèm kiến thức trọng tâm</p>
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-200/70 flex items-center justify-between mt-2">
+                                <div>
+                                    <div class="text-[10px] text-slate-400 uppercase font-medium">Học phí / giờ</div>
+                                    <div class="text-sm font-extrabold text-brand-700" 
+                                         th:text="${slot.hocPhiMoiGio != null ? #numbers.formatDecimal(slot.hocPhiMoiGio, 0, 'COMMA', 0, 'POINT') + ' đ' : 'Thỏa thuận'}">150.000 đ</div>
+                                </div>
+                                <button type="button" 
+                                        th:attr="data-slot-id=${slot.id}, data-tutor-id=${tutor.id}, data-tutor-name=${tutor.nguoiDung.hoTen}, data-day=${slot.thuTrongTuanMoTa}, data-time=${slot.gioBatDau + ' - ' + slot.gioKetThuc}, data-start=${slot.gioBatDau}, data-end=${slot.gioKetThuc}, data-fee=${slot.hocPhiMoiGio != null ? slot.hocPhiMoiGio : 150000}"
+                                        onclick="openDatLichModal(this)"
+                                        class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl shadow-sm transition">
+                                    Đặt Lịch Ngay
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${#lists.isEmpty(lichDaySlots)}" class="text-sm text-slate-500 italic p-6 bg-slate-50 rounded-xl text-center">
+                        <span class="material-symbols-outlined text-2xl text-slate-400 block mb-1">event_busy</span>
+                        Gia sư hiện chưa mở lịch rảnh cố định tuần này. Bạn có thể bấm nút <strong>"Nhắn Tin Tư Vấn 1-1"</strong> để liên hệ hẹn giờ kèm riêng!
                     </div>
                 </div>
 
@@ -321,20 +388,35 @@
                             <span class="material-symbols-outlined text-xs">school</span> Lớp Kèm Trực Tuyến 1-1 & Nhóm
                         </span>
                         <div class="text-xs text-slate-400">Học phí chỉ từ</div>
-                        <div class="text-2xl md:text-3xl font-extrabold text-brand-700 mt-1">150.000 đ <span class="text-xs font-normal text-slate-500">/ buổi</span></div>
+                        <div class="text-2xl md:text-3xl font-extrabold text-brand-700 mt-1">150.000 đ <span class="text-xs font-normal text-slate-500">/ giờ</span></div>
                     </div>
 
-                    <!-- Booking Form Button -->
-                    <button type="button" 
-                            onclick="openRegisterModal('Đăng ký tư vấn học kèm 1-kèm-1', 'Thỏa thuận theo buổi')"
-                            class="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-brand-500/25 transition duration-200 flex items-center justify-center gap-2 mb-3">
-                        <span class="material-symbols-outlined text-base">support_agent</span>
-                        <span>Đăng Ký Tư Vấn & Xếp Lớp</span>
-                    </button>
+                    <!-- Booking & Chat Actions -->
+                    <div class="space-y-2.5 mb-5">
+                        <a href="#lich-day-1k1" class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs md:text-sm rounded-xl shadow-lg shadow-brand-500/25 transition duration-200 flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-base">calendar_month</span>
+                            <span>Xem Lịch Rảnh & Đặt Buổi Học</span>
+                        </a>
 
-                    <a href="tel:19006868" class="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-2 mb-6">
+                        <button type="button" 
+                                th:attr="data-partner-id=${tutor.nguoiDung.id}, data-partner-name=${tutor.nguoiDung.hoTen}"
+                                onclick="openChatModal(this.getAttribute('data-partner-id'), this.getAttribute('data-partner-name'))"
+                                class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs md:text-sm rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-base">chat</span>
+                            <span>Nhắn Tin Tư Vấn Trực Tiếp 1-1</span>
+                        </button>
+
+                        <button type="button" 
+                                onclick="openRegisterModal('Đăng ký tư vấn học kèm 1-kèm-1', 'Thỏa thuận theo buổi')"
+                                class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-base">support_agent</span>
+                            <span>Yêu Cầu Ban Cố Vấn Gọi Lại</span>
+                        </button>
+                    </div>
+
+                    <a href="tel:19006868" class="w-full py-2.5 px-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-2 mb-6">
                         <span class="material-symbols-outlined text-base text-brand-600">call</span>
-                        <span>Hotline: 1900 6868</span>
+                        <span>Hotline Hỗ Trợ: 1900 6868</span>
                     </a>
 
                     <!-- Perks list -->
@@ -398,6 +480,111 @@
             <div class="p-2 bg-slate-100 flex items-center justify-center max-h-[75vh] overflow-auto">
                 <img id="lightboxImg" src="" alt="Chứng chỉ" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow">
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Đặt Lịch Ca Học 1-1 (WBS 2.3) -->
+    <div id="datLich1k1Modal" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl overflow-hidden max-w-lg w-full shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-5 bg-gradient-to-r from-brand-700 to-indigo-800 text-white flex items-center justify-between">
+                <div>
+                    <h4 class="font-bold text-base flex items-center gap-2">
+                        <span class="material-symbols-outlined text-xl">event_available</span>
+                        <span>Đặt Ca Học Kèm 1-1</span>
+                    </h4>
+                    <p class="text-xs text-indigo-200 mt-0.5" id="modalSlotSubtitle">Gia sư hướng dẫn</p>
+                </div>
+                <button type="button" onclick="closeDatLichModal()" class="text-indigo-200 hover:text-white transition">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <form onsubmit="handleDatLich1k1Submit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="modalSlotId" value="">
+                <input type="hidden" id="modalTutorId" value="">
+                <input type="hidden" id="modalStartTime" value="">
+                <input type="hidden" id="modalEndTime" value="">
+                <input type="hidden" id="modalSlotFee" value="">
+
+                <!-- Slot Summary Card -->
+                <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs text-slate-600">
+                    <div class="flex items-center justify-between">
+                        <span>Khung giờ đã chọn:</span>
+                        <strong class="text-slate-800 font-semibold" id="modalSlotTimeText">19:00 - 21:00</strong>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span>Học phí dự kiến:</span>
+                        <strong class="text-brand-700 font-bold text-sm" id="modalSlotFeeText">150.000 đ</strong>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Chọn ngày học cụ thể *</label>
+                    <input type="date" id="modalNgayHoc" required 
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-brand-500">
+                    <span class="text-[11px] text-slate-400 mt-1 block">Khuyến nghị chọn ngày tương ứng với thứ trong khung giờ đã định.</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nội dung / Mục tiêu cần gia sư hỗ trợ *</label>
+                    <textarea id="modalGhiChuHocVien" rows="3" required 
+                              placeholder="Ví dụ: Ôn tập chương 3 Đạo hàm, giải đáp một số bài tập nâng cao trong đề cương..." 
+                              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-brand-500"></textarea>
+                </div>
+
+                <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100 flex items-start gap-2 text-xs text-emerald-800">
+                    <span class="material-symbols-outlined text-base text-emerald-600 shrink-0">shield</span>
+                    <span>Học phí được sàn StudyWithMe giữ ký quỹ an toàn. Gia sư chỉ được giải ngân sau khi buổi học hoàn tất 100%.</span>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" id="btnSubmitDatLich" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-base">send</span>
+                        <span>Xác Nhận Gửi Yêu Cầu Đặt Lịch</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Nhắn Tin Tư Vấn 1-1 (MongoDB Chat) -->
+    <div id="quickChatModal" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl overflow-hidden max-w-md w-full shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-5 bg-gradient-to-r from-emerald-700 to-teal-800 text-white flex items-center justify-between">
+                <div>
+                    <h4 class="font-bold text-base flex items-center gap-2">
+                        <span class="material-symbols-outlined text-xl">chat</span>
+                        <span>Nhắn Tin Với Gia Sư</span>
+                    </h4>
+                    <p class="text-xs text-teal-100 mt-0.5" id="chatPartnerName">Gia sư</p>
+                </div>
+                <button type="button" onclick="closeChatModal()" class="text-teal-100 hover:text-white transition">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <form onsubmit="handleQuickChatSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="chatPartnerId" value="">
+
+                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 flex items-start gap-2">
+                    <span class="material-symbols-outlined text-base text-teal-600 shrink-0">info</span>
+                    <span>Tin nhắn của bạn được mã hóa và lưu trữ tức thì trên cụm MongoDB Chat. Gia sư sẽ nhận được thông báo ngay lập tức.</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nội dung trao đổi / câu hỏi của bạn *</label>
+                    <textarea id="chatMessageContent" rows="4" required 
+                              placeholder="Chào thầy/cô, em muốn hỏi thêm về lịch học và tài liệu kèm buổi 1-1..." 
+                              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-emerald-500"></textarea>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" id="btnSubmitChat" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-base">send</span>
+                        <span>Gửi Tin Nhắn Ngay</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -481,10 +668,155 @@
             closeRegisterModal();
         }
 
+        /* ==============================================================================
+         * WBS 2.0: ĐẶT LỊCH CA HỌC 1-1 VỚI GIA SƯ
+         * ============================================================================== */
+        function openDatLichModal(btn) {
+            const slotId = btn.getAttribute('data-slot-id');
+            const tutorId = btn.getAttribute('data-tutor-id');
+            const tutorName = btn.getAttribute('data-tutor-name') || 'Gia sư';
+            const dayText = btn.getAttribute('data-day');
+            const timeText = btn.getAttribute('data-time');
+            const startTime = btn.getAttribute('data-start');
+            const endTime = btn.getAttribute('data-end');
+            const fee = btn.getAttribute('data-fee');
+
+            document.getElementById('modalSlotId').value = slotId;
+            document.getElementById('modalTutorId').value = tutorId;
+            document.getElementById('modalStartTime').value = startTime;
+            document.getElementById('modalEndTime').value = endTime;
+            document.getElementById('modalSlotFee').value = fee;
+
+            document.getElementById('modalSlotSubtitle').textContent = 'Gia sư ' + tutorName + ' (' + dayText + ')';
+            document.getElementById('modalSlotTimeText').textContent = dayText + ' | ' + timeText;
+            document.getElementById('modalSlotFeeText').textContent = Number(fee).toLocaleString('vi-VN') + ' đ';
+
+            // Min date: tomorrow
+            const tomorrow = new Date(Date.now() + 86400000);
+            document.getElementById('modalNgayHoc').min = tomorrow.toISOString().split('T')[0];
+
+            document.getElementById('datLich1k1Modal').classList.remove('hidden');
+        }
+
+        function closeDatLichModal() {
+            document.getElementById('datLich1k1Modal').classList.add('hidden');
+        }
+
+        async function handleDatLich1k1Submit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitDatLich');
+            const origText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined text-base animate-spin">refresh</span> Đang xử lý...';
+
+            const ngayHoc = document.getElementById('modalNgayHoc').value;
+            const startTime = document.getElementById('modalStartTime').value;
+            const endTime = document.getElementById('modalEndTime').value;
+            const fee = parseFloat(document.getElementById('modalSlotFee').value);
+            const slotId = parseInt(document.getElementById('modalSlotId').value);
+            const tutorId = parseInt(document.getElementById('modalTutorId').value);
+            const ghiChu = document.getElementById('modalGhiChuHocVien').value;
+
+            const formatTime = (t) => t.length === 5 ? t + ':00' : t;
+            const payload = {
+                giangVienId: tutorId,
+                lichDayId: slotId,
+                thoiGianBatDau: ngayHoc + 'T' + formatTime(startTime),
+                thoiGianKetThuc: ngayHoc + 'T' + formatTime(endTime),
+                hocPhiCaHoc: fee,
+                ghiChuHocVien: ghiChu
+            };
+
+            try {
+                const res = await fetch('/api/hoc-vien/dat-lich-1k1', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    alert('Bạn cần đăng nhập tài khoản Học Viên để đặt lịch ca học 1-1!');
+                    window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+                    return;
+                }
+
+                const result = await res.json();
+                if (res.ok && result.success) {
+                    alert('🎉 Chúc mừng! Ca học 1-1 đã được đặt thành công (Mã ca: ' + (result.data ? result.data.maCaHoc : '') + '). Gia sư sẽ duyệt và sàn sẽ hướng dẫn bạn ký quỹ học phí.');
+                    closeDatLichModal();
+                    document.getElementById('modalGhiChuHocVien').value = '';
+                } else {
+                    alert('Lỗi đặt lịch: ' + (result.message || 'Không thể tạo yêu cầu đặt lịch'));
+                }
+            } catch (err) {
+                alert('Có lỗi kết nối đến máy chủ. Vui lòng thử lại!');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origText;
+            }
+        }
+
+        /* ==============================================================================
+         * WBS 6.0: NHẮN TIN TƯ VẤN 1-1 QUA MONGODB CHAT
+         * ============================================================================== */
+        function openChatModal(partnerId, partnerName) {
+            document.getElementById('chatPartnerId').value = partnerId;
+            document.getElementById('chatPartnerName').textContent = 'Trò chuyện cùng: ' + (partnerName || 'Gia sư');
+            document.getElementById('quickChatModal').classList.remove('hidden');
+        }
+
+        function closeChatModal() {
+            document.getElementById('quickChatModal').classList.add('hidden');
+        }
+
+        async function handleQuickChatSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitChat');
+            const origText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined text-base animate-spin">refresh</span> Đang gửi...';
+
+            const partnerId = parseInt(document.getElementById('chatPartnerId').value);
+            const content = document.getElementById('chatMessageContent').value.trim();
+
+            try {
+                const res = await fetch('/api/chat/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nguoiNhanId: partnerId,
+                        noiDungTinNhan: content
+                    })
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    alert('Vui lòng đăng nhập tài khoản để gửi tin nhắn tư vấn tới gia sư!');
+                    window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+                    return;
+                }
+
+                const result = await res.json();
+                if (res.ok && result.success) {
+                    alert('✅ Tin nhắn đã được gửi tới gia sư thành công qua MongoDB Chat!');
+                    closeChatModal();
+                    document.getElementById('chatMessageContent').value = '';
+                } else {
+                    alert('Lỗi gửi tin nhắn: ' + (result.message || 'Không thể gửi tin nhắn'));
+                }
+            } catch (err) {
+                alert('Có lỗi mạng khi gửi tin nhắn. Vui lòng thử lại!');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origText;
+            }
+        }
+
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeImageLightbox();
                 closeRegisterModal();
+                closeDatLichModal();
+                closeChatModal();
             }
         });
         document.getElementById('imageLightboxModal').addEventListener('click', function(e) {
@@ -492,6 +824,12 @@
         });
         document.getElementById('registerClassModal').addEventListener('click', function(e) {
             if (e.target === this) closeRegisterModal();
+        });
+        document.getElementById('datLich1k1Modal').addEventListener('click', function(e) {
+            if (e.target === this) closeDatLichModal();
+        });
+        document.getElementById('quickChatModal').addEventListener('click', function(e) {
+            if (e.target === this) closeChatModal();
         });
     </script>
 </body>

@@ -139,7 +139,7 @@
               </div>
 
               <!-- CTA Button -->
-              <a th:href="@{/login}"
+              <a th:href="@{'/khoa-hoc/' + ${course.duongDanSlug ?: course.id}}"
                  class="px-3.5 py-1.5 rounded-lg bg-surface-container-low hover:bg-primary hover:text-white text-primary text-xs font-bold transition-all flex items-center gap-1 shadow-xs cursor-pointer">
                 <span>Xem Khóa</span>
                 <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
@@ -160,7 +160,7 @@
 
       <!-- Bottom View All Button -->
       <div class="mt-10 text-center">
-        <a href="#tim-gia-su" 
+        <a th:href="@{/khoa-hoc}" 
            class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-surface-container-lowest hover:bg-surface-container border border-surface-container text-on-surface font-label-lg text-label-lg font-bold shadow-sm transition-all transform hover:-translate-y-0.5">
           <span>Khám Phá Tất Cả Chương Trình &amp; Khóa Học</span>
           <span class="material-symbols-outlined text-[18px]">east</span>

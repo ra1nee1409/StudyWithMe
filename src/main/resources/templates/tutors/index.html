@@ -161,9 +161,16 @@
                 <!-- Card Actions Bottom -->
                 <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center gap-2">
                     <a th:href="@{'/gia-su/' + ${tutor.id}}" 
-                       class="flex-1 py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl text-center transition duration-200 shadow-sm flex items-center justify-center gap-1.5">
-                        <span>Xem Hồ Sơ & Lớp Học</span>
+                       class="flex-1 py-2.5 px-3 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl text-center transition duration-200 shadow-sm flex items-center justify-center gap-1">
+                        <span>Hồ Sơ & Lớp</span>
                         <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+
+                    <a th:href="@{'/gia-su/' + ${tutor.id} + '#lich-day-1k1'}" 
+                       class="py-2.5 px-3 bg-indigo-50 hover:bg-indigo-100 text-brand-700 border border-brand-200 text-xs font-semibold rounded-xl text-center transition duration-200 flex items-center justify-center gap-1"
+                       title="Xem khung giờ rảnh và đặt lịch 1-kèm-1">
+                        <span class="material-symbols-outlined text-sm">calendar_month</span>
+                        <span>Đặt Lịch 1-1</span>
                     </a>
 
                     <button th:if="${tutor.linkVideoDayThu != null and !tutor.linkVideoDayThu.isBlank()}"

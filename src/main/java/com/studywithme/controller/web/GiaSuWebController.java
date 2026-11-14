@@ -1,9 +1,11 @@
 package com.studywithme.controller.web;
 
+import com.studywithme.dto.tutor.LichDaySlotDto;
 import com.studywithme.entity.HoSoGiangVien;
 import com.studywithme.entity.KhoaHoc;
 import com.studywithme.entity.LopHocTrucTuyen;
 import com.studywithme.service.GiaSuService;
+import com.studywithme.service.LichDayGiaSuService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,9 +24,11 @@ import java.util.List;
 public class GiaSuWebController {
 
     private final GiaSuService giaSuService;
+    private final LichDayGiaSuService lichDayGiaSuService;
 
-    public GiaSuWebController(GiaSuService giaSuService) {
+    public GiaSuWebController(GiaSuService giaSuService, LichDayGiaSuService lichDayGiaSuService) {
         this.giaSuService = giaSuService;
+        this.lichDayGiaSuService = lichDayGiaSuService;
     }
 
     /**
@@ -65,11 +69,13 @@ public class GiaSuWebController {
         List<LopHocTrucTuyen> onlineClasses = giaSuService.layLopHocCuaGiaSu(id);
         List<KhoaHoc> courses = giaSuService.layKhoaHocCuaGiaSu(id);
         List<HoSoGiangVien> similarTutors = giaSuService.layGiaSuTuongTu(id);
+        List<LichDaySlotDto> lichDaySlots = lichDayGiaSuService.layDanhSachLichDayKhaDung(id);
 
         model.addAttribute("tutor", tutor);
         model.addAttribute("onlineClasses", onlineClasses);
         model.addAttribute("courses", courses);
         model.addAttribute("similarTutors", similarTutors);
+        model.addAttribute("lichDaySlots", lichDaySlots);
         model.addAttribute("activePage", "tutors");
 
         return "tutors/detail";

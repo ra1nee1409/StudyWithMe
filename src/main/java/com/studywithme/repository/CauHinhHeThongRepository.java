@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CauHinhHeThongRepository extends JpaRepository<CauHinhHeThong, Long> {
+public interface CauHinhHeThongRepository extends JpaRepository<CauHinhHeThong, String> {
 
     Optional<CauHinhHeThong> findByMaCauHinh(String maCauHinh);
 

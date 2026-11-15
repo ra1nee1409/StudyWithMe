@@ -54,7 +54,7 @@
           <div>
             <p class="text-[11px] font-semibold text-status-success uppercase tracking-wider">Đang sẵn sàng nhận</p>
             <h3 class="text-2xl font-extrabold text-status-success mt-1" 
-                th:text="${#lists.size(danhSachLichDay.?[trangThai.name() == 'CON_TRONG'])}">0</h3>
+                th:text="${#lists.size(danhSachLichDay.?[trangThai != null && trangThai.name() == 'CON_TRONG'])}">0</h3>
           </div>
           <div class="w-11 h-11 rounded-xl bg-status-success/10 text-status-success flex items-center justify-center">
             <span class="material-symbols-outlined text-[24px]">check_circle</span>
@@ -65,7 +65,7 @@
           <div>
             <p class="text-[11px] font-semibold text-status-warning uppercase tracking-wider">Đang tạm khóa</p>
             <h3 class="text-2xl font-extrabold text-status-warning mt-1" 
-                th:text="${#lists.size(danhSachLichDay.?[trangThai.name() == 'TAM_KHOA'])}">0</h3>
+                th:text="${#lists.size(danhSachLichDay.?[trangThai != null && trangThai.name() == 'TAM_KHOA'])}">0</h3>
           </div>
           <div class="w-11 h-11 rounded-xl bg-status-warning/10 text-status-warning flex items-center justify-center">
             <span class="material-symbols-outlined text-[24px]">lock</span>
@@ -105,16 +105,16 @@
             <!-- Day Header -->
             <div class="flex items-center justify-between pb-2 mb-2 border-b border-surface-container/60">
               <span class="font-bold text-xs text-on-surface uppercase tracking-wider" th:text="${thu.moTa}">Thứ 2</span>
-              <button type="button" th:onclick="'openAddSlotModalForDay(\'' + ${thu.name()} + '\')'" class="w-6 h-6 rounded-md hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-all" title="Thêm slot cho ngày này">
+              <button type="button" th:data-thu="${thu.name()}" onclick="openAddSlotModalForDay(this.dataset.thu)" class="w-6 h-6 rounded-md hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-all" title="Thêm slot cho ngày này">
                 <span class="material-symbols-outlined text-[16px]">add</span>
               </button>
             </div>
 
             <!-- Slots for this day -->
             <div class="flex-1 space-y-2">
-              <div th:each="slot : ${danhSachLichDay}" th:if="${slot.thuTrongTuan == thu}" 
+              <div th:each="slot : ${slotsTheoThu != null ? slotsTheoThu.get(thu) : {}}" 
                    class="p-2.5 rounded-lg border transition-all flex flex-col gap-1.5 shadow-2xs"
-                   th:classappend="${slot.trangThai.name() == 'CON_TRONG'} ? 'bg-surface-card border-status-success/30 hover:border-status-success' : 'bg-surface-container/70 border-surface-container opacity-70'">
+                   th:classappend="${slot.trangThai != null && slot.trangThai.name() == 'CON_TRONG'} ? 'bg-surface-card border-status-success/30 hover:border-status-success' : 'bg-surface-container/70 border-surface-container opacity-70'">
                 
                 <div class="flex items-center justify-between">
                   <span class="text-xs font-bold text-on-surface flex items-center gap-1">
@@ -122,29 +122,29 @@
                     <span th:text="${slot.gioBatDau} + ' - ' + ${slot.gioKetThuc}">19:30 - 21:00</span>
                   </span>
                   <span class="text-[10px] font-bold px-1.5 py-0.5 rounded"
-                        th:classappend="${slot.trangThai.name() == 'CON_TRONG'} ? 'bg-status-success/15 text-status-success' : 'bg-status-warning/15 text-status-warning'"
-                        th:text="${slot.trangThai.moTa}">Còn trống</span>
+                        th:classappend="${slot.trangThai != null && slot.trangThai.name() == 'CON_TRONG'} ? 'bg-status-success/15 text-status-success' : 'bg-status-warning/15 text-status-warning'"
+                        th:text="${slot.trangThai != null ? slot.trangThai.moTa : 'N/A'}">Còn trống</span>
                 </div>
 
                 <div class="flex items-center justify-between text-[11px] text-on-surface-variant">
-                  <span class="font-medium" th:text="${slot.loaiLich.name() == 'CO_DINH' ? 'Cố định' : 'Linh hoạt'}">Cố định</span>
-                  <span class="font-bold text-on-surface" th:text="${#numbers.formatDecimal(slot.hocPhiMoiGio, 0, 'COMMA', 0, 'POINT')} + 'đ/h'">150,000đ/h</span>
+                  <span class="font-medium" th:text="${slot.loaiLich != null && slot.loaiLich.name() == 'CO_DINH' ? 'Cố định' : 'Linh hoạt'}">Cố định</span>
+                  <span class="font-bold text-on-surface" th:text="${slot.hocPhiMoiGio != null ? #numbers.formatDecimal(slot.hocPhiMoiGio, 0, 'COMMA', 0, 'POINT') + 'đ/h' : '0đ/h'}">150,000đ/h</span>
                 </div>
 
                 <p th:if="${slot.ghiChu != null && !slot.ghiChu.isEmpty()}" class="text-[10px] text-on-surface-variant italic truncate" th:text="${slot.ghiChu}"></p>
 
                 <div class="flex items-center justify-end gap-1 pt-1 border-t border-surface-container/30">
-                  <button type="button" th:onclick="'toggleSlot(' + ${slot.id} + ')'" class="p-1 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-all" th:title="${slot.trangThai.name() == 'CON_TRONG'} ? 'Tạm khóa' : 'Mở lại'">
-                    <span class="material-symbols-outlined text-[15px]" th:text="${slot.trangThai.name() == 'CON_TRONG'} ? 'lock' : 'lock_open'">lock</span>
+                  <button type="button" th:data-id="${slot.id}" onclick="toggleSlot(this.dataset.id)" class="p-1 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-all" th:title="${slot.trangThai != null && slot.trangThai.name() == 'CON_TRONG'} ? 'Tạm khóa' : 'Mở lại'">
+                    <span class="material-symbols-outlined text-[15px]" th:text="${slot.trangThai != null && slot.trangThai.name() == 'CON_TRONG'} ? 'lock' : 'lock_open'">lock</span>
                   </button>
-                  <button type="button" th:onclick="'deleteSlot(' + ${slot.id} + ')'" class="p-1 rounded hover:bg-status-error/10 text-on-surface-variant hover:text-status-error transition-all" title="Xóa slot này">
+                  <button type="button" th:data-id="${slot.id}" onclick="deleteSlot(this.dataset.id)" class="p-1 rounded hover:bg-status-error/10 text-on-surface-variant hover:text-status-error transition-all" title="Xóa slot này">
                     <span class="material-symbols-outlined text-[15px]">delete</span>
                   </button>
                 </div>
               </div>
 
               <!-- Day has no slots -->
-              <div th:if="${#lists.isEmpty(danhSachLichDay.?[thuTrongTuan == #root.thu])}" class="h-28 flex flex-col items-center justify-center text-center p-2 text-outline">
+              <div th:if="${slotsTheoThu == null || #lists.isEmpty(slotsTheoThu.get(thu))}" class="h-28 flex flex-col items-center justify-center text-center p-2 text-outline">
                 <span class="material-symbols-outlined text-xl opacity-40 mb-1">free_cancellation</span>
                 <span class="text-[11px] opacity-60">Chưa mở slot</span>
               </div>

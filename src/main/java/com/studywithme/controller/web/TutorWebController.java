@@ -171,8 +171,19 @@ public class TutorWebController {
                 .map(hoSo -> lichDayGiaSuService.layDanhSachLichDay(hoSo.getId()))
                 .orElse(new ArrayList<>());
 
+        java.util.Map<ThuTrongTuan, List<LichDaySlotDto>> slotsTheoThu = new java.util.EnumMap<>(ThuTrongTuan.class);
+        for (ThuTrongTuan thu : ThuTrongTuan.values()) {
+            slotsTheoThu.put(thu, new ArrayList<>());
+        }
+        for (LichDaySlotDto slot : danhSachLichDay) {
+            if (slot.getThuTrongTuan() != null && slotsTheoThu.containsKey(slot.getThuTrongTuan())) {
+                slotsTheoThu.get(slot.getThuTrongTuan()).add(slot);
+            }
+        }
+
         model.addAttribute("danhSachLop", danhSachLop);
         model.addAttribute("danhSachLichDay", danhSachLichDay);
+        model.addAttribute("slotsTheoThu", slotsTheoThu);
         model.addAttribute("cacThuTrongTuan", ThuTrongTuan.values());
         model.addAttribute("cacLoaiLich", LoaiLichDay.values());
         return "tutor/schedule";

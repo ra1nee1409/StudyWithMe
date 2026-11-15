@@ -33,6 +33,7 @@ public class ChatMongoServiceImpl implements ChatMongoService {
     private final TinNhanMongoRepository tinNhanMongoRepository;
     private final NguoiDungRepository nguoiDungRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final com.studywithme.service.ThongBaoService thongBaoService;
 
     @Override
     public TinNhanDto guiTinNhan(Long nguoiGuiId, GuiTinNhanRequest request) {
@@ -105,6 +106,25 @@ public class ChatMongoServiceImpl implements ChatMongoService {
             messagingTemplate.convertAndSend("/topic/users/" + nguoiGuiId + "/conversations", layDanhSachCuocTroChuyen(nguoiGuiId));
         } catch (Exception e) {
             log.warn("Không thể gửi tin nhắn qua WebSocket: {}", e.getMessage());
+        }
+
+        // 5. Bắn In-app Notification cho người nhận
+        try {
+            String notificationContent = request.getLoaiTinNhan() == com.studywithme.entity.enums.shared.LoaiTinNhan.DE_XUAT_CA_HOC
+                    ? "Đã gửi một đề xuất ca học kèm 1-1 cho bạn."
+                    : (request.getNoiDung() != null && request.getNoiDung().length() > 60
+                        ? request.getNoiDung().substring(0, 60) + "..."
+                        : request.getNoiDung());
+
+            thongBaoService.taoThongBao(
+                    request.getNguoiNhanId(),
+                    "Tin nhắn mới từ " + nguoiGui.getHoTen(),
+                    notificationContent,
+                    com.studywithme.entity.enums.shared.LoaiThongBao.TIN_NHAN_MOI,
+                    "/chat?userId=" + nguoiGuiId
+            );
+        } catch (Exception e) {
+            log.warn("Không thể tạo thông báo tin nhắn mới: {}", e.getMessage());
         }
 
         return resultDto;

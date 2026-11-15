@@ -36,6 +36,41 @@
 
       <!-- Auth & Actions -->
       <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <!-- Notification Bell Icon with Dropdown (WBS 7.2) -->
+        <div class="relative" id="notification-dropdown-wrapper">
+          <button type="button" id="btn-notification-bell" onclick="toggleNotificationDropdown()" class="relative p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer" title="Thông báo hệ thống">
+            <span class="material-symbols-outlined text-[20px] sm:text-[22px]">notifications</span>
+            <span id="notification-unread-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center hidden">
+              0
+            </span>
+          </button>
+
+          <!-- Notification Dropdown Menu -->
+          <div id="notification-dropdown-menu" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-surface-container py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+            <div class="px-4 py-2.5 border-b border-surface-container flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[20px]">notifications_active</span>
+                <span class="font-bold text-sm text-on-surface">Thông Báo</span>
+              </div>
+              <button type="button" onclick="markAllNotificationsAsRead()" class="text-[11px] font-semibold text-primary hover:underline cursor-pointer">
+                Đánh dấu tất cả đã đọc
+              </button>
+            </div>
+
+            <!-- List items -->
+            <div id="notification-list-container" class="max-h-80 overflow-y-auto divide-y divide-surface-container/50">
+              <div class="p-4 text-center text-xs text-on-surface-variant">Đang tải thông báo...</div>
+            </div>
+
+            <div class="px-4 py-2 border-t border-surface-container text-center bg-surface-container-lowest">
+              <span class="text-[11px] text-on-surface-variant flex items-center justify-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse"></span>
+                Kết nối thời gian thực WebSocket STOMP
+              </span>
+            </div>
+          </div>
+        </div>
+
         <!-- Chat / Messenger Hub Icon Button -->
         <a th:href="@{/chat}" class="relative p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors" title="Tin nhắn trực tuyến">
           <span class="material-symbols-outlined text-[20px] sm:text-[22px]">chat</span>
@@ -374,9 +409,166 @@
           setGuestUI();
         }
 
-        // Cập nhật số lượng giỏ hàng
+        // Cập nhật số lượng giỏ hàng & thông báo
         updateCartBadgeCount();
+        initNotificationModule();
       })();
+
+      /* ==============================================================================
+       * WBS 7.2: QUẢN LÝ CHUÔNG THÔNG BÁO TỨC THỜI (IN-APP NOTIFICATIONS)
+       * ============================================================================== */
+      function toggleNotificationDropdown() {
+        const menu = document.getElementById('notification-dropdown-menu');
+        if (!menu) return;
+        const isHidden = menu.classList.contains('hidden');
+        if (isHidden) {
+          menu.classList.remove('hidden');
+          fetchNotificationsList();
+        } else {
+          menu.classList.add('hidden');
+        }
+      }
+
+      async function initNotificationModule() {
+        const token = localStorage.getItem('studywithme_token');
+        const userStr = localStorage.getItem('studywithme_user');
+        if (!token || !userStr) return;
+
+        try {
+          const res = await fetch('/api/notifications/unread-count');
+          if (res.ok) {
+            const data = await res.json();
+            const count = (data.duLieu && data.duLieu.count) || 0;
+            updateNotificationBadge(count);
+          }
+        } catch (e) {
+          console.warn('Lỗi lấy số thông báo chưa đọc:', e);
+        }
+
+        // Đăng ký nhận thông báo realtime qua WebSocket STOMP nếu có thư viện Stomp
+        try {
+          const user = JSON.parse(userStr);
+          if (window.SockJS && window.Stomp && user.id) {
+            const socket = new SockJS('/ws-chat');
+            const stompClient = Stomp.over(socket);
+            stompClient.debug = null;
+            stompClient.connect({}, function() {
+              stompClient.subscribe('/topic/users/' + user.id + '/notifications', function(msg) {
+                try {
+                  const notif = JSON.parse(msg.body);
+                  const badge = document.getElementById('notification-unread-badge');
+                  let currentCount = badge && !badge.classList.contains('hidden') ? parseInt(badge.textContent) || 0 : 0;
+                  updateNotificationBadge(currentCount + 1);
+                } catch (err) {}
+              });
+            });
+          }
+        } catch (wsErr) {}
+      }
+
+      function updateNotificationBadge(count) {
+        const badge = document.getElementById('notification-unread-badge');
+        if (!badge) return;
+        if (count > 0) {
+          badge.textContent = count > 99 ? '99+' : count;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+
+      async function fetchNotificationsList() {
+        const container = document.getElementById('notification-list-container');
+        if (!container) return;
+
+        try {
+          const res = await fetch('/api/notifications?limit=8');
+          if (!res.ok) {
+            container.innerHTML = '<div class="p-4 text-center text-xs text-error">Vui lòng đăng nhập để xem thông báo</div>';
+            return;
+          }
+          const data = await res.json();
+          const list = data.duLieu || [];
+
+          if (list.length === 0) {
+            container.innerHTML = '<div class="p-6 text-center text-xs text-on-surface-variant flex flex-col items-center gap-2"><span class="material-symbols-outlined text-2xl text-outline">notifications_off</span><span>Bạn chưa có thông báo nào</span></div>';
+            return;
+          }
+
+          container.innerHTML = list.map(item => {
+            const unreadClass = item.daDoc ? 'bg-white' : 'bg-primary/5 font-medium';
+            const iconMap = {
+              'CA_HOC_MOI': { icon: 'event_available', color: 'text-primary bg-primary/10' },
+              'DUYET_CA_HOC': { icon: 'check_circle', color: 'text-status-success bg-status-success/10' },
+              'TU_CHOI_CA_HOC': { icon: 'cancel', color: 'text-error bg-error/10' },
+              'KY_QUY_THANH_CONG': { icon: 'payments', color: 'text-tertiary bg-tertiary/10' },
+              'GIAI_NGAN_VI': { icon: 'account_balance_wallet', color: 'text-status-success bg-status-success/10' },
+              'TIN_NHAN_MOI': { icon: 'chat', color: 'text-brand-500 bg-brand-50' }
+            };
+            const meta = iconMap[item.loaiThongBao] || { icon: 'notifications', color: 'text-secondary bg-surface-container' };
+
+            return `
+              <div onclick="handleNotificationClick(${item.id}, '${item.duongDanLienKet || ''}')" class="p-3.5 flex items-start gap-3 hover:bg-surface-container-low transition-colors cursor-pointer ${unreadClass}">
+                <div class="w-8 h-8 rounded-full ${meta.color} flex items-center justify-center shrink-0 mt-0.5">
+                  <span class="material-symbols-outlined text-[18px]">${meta.icon}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-2">
+                    <h5 class="text-xs font-bold text-on-surface truncate">${item.tieuDe || 'Thông báo'}</h5>
+                    <span class="text-[10px] text-outline shrink-0">${item.thoiGianTaoFormatted || ''}</span>
+                  </div>
+                  <p class="text-xs text-on-surface-variant mt-0.5 line-clamp-2 leading-relaxed">${item.noiDung || ''}</p>
+                </div>
+                ${!item.daDoc ? '<span class="w-2 h-2 rounded-full bg-primary shrink-0 self-center"></span>' : ''}
+              </div>
+            `;
+          }).join('');
+        } catch (err) {
+          container.innerHTML = '<div class="p-4 text-center text-xs text-error">Lỗi khi tải thông báo</div>';
+        }
+      }
+
+      async function handleNotificationClick(id, link) {
+        try {
+          await fetch('/api/notifications/' + id + '/read', { method: 'POST' });
+          const badge = document.getElementById('notification-unread-badge');
+          if (badge && !badge.classList.contains('hidden')) {
+            let count = parseInt(badge.textContent) || 0;
+            if (count > 1) {
+              badge.textContent = count - 1;
+            } else {
+              badge.classList.add('hidden');
+            }
+          }
+        } catch (e) {}
+
+        if (link && link !== 'null' && link !== '') {
+          window.location.href = link;
+        } else {
+          fetchNotificationsList();
+        }
+      }
+
+      async function markAllNotificationsAsRead() {
+        try {
+          const res = await fetch('/api/notifications/read-all', { method: 'POST' });
+          if (res.ok) {
+            updateNotificationBadge(0);
+            fetchNotificationsList();
+          }
+        } catch (e) {
+          console.warn('Lỗi đánh dấu đã đọc tất cả:', e);
+        }
+      }
+
+      // Đóng dropdown thông báo khi click ra ngoài
+      document.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('notification-dropdown-wrapper');
+        const menu = document.getElementById('notification-dropdown-menu');
+        if (wrapper && menu && !wrapper.contains(e.target)) {
+          menu.classList.add('hidden');
+        }
+      });
 
       function updateCartBadgeCount() {
         try {

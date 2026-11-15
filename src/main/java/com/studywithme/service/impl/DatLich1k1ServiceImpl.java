@@ -12,6 +12,7 @@ import com.studywithme.entity.LichSuViTien;
 import com.studywithme.entity.NguoiDung;
 import com.studywithme.entity.enums.admin.LoaiGiaoDichVi;
 import com.studywithme.entity.enums.hocvien.TrangThaiDatLich;
+import com.studywithme.entity.enums.shared.LoaiThongBao;
 import com.studywithme.exception.ResourceNotFoundException;
 import com.studywithme.repository.DanhMucRepository;
 import com.studywithme.repository.DatLich1k1Repository;
@@ -21,6 +22,7 @@ import com.studywithme.repository.LichSuViTienRepository;
 import com.studywithme.repository.NguoiDungRepository;
 import com.studywithme.service.CauHinhHeThongService;
 import com.studywithme.service.DatLich1k1Service;
+import com.studywithme.service.ThongBaoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,7 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
     private final CauHinhHeThongService cauHinhHeThongService;
     private final LichSuViTienRepository lichSuViTienRepository;
     private final PayOS payOS;
+    private final ThongBaoService thongBaoService;
 
     @Override
     @Transactional
@@ -126,6 +129,19 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
 
         DatLich1k1 saved = datLich1k1Repository.save(datLich);
         log.info("Hoc vien ID {} da dat ca hoc 1-1 ma {} voi gia su ID {}", hocVienId, maDatLich, giangVien.getId());
+
+        try {
+            thongBaoService.taoThongBao(
+                    giangVien.getNguoiDung().getId(),
+                    "Yêu cầu ca học 1-1 mới",
+                    "Học viên " + hocVien.getHoTen() + " vừa đặt lịch kèm 1-1 mã " + maDatLich + ". Vui lòng xác nhận.",
+                    LoaiThongBao.CA_HOC_MOI,
+                    "/tutor/ca-hoc"
+            );
+        } catch (Exception e) {
+            log.warn("Không thể gửi thông báo ca học mới tới gia sư: {}", e.getMessage());
+        }
+
         return saved;
     }
 
@@ -152,7 +168,31 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
             log.info("Gia su ID {} da TU CHOI ca hoc 1-1 ma {}", giangVienId, caHoc.getMaDatLich());
         }
 
-        return datLich1k1Repository.save(caHoc);
+        DatLich1k1 saved = datLich1k1Repository.save(caHoc);
+
+        try {
+            if (request.isChapNhan()) {
+                thongBaoService.taoThongBao(
+                        caHoc.getHocVien().getId(),
+                        "Gia sư đã đồng ý ca học kèm 1-1",
+                        "Gia sư " + caHoc.getGiangVien().getNguoiDung().getHoTen() + " đã chấp nhận ca học " + caHoc.getMaDatLich() + ". Vui lòng thanh toán ký quỹ để giữ chỗ.",
+                        LoaiThongBao.DUYET_CA_HOC,
+                        "/student/ca-hoc"
+                );
+            } else {
+                thongBaoService.taoThongBao(
+                        caHoc.getHocVien().getId(),
+                        "Ca học 1-1 không được chấp nhận",
+                        "Gia sư " + caHoc.getGiangVien().getNguoiDung().getHoTen() + " đã từ chối ca học " + caHoc.getMaDatLich() + ". Lý do: " + caHoc.getLyDoHuy(),
+                        LoaiThongBao.TU_CHOI_CA_HOC,
+                        "/student/ca-hoc"
+                );
+            }
+        } catch (Exception e) {
+            log.warn("Lỗi khi gửi thông báo phản hồi ca học: {}", e.getMessage());
+        }
+
+        return saved;
     }
 
     @Override
@@ -177,7 +217,30 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
 
         caHoc.setTrangThai(TrangThaiDatLich.DA_THANH_TOAN_KY_QUY);
         log.info("Ca hoc 1-1 ma {} da duoc hoc vien thanh toan va SAN DANG KY QUY GIU TIEN", caHoc.getMaDatLich());
-        return datLich1k1Repository.save(caHoc);
+        DatLich1k1 saved = datLich1k1Repository.save(caHoc);
+
+        try {
+            // Báo học viên
+            thongBaoService.taoThongBao(
+                    caHoc.getHocVien().getId(),
+                    "Ký quỹ ca học thành công!",
+                    "Bạn đã ký quỹ học phí ca " + caHoc.getMaDatLich() + ". Phòng học trực tuyến đã sẵn sàng.",
+                    LoaiThongBao.KY_QUY_THANH_CONG,
+                    "/student/ca-hoc"
+            );
+            // Báo gia sư
+            thongBaoService.taoThongBao(
+                    caHoc.getGiangVien().getNguoiDung().getId(),
+                    "Học viên đã ký quỹ ca học 1-1",
+                    "Học viên " + caHoc.getHocVien().getHoTen() + " đã ký quỹ học phí ca " + caHoc.getMaDatLich() + ". Ca học đã sẵn sàng diễn ra.",
+                    LoaiThongBao.KY_QUY_THANH_CONG,
+                    "/tutor/ca-hoc"
+            );
+        } catch (Exception e) {
+            log.warn("Lỗi khi gửi thông báo ký quỹ ca học: {}", e.getMessage());
+        }
+
+        return saved;
     }
 
     @Override
@@ -305,7 +368,30 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
         lichSuViTienRepository.save(ls);
 
         log.info("Hoan tat ca hoc 1-1 ma {}. Da giai phong {} VND ve vi gia su ID {}", caHoc.getMaDatLich(), thucNhan, giangVienId);
-        return datLich1k1Repository.save(caHoc);
+        DatLich1k1 saved = datLich1k1Repository.save(caHoc);
+
+        try {
+            // Thông báo giải ngân cho gia sư
+            thongBaoService.taoThongBao(
+                    caHoc.getGiangVien().getNguoiDung().getId(),
+                    "Học phí ca dạy đã về ví tiền!",
+                    "Hệ thống đã giải ngân " + thucNhan.longValue() + " đ vào ví của bạn cho ca " + caHoc.getMaDatLich() + ".",
+                    LoaiThongBao.GIAI_NGAN_VI,
+                    "/tutor/vi-tien"
+            );
+            // Thông báo hoàn tất cho học viên
+            thongBaoService.taoThongBao(
+                    caHoc.getHocVien().getId(),
+                    "Ca học 1-1 đã hoàn tất",
+                    "Ca học " + caHoc.getMaDatLich() + " đã hoàn tất. Bạn hãy dành ít phút để đánh giá chất lượng gia sư nhé!",
+                    LoaiThongBao.HE_THONG,
+                    "/student/ca-hoc"
+            );
+        } catch (Exception e) {
+            log.warn("Lỗi khi gửi thông báo hoàn tất ca học: {}", e.getMessage());
+        }
+
+        return saved;
     }
 
     @Override

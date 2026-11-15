@@ -13,6 +13,7 @@ import com.studywithme.entity.enums.giaovien.TrinhDoKhoaHoc;
 import com.studywithme.entity.enums.shared.TrangThaiNguoiDung;
 import com.studywithme.entity.enums.shared.VaiTroName;
 import com.studywithme.repository.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,11 +24,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
@@ -147,6 +148,24 @@ class TutorCourseStudioIntegrationTest {
                         .build())
         );
         this.testDanhMucId = danhMuc.getId();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        nguoiDungRepository.findByEmail(tutorEmail).ifPresent(tutor -> {
+            hoSoGiangVienRepository.findByNguoiDungId(tutor.getId()).ifPresent(hs -> {
+                List<KhoaHoc> khs = khoaHocRepository.findByGiangVienId(hs.getId());
+                for (KhoaHoc kh : khs) {
+                    List<ChuongHoc> chuongs = chuongHocRepository.findByKhoaHocIdOrderByThuTuSapXepAsc(kh.getId());
+                    for (ChuongHoc c : chuongs) {
+                        List<BaiHoc> baiHocs = baiHocRepository.findByChuongHocIdOrderByThuTuSapXepAsc(c.getId());
+                        baiHocRepository.deleteAll(baiHocs);
+                    }
+                    chuongHocRepository.deleteAll(chuongs);
+                    khoaHocRepository.delete(kh);
+                }
+            });
+        });
     }
 
     private String layToken(String email, String password) throws Exception {

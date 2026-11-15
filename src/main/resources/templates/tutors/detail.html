@@ -578,10 +578,14 @@
                               class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-emerald-500"></textarea>
                 </div>
 
-                <div class="pt-2">
+                <div class="pt-2 flex flex-col gap-2">
                     <button type="submit" id="btnSubmitChat" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined text-base">send</span>
-                        <span>Gửi Tin Nhắn Ngay</span>
+                        <span>Gửi Tin Nhắn Nhanh</span>
+                    </button>
+                    <button type="button" onclick="goToFullChat()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-base text-emerald-600">forum</span>
+                        <span>Mở Trung Tâm Tin Nhắn (Messenger Hub)</span>
                     </button>
                 </div>
             </form>
@@ -767,6 +771,15 @@
 
         function closeChatModal() {
             document.getElementById('quickChatModal').classList.add('hidden');
+        }
+
+        function goToFullChat() {
+            const partnerId = document.getElementById('chatPartnerId').value;
+            if (partnerId) {
+                window.location.href = '/chat?userId=' + partnerId;
+            } else {
+                window.location.href = '/chat';
+            }
         }
 
         async function handleQuickChatSubmit(e) {

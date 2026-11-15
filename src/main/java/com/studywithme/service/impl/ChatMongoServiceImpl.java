@@ -14,11 +14,13 @@ import com.studywithme.repository.mongo.TinNhanMongoRepository;
 import com.studywithme.service.ChatMongoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -30,6 +32,7 @@ public class ChatMongoServiceImpl implements ChatMongoService {
     private final CuocTroChuyenMongoRepository cuocTroChuyenMongoRepository;
     private final TinNhanMongoRepository tinNhanMongoRepository;
     private final NguoiDungRepository nguoiDungRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     public TinNhanDto guiTinNhan(Long nguoiGuiId, GuiTinNhanRequest request) {
@@ -92,7 +95,19 @@ public class ChatMongoServiceImpl implements ChatMongoService {
         }
         cuocTroChuyenMongoRepository.save(cuocTroChuyen);
 
-        return mapToTinNhanDto(savedMessage, nguoiGuiId);
+        TinNhanDto resultDto = mapToTinNhanDto(savedMessage, nguoiGuiId);
+
+        // 4. Phát tán tin nhắn thời gian thực qua WebSocket STOMP (0s delay)
+        try {
+            messagingTemplate.convertAndSend("/topic/conversations/" + cuocTroChuyen.getId(), resultDto);
+            messagingTemplate.convertAndSend("/topic/users/" + request.getNguoiNhanId() + "/messages", resultDto);
+            messagingTemplate.convertAndSend("/topic/users/" + request.getNguoiNhanId() + "/conversations", layDanhSachCuocTroChuyen(request.getNguoiNhanId()));
+            messagingTemplate.convertAndSend("/topic/users/" + nguoiGuiId + "/conversations", layDanhSachCuocTroChuyen(nguoiGuiId));
+        } catch (Exception e) {
+            log.warn("Không thể gửi tin nhắn qua WebSocket: {}", e.getMessage());
+        }
+
+        return resultDto;
     }
 
     @Override
@@ -165,6 +180,16 @@ public class ChatMongoServiceImpl implements ChatMongoService {
             conv.setSoTinChuaDocUser2(0);
         }
         cuocTroChuyenMongoRepository.save(conv);
+
+        if (!unreadList.isEmpty()) {
+            try {
+                messagingTemplate.convertAndSend("/topic/conversations/" + cuocTroChuyenId + "/seen",
+                        (Object) Map.of("cuocTroChuyenId", cuocTroChuyenId, "readerId", currentUserId));
+                messagingTemplate.convertAndSend("/topic/users/" + currentUserId + "/conversations", (Object) layDanhSachCuocTroChuyen(currentUserId));
+            } catch (Exception e) {
+                log.warn("Không thể phát tán sự kiện đã đọc qua WebSocket: {}", e.getMessage());
+            }
+        }
 
         return unreadList.size();
     }

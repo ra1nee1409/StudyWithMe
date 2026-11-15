@@ -36,6 +36,14 @@
 
       <!-- Auth & Actions -->
       <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <!-- Chat / Messenger Hub Icon Button -->
+        <a th:href="@{/chat}" class="relative p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors" title="Tin nhắn trực tuyến">
+          <span class="material-symbols-outlined text-[20px] sm:text-[22px]">chat</span>
+          <span id="header-chat-unread-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center hidden">
+            0
+          </span>
+        </a>
+
         <!-- Cart Icon Button -->
         <a th:href="@{/cart}" class="relative p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors" title="Giỏ hàng khóa học">
           <span class="material-symbols-outlined text-[20px] sm:text-[22px]">shopping_cart</span>
@@ -167,6 +175,10 @@
             <a th:href="@{/cart}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
               <span class="material-symbols-outlined text-primary text-[20px]">shopping_cart</span>
               <span>Giỏ Hàng Của Bạn</span>
+            </a>
+            <a th:href="@{/chat}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
+              <span class="material-symbols-outlined text-primary text-[20px]">chat</span>
+              <span>Tin Nhắn Trực Tuyến</span>
             </a>
           </div>
         </div>

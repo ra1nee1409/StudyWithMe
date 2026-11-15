@@ -101,6 +101,17 @@
           <span>Gia sư của tôi</span>
         </a>
 
+        <!-- 5.5. Tin nhắn trực tuyến (Messenger Hub) -->
+        <a th:href="@{/chat}"
+           th:classappend="${activeTab == 'chat'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all group">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[20px]">chat</span>
+            <span>Tin nhắn trực tuyến</span>
+          </div>
+          <span id="student-unread-msg-badge" class="hidden px-2 py-0.5 rounded-full text-[11px] font-bold bg-error text-white">0</span>
+        </a>
+
         <!-- 6. Danh sách yêu thích -->
         <a th:href="@{/student/yeu-thich}"
            th:classappend="${activeTab == 'wishlist'} ? 'bg-primary text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"

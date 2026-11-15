@@ -88,6 +88,7 @@ public class SecurityConfig {
                     "/favicon.ico",
                     "/api/public/**",
                     "/api/auth/**",
+                    "/ws-chat/**",
                     "/error",
                     "/swagger-ui/**",
                     "/swagger-ui.html",

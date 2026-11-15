@@ -83,6 +83,17 @@
           <span>Học viên của tôi</span>
         </a>
 
+        <!-- 4.5. Tin nhắn trực tuyến -->
+        <a th:href="@{/chat}"
+           th:classappend="${activeTab == 'chat'} ? 'bg-tertiary-container text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"
+           class="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all group">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[20px]">chat</span>
+            <span>Tin nhắn trực tuyến</span>
+          </div>
+          <span id="tutor-unread-msg-badge" class="hidden px-2 py-0.5 rounded-full text-[11px] font-bold bg-error text-white">0</span>
+        </a>
+
         <!-- 5. Ví tiền & Thu nhập -->
         <a th:href="@{/tutor/vi-tien}"
            th:classappend="${activeTab == 'wallet'} ? 'bg-tertiary-container text-white font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium'"

@@ -21,6 +21,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
+@Transactional
 class CourseModerationIntegrationTest {
 
     @Autowired

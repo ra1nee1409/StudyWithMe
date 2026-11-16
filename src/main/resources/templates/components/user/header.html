@@ -16,13 +16,17 @@
         </a>
       </div>
 
-      <!-- Quick Search Bar (chỉ hiện trên màn hình rất lớn 2xl để không chiếm diện tích) -->
+      <!-- Quick Search Bar (Desktop & large screens) -->
       <div class="hidden 2xl:flex items-center flex-1 max-w-xs relative shrink-0">
-        <input
-          class="w-full pl-9 pr-4 py-2 bg-surface-container-low rounded-full text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container transition-all"
-          placeholder="Tìm môn học, gia sư hoặc lớp..." type="text">
-        <span
-          class="material-symbols-outlined text-outline absolute left-3 top-1/2 -translate-y-1/2 text-[18px]">search</span>
+        <form th:action="@{/khoa-hoc}" method="get" class="w-full relative">
+          <input
+            name="keyword"
+            class="w-full pl-9 pr-4 py-2 bg-surface-container-low rounded-full text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container transition-all"
+            placeholder="Tìm môn học, gia sư hoặc lớp..." type="text">
+          <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors cursor-pointer" aria-label="Tìm kiếm">
+            <span class="material-symbols-outlined text-[18px]">search</span>
+          </button>
+        </form>
       </div>
 
       <!-- Main Navigation (Desktop) -->
@@ -221,6 +225,19 @@
                 <span>Quản Trị Hệ Thống</span>
               </a>
             </div>
+          </div>
+
+          <!-- Mobile Quick Search Form (BUG-SWM-004 Fix: full width, no overflow) -->
+          <div class="pt-3 pb-1">
+            <form th:action="@{/khoa-hoc}" method="get" class="relative w-full">
+              <input
+                name="keyword"
+                class="w-full pl-9 pr-4 py-2.5 bg-surface-container-low rounded-xl text-xs font-medium text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all box-border"
+                placeholder="Tìm môn học, gia sư hoặc lớp..." type="text">
+              <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors cursor-pointer" aria-label="Tìm kiếm">
+                <span class="material-symbols-outlined text-[18px]">search</span>
+              </button>
+            </form>
           </div>
 
           <!-- Navigation Links -->

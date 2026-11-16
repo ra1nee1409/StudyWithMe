@@ -10,8 +10,8 @@
       <div id="home-banner-carousel"
         class="relative group rounded-2xl lg:rounded-3xl overflow-hidden shadow-[0_12px_40px_-10px_rgba(0,165,223,0.18)] border border-surface-container/60 bg-surface-container-low">
 
-        <!-- Slides Container -->
-        <div class="relative w-full h-[260px] sm:h-[360px] md:h-[420px] lg:h-[460px] overflow-hidden">
+        <!-- Slides Container (Stabilized aspect-ratio & min-height to prevent layout shift < 480px) -->
+        <div class="relative w-full min-h-[220px] h-[220px] xs:h-[260px] sm:h-[360px] md:h-[420px] lg:h-[460px] overflow-hidden bg-slate-950">
 
           <!-- When banners exist in database -->
           <div th:if="${!#lists.isEmpty(banners)}" class="w-full h-full">

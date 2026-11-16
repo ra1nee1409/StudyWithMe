@@ -71,3 +71,8 @@ uml/
 
 # User uploads
 uploads/
+
+# Test case spreadsheets (Private)
+TEST_CASES_STUDYWITHME.*
+*.xlsx
+*.csv

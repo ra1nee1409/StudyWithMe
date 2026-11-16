@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <body>
   <!-- ==================== SECTION 1: HERO & SMART TUTOR FINDER ==================== -->
   <section th:fragment="hero-section"
@@ -8,14 +9,14 @@
     <div
       class="absolute -top-32 left-1/2 -translate-x-1/2 w-[720px] h-[360px] bg-gradient-to-r from-primary-container/15 via-secondary-container/20 to-tertiary-container/10 blur-3xl pointer-events-none rounded-full">
     </div>
-    <div
-      class="absolute top-48 -right-24 w-96 h-96 bg-accent-cyan-subtle/80 blur-2xl pointer-events-none rounded-full">
+    <div class="absolute top-48 -right-24 w-96 h-96 bg-accent-cyan-subtle/80 blur-2xl pointer-events-none rounded-full">
     </div>
 
     <div class="max-w-7xl mx-auto px-6 lg:px-margin-desktop pt-8 sm:pt-12 relative z-10">
       <!-- Badge Giới thiệu -->
       <div class="flex items-center justify-center mb-5">
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent-cyan-subtle text-primary font-label-md text-label-md border border-primary/20 shadow-xs">
+        <div
+          class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent-cyan-subtle text-primary font-label-md text-label-md border border-primary/20 shadow-xs">
           <span class="material-symbols-outlined text-[18px]">verified</span>
           <span class="font-bold">Nền Tảng Kết Nối Gia Sư Trực Tuyến & 1-Kèm-1</span>
         </div>
@@ -27,7 +28,8 @@
           Tìm Kiếm Gia Sư Phù Hợp Cùng <span class="text-primary">StudyWithMe</span>
         </h1>
         <p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl mx-auto">
-          Hệ thống kết nối trực tiếp học sinh với đội ngũ gia sư chất lượng cao, đồng hành từ Lớp 1 đến Lớp 12, luyện thi đại học và bồi dưỡng kiến thức chuyên sâu.
+          Hệ thống kết nối trực tiếp học sinh với đội ngũ gia sư chất lượng cao, đồng hành từ Lớp 1 đến Lớp 12, luyện
+          thi đại học và bồi dưỡng kiến thức chuyên sâu.
         </p>
       </div>
 
@@ -39,7 +41,8 @@
           <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Tìm Gia Sư Theo Yêu Cầu Của Bạn</h2>
         </div>
 
-        <form th:action="@{/gia-su}" method="get" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
+        <form th:action="@{/gia-su}" method="get"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
           <!-- Step 1: Grade Selection -->
           <div class="lg:col-span-3 space-y-1.5">
             <label class="block font-label-md text-label-md text-on-surface-variant font-medium">1. Khối Lớp Học</label>
@@ -61,7 +64,8 @@
 
           <!-- Step 2: Subject -->
           <div class="lg:col-span-3 space-y-1.5">
-            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">2. Môn Cần Bổ Trợ</label>
+            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">2. Môn Cần Bổ
+              Trợ</label>
             <div class="relative">
               <select name="keyword"
                 class="w-full h-12 pl-10 pr-8 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container appearance-none transition-all cursor-pointer">
@@ -82,7 +86,8 @@
 
           <!-- Step 3: Format -->
           <div class="lg:col-span-3 space-y-1.5">
-            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">3. Hình Thức Học</label>
+            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">3. Hình Thức
+              Học</label>
             <div class="relative">
               <select name="format"
                 class="w-full h-12 pl-10 pr-8 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container appearance-none transition-all cursor-pointer">
@@ -113,20 +118,26 @@
           class="mt-5 pt-4 flex flex-wrap items-center gap-2 text-body-sm font-body-sm text-on-surface-variant border-t border-surface-container">
           <span class="font-bold text-on-surface text-label-md font-label-md">Gợi ý phổ biến:</span>
           <a th:href="@{/gia-su(keyword='Toán')}"
-            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">Toán 9 Luyện thi vào 10</a>
+            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">Toán
+            9 Luyện thi vào 10</a>
           <a th:href="@{/gia-su(keyword='IELTS', chungChi='IELTS')}"
-            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">IELTS Cấp tốc 6.5+</a>
+            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">IELTS
+            Cấp tốc 6.5+</a>
           <a th:href="@{/gia-su(keyword='Hóa')}"
-            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">Lấy gốc Hóa 10 & 11</a>
+            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">Lấy
+            gốc Hóa 10 & 11</a>
           <a th:href="@{/gia-su(keyword='Tiếng Anh')}"
-            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">Tiếng Anh Tiểu học Cambridge</a>
+            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">Tiếng
+            Anh Tiểu học Cambridge</a>
         </div>
       </div>
 
       <!-- Key Features Overview -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto mt-8">
-        <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
-          <div class="w-12 h-12 rounded-xl bg-accent-cyan-subtle flex items-center justify-center shrink-0 text-primary">
+        <div
+          class="bg-surface-container-lowest/90 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
+          <div
+            class="w-12 h-12 rounded-xl bg-accent-cyan-subtle flex items-center justify-center shrink-0 text-primary">
             <span class="material-symbols-outlined text-[26px]">school</span>
           </div>
           <div>
@@ -135,8 +146,10 @@
           </div>
         </div>
 
-        <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
-          <div class="w-12 h-12 rounded-xl bg-accent-coral-subtle flex items-center justify-center shrink-0 text-tertiary-container">
+        <div
+          class="bg-surface-container-lowest/90 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
+          <div
+            class="w-12 h-12 rounded-xl bg-accent-coral-subtle flex items-center justify-center shrink-0 text-tertiary-container">
             <span class="material-symbols-outlined text-[26px]">verified_user</span>
           </div>
           <div>
@@ -145,8 +158,10 @@
           </div>
         </div>
 
-        <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
-          <div class="w-12 h-12 rounded-xl bg-accent-navy-subtle flex items-center justify-center shrink-0 text-secondary">
+        <div
+          class="bg-surface-container-lowest/90 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
+          <div
+            class="w-12 h-12 rounded-xl bg-accent-navy-subtle flex items-center justify-center shrink-0 text-secondary">
             <span class="material-symbols-outlined text-[26px]">devices</span>
           </div>
           <div>
@@ -155,8 +170,10 @@
           </div>
         </div>
 
-        <div class="bg-surface-container-lowest/90 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
-          <div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 text-status-success">
+        <div
+          class="bg-surface-container-lowest/90 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
+          <div
+            class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 text-status-success">
             <span class="material-symbols-outlined text-[26px]">person_pin</span>
           </div>
           <div>
@@ -168,4 +185,5 @@
     </div>
   </section>
 </body>
+
 </html>

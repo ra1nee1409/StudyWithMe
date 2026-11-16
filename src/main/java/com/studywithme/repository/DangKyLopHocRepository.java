@@ -16,6 +16,7 @@ public interface DangKyLopHocRepository extends JpaRepository<DangKyLopHoc, Long
     List<DangKyLopHoc> findByLopHocId(Long lopHocId);
     long countByLopHocId(Long lopHocId);
     long countByHocVienId(Long hocVienId);
+    @EntityGraph(attributePaths = {"hocVien", "lopHoc"})
     List<DangKyLopHoc> findByLopHocGiangVienId(Long giangVienId);
     long countByLopHocGiangVienId(Long giangVienId);
 }

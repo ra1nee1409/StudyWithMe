@@ -13,8 +13,10 @@ import java.util.List;
 @Repository
 public interface LopHocTrucTuyenRepository extends JpaRepository<LopHocTrucTuyen, Long> {
 
+    @EntityGraph(attributePaths = {"danhMuc"})
     List<LopHocTrucTuyen> findByGiangVienId(Long giangVienId);
 
+    @EntityGraph(attributePaths = {"danhMuc"})
     List<LopHocTrucTuyen> findByGiangVienIdOrderByNgayTaoDesc(Long giangVienId);
 
     long countByGiangVienId(Long giangVienId);

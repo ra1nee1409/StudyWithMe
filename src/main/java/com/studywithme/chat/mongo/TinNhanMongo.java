@@ -4,6 +4,7 @@ import com.studywithme.entity.enums.shared.LoaiTinNhan;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @Document(collection = "tin_nhan")
+@CompoundIndex(name = "idx_tinnhan_conv_time", def = "{'cuocTroChuyenId': 1, 'thoiGianGui': 1}")
 @Getter
 @Setter
 @Builder

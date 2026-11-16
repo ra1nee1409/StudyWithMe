@@ -32,7 +32,8 @@ public class PaymentWebController {
     private final DatLich1k1Repository datLich1k1Repository;
 
     private Optional<NguoiDung> getUserFromPrincipal(Principal principal) {
-        if (principal == null) return Optional.empty();
+        if (principal == null)
+            return Optional.empty();
         return nguoiDungRepository.findByEmail(principal.getName());
     }
 
@@ -52,12 +53,12 @@ public class PaymentWebController {
      */
     @GetMapping("/checkout")
     public String checkout(@RequestParam(required = false) Long courseId,
-                           @RequestParam(required = false) String courseIds,
-                           @RequestParam(required = false) Boolean cancel,
-                           Model model,
-                           Principal principal) {
+            @RequestParam(required = false) String courseIds,
+            @RequestParam(required = false) Boolean cancel,
+            Model model,
+            Principal principal) {
         Optional<NguoiDung> userOpt = getUserFromPrincipal(principal);
-        
+
         List<KhoaHoc> items = new ArrayList<>();
         Set<Long> idsToFetch = new HashSet<>();
 
@@ -68,7 +69,8 @@ public class PaymentWebController {
             for (String part : courseIds.split(",")) {
                 try {
                     idsToFetch.add(Long.parseLong(part.trim()));
-                } catch (NumberFormatException ignored) {}
+                } catch (NumberFormatException ignored) {
+                }
             }
         }
 
@@ -78,9 +80,10 @@ public class PaymentWebController {
 
         java.math.BigDecimal tongTien = java.math.BigDecimal.ZERO;
         for (KhoaHoc kh : items) {
-            java.math.BigDecimal gia = (kh.getGiaKhuyenMai() != null && kh.getGiaKhuyenMai().compareTo(java.math.BigDecimal.ZERO) >= 0)
-                    ? kh.getGiaKhuyenMai()
-                    : (kh.getGiaGoc() != null ? kh.getGiaGoc() : java.math.BigDecimal.ZERO);
+            java.math.BigDecimal gia = (kh.getGiaKhuyenMai() != null
+                    && kh.getGiaKhuyenMai().compareTo(java.math.BigDecimal.ZERO) >= 0)
+                            ? kh.getGiaKhuyenMai()
+                            : (kh.getGiaGoc() != null ? kh.getGiaGoc() : java.math.BigDecimal.ZERO);
             tongTien = tongTien.add(gia);
         }
 
@@ -92,7 +95,8 @@ public class PaymentWebController {
         model.addAttribute("selectedCourseId", courseId);
 
         if (Boolean.TRUE.equals(cancel)) {
-            model.addAttribute("cancelledMessage", "Bạn đã hủy giao dịch trên cổng thanh toán. Bạn có thể kiểm tra lại thông tin và thanh toán lại khi sẵn sàng.");
+            model.addAttribute("cancelledMessage",
+                    "Bạn đã hủy giao dịch trên cổng thanh toán. Bạn có thể kiểm tra lại thông tin và thanh toán lại khi sẵn sàng.");
         }
 
         return "checkout/index";
@@ -103,10 +107,10 @@ public class PaymentWebController {
      */
     @PostMapping("/checkout/payos")
     public String processPayOsCheckout(@RequestParam(name = "courseIds", required = false) List<Long> courseIds,
-                                       @RequestParam(name = "ghiChu", required = false) String ghiChu,
-                                       Principal principal,
-                                       HttpServletRequest request,
-                                       RedirectAttributes redirectAttributes) {
+            @RequestParam(name = "ghiChu", required = false) String ghiChu,
+            Principal principal,
+            HttpServletRequest request,
+            RedirectAttributes redirectAttributes) {
         if (courseIds == null || courseIds.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng chọn ít nhất 1 khóa học để thanh toán.");
             return "redirect:/cart";
@@ -114,7 +118,8 @@ public class PaymentWebController {
 
         Optional<NguoiDung> userOpt = getUserFromPrincipal(principal);
         if (userOpt.isEmpty()) {
-            return "redirect:/login?redirect=/checkout" + (courseIds.size() == 1 ? "?courseId=" + courseIds.get(0) : "");
+            return "redirect:/login?redirect=/checkout"
+                    + (courseIds.size() == 1 ? "?courseId=" + courseIds.get(0) : "");
         }
 
         NguoiDung user = userOpt.get();
@@ -131,7 +136,8 @@ public class PaymentWebController {
             return "redirect:" + paymentUrl;
         } catch (Exception e) {
             log.error("Lỗi khi tạo đơn hàng payOS", e);
-            redirectAttributes.addFlashAttribute("errorMessage", "Đã xảy ra lỗi khi tạo liên kết thanh toán payOS: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Đã xảy ra lỗi khi tạo liên kết thanh toán payOS: " + e.getMessage());
             return "redirect:/checkout";
         }
     }
@@ -141,19 +147,21 @@ public class PaymentWebController {
      */
     @GetMapping("/payment/payos-callback")
     public String payosCallback(@RequestParam(name = "orderCode", required = false) Long orderCode,
-                                @RequestParam(name = "status", required = false) String status,
-                                @RequestParam(name = "cancel", required = false) Boolean cancel,
-                                @RequestParam(name = "type", required = false) String type,
-                                @RequestParam(name = "id", required = false) Long id,
-                                Model model,
-                                Principal principal,
-                                RedirectAttributes redirectAttributes) {
-        log.info("Nhận callback từ payOS: orderCode={}, status={}, cancel={}, type={}, id={}", orderCode, status, cancel, type, id);
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "cancel", required = false) Boolean cancel,
+            @RequestParam(name = "type", required = false) String type,
+            @RequestParam(name = "id", required = false) Long id,
+            Model model,
+            Principal principal,
+            RedirectAttributes redirectAttributes) {
+        log.info("Nhận callback từ payOS: orderCode={}, status={}, cancel={}, type={}, id={}", orderCode, status,
+                cancel, type, id);
 
         // Xử lý riêng cho ca học 1-1 ký quỹ
         if ("1k1".equalsIgnoreCase(type) || (id != null && "1k1".equalsIgnoreCase(type))) {
             if (Boolean.TRUE.equals(cancel)) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Bạn đã hủy thao tác thanh toán ký quỹ ca học 1-1.");
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Bạn đã hủy thao tác thanh toán ký quỹ ca học 1-1.");
                 return "redirect:/student/ca-hoc";
             }
             try {
@@ -164,7 +172,8 @@ public class PaymentWebController {
                         datLich1k1Service.xacNhanThanhToanKyQuy(c.getId());
                     });
                 }
-                redirectAttributes.addFlashAttribute("successMessage", "🎉 Thanh toán ký quỹ ca học 1-1 thành công! Sàn StudyWithMe đang giữ bảo đảm học phí của bạn.");
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "🎉 Thanh toán ký quỹ ca học 1-1 thành công! Sàn StudyWithMe đang giữ bảo đảm học phí của bạn.");
             } catch (Exception e) {
                 log.error("Lỗi xác nhận ký quỹ ca học 1-1: {}", e.getMessage());
                 redirectAttributes.addFlashAttribute("errorMessage", "Lỗi xác nhận ký quỹ: " + e.getMessage());

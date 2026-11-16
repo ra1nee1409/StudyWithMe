@@ -1,58 +1,72 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <body>
-  <header th:fragment="main-header(activePage)" class="fixed top-0 left-0 w-full z-50 bg-white/95 shadow-[0_1px_8px_rgba(28,105,154,0.08)]">
-    <div class="h-16 sm:h-20 w-full max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
+  <header th:fragment="main-header(activePage)"
+    class="fixed top-0 left-0 w-full z-50 bg-white/95 shadow-[0_1px_8px_rgba(28,105,154,0.08)]">
+    <div
+      class="h-16 sm:h-20 w-full max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
       <!-- Logo -->
       <div class="flex items-center gap-2 sm:gap-space-md shrink-0">
         <a class="flex items-center gap-2 group" th:href="@{/}">
-          <img th:src="@{/images/logo-icon.png}" src="/images/logo-icon.png" alt="StudyWithMe Logo" class="h-8 w-8 sm:h-10 sm:w-10 object-contain transition-transform group-hover:scale-105">
-          <img th:src="@{/images/logo-text.png}" src="/images/logo-text.png" alt="StudyWithMe" class="h-6 sm:h-7 object-contain hidden sm:inline-block transition-opacity group-hover:opacity-90">
+          <img th:src="@{/images/logo-icon.png}" src="/images/logo-icon.png" alt="StudyWithMe Logo"
+            class="h-8 w-8 sm:h-10 sm:w-10 object-contain transition-transform group-hover:scale-105">
+          <img th:src="@{/images/logo-text.png}" src="/images/logo-text.png" alt="StudyWithMe"
+            class="h-6 sm:h-7 object-contain hidden sm:inline-block transition-opacity group-hover:opacity-90">
         </a>
       </div>
 
       <!-- Quick Search Bar (chỉ hiện trên màn hình rất lớn 2xl để không chiếm diện tích) -->
       <div class="hidden 2xl:flex items-center flex-1 max-w-xs relative shrink-0">
-        <input class="w-full pl-9 pr-4 py-2 bg-surface-container-low rounded-full text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container transition-all" placeholder="Tìm môn học, gia sư hoặc lớp..." type="text">
-        <span class="material-symbols-outlined text-outline absolute left-3 top-1/2 -translate-y-1/2 text-[18px]">search</span>
+        <input
+          class="w-full pl-9 pr-4 py-2 bg-surface-container-low rounded-full text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container transition-all"
+          placeholder="Tìm môn học, gia sư hoặc lớp..." type="text">
+        <span
+          class="material-symbols-outlined text-outline absolute left-3 top-1/2 -translate-y-1/2 text-[18px]">search</span>
       </div>
 
       <!-- Main Navigation (Desktop) -->
       <nav class="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0">
         <a class="px-3.5 py-2 rounded-lg font-label-lg text-label-lg whitespace-nowrap transition-colors"
-           th:classappend="${activePage == 'courses'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
-           th:href="@{/khoa-hoc}">Khóa Học</a>
+          th:classappend="${activePage == 'courses'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
+          th:href="@{/khoa-hoc}">Khóa Học</a>
         <a class="px-3.5 py-2 rounded-lg font-label-lg text-label-lg whitespace-nowrap transition-colors"
-           th:classappend="${activePage == 'tutors'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
-           th:href="@{/gia-su}">Tìm Gia Sư</a>
+          th:classappend="${activePage == 'tutors'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
+          th:href="@{/gia-su}">Tìm Gia Sư</a>
         <a class="px-3.5 py-2 rounded-lg text-on-surface-variant font-label-lg text-label-lg whitespace-nowrap hover:text-primary hover:bg-surface-container-low transition-colors"
-           th:href="@{/#lop-1-kem-1}">Các Cấp Học</a>
+          th:href="@{/#lop-1-kem-1}">Các Cấp Học</a>
         <a class="px-3.5 py-2 rounded-lg text-on-surface-variant font-label-lg text-label-lg whitespace-nowrap hover:text-primary hover:bg-surface-container-low transition-colors"
-           th:href="@{/#gia-su}">Gia Sư Nổi Bật</a>
-        <a id="nav-become-tutor-link" class="px-3.5 py-2 rounded-lg font-label-lg text-label-lg whitespace-nowrap transition-colors"
-           th:classappend="${activePage == 'tutor-apply'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
-           th:href="@{/tro-thanh-giang-vien}">Trở Thành Giảng Viên</a>
+          th:href="@{/#gia-su}">Gia Sư Nổi Bật</a>
+        <a id="nav-become-tutor-link"
+          class="px-3.5 py-2 rounded-lg font-label-lg text-label-lg whitespace-nowrap transition-colors"
+          th:classappend="${activePage == 'tutor-apply'} ? 'text-primary font-bold bg-accent-cyan-subtle' : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'"
+          th:href="@{/tro-thanh-giang-vien}">Trở Thành Giảng Viên</a>
       </nav>
 
       <!-- Auth & Actions -->
       <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
         <!-- Notification Bell Icon with Dropdown (WBS 7.2) -->
         <div class="relative" id="notification-dropdown-wrapper">
-          <button type="button" id="btn-notification-bell" onclick="toggleNotificationDropdown()" class="relative p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer" title="Thông báo hệ thống">
+          <button type="button" id="btn-notification-bell" onclick="toggleNotificationDropdown()"
+            class="relative p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer"
+            title="Thông báo hệ thống">
             <span class="material-symbols-outlined text-[20px] sm:text-[22px]">notifications</span>
-            <span id="notification-unread-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center hidden">
+            <span id="notification-unread-badge"
+              class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center hidden">
               0
             </span>
           </button>
 
           <!-- Notification Dropdown Menu -->
-          <div id="notification-dropdown-menu" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-surface-container py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+          <div id="notification-dropdown-menu"
+            class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-surface-container py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
             <div class="px-4 py-2.5 border-b border-surface-container flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary text-[20px]">notifications_active</span>
                 <span class="font-bold text-sm text-on-surface">Thông Báo</span>
               </div>
-              <button type="button" onclick="markAllNotificationsAsRead()" class="text-[11px] font-semibold text-primary hover:underline cursor-pointer">
+              <button type="button" onclick="markAllNotificationsAsRead()"
+                class="text-[11px] font-semibold text-primary hover:underline cursor-pointer">
                 Đánh dấu tất cả đã đọc
               </button>
             </div>
@@ -72,17 +86,23 @@
         </div>
 
         <!-- Chat / Messenger Hub Icon Button -->
-        <a th:href="@{/chat}" class="relative p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors" title="Tin nhắn trực tuyến">
+        <a th:href="@{/chat}"
+          class="relative p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors"
+          title="Tin nhắn trực tuyến">
           <span class="material-symbols-outlined text-[20px] sm:text-[22px]">chat</span>
-          <span id="header-chat-unread-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center hidden">
+          <span id="header-chat-unread-badge"
+            class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center hidden">
             0
           </span>
         </a>
 
         <!-- Cart Icon Button -->
-        <a th:href="@{/cart}" class="relative p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors" title="Giỏ hàng khóa học">
+        <a th:href="@{/cart}"
+          class="relative p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors"
+          title="Giỏ hàng khóa học">
           <span class="material-symbols-outlined text-[20px] sm:text-[22px]">shopping_cart</span>
-          <span id="cart-badge-count" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center hidden">
+          <span id="cart-badge-count"
+            class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center hidden">
             0
           </span>
         </a>
@@ -90,49 +110,57 @@
         <!-- Guest State (Shown when not logged in) -->
         <div id="nav-auth-guest" class="hidden sm:flex items-center gap-1 sm:gap-2 shrink-0">
           <a class="px-3.5 py-2 rounded-full font-label-lg text-label-lg whitespace-nowrap transition-colors"
-             th:classappend="${activePage == 'login'} ? 'bg-accent-cyan-subtle text-primary font-bold' : 'text-secondary hover:text-on-primary-container hover:bg-accent-cyan-subtle'"
-             th:href="@{/login}">Đăng nhập</a>
+            th:classappend="${activePage == 'login'} ? 'bg-accent-cyan-subtle text-primary font-bold' : 'text-secondary hover:text-on-primary-container hover:bg-accent-cyan-subtle'"
+            th:href="@{/login}">Đăng nhập</a>
           <a class="hidden md:inline-flex px-3.5 py-2 rounded-full font-label-lg text-label-lg whitespace-nowrap transition-colors"
-             th:classappend="${activePage == 'register'} ? 'bg-accent-cyan-subtle text-primary font-bold' : 'text-secondary hover:text-on-primary-container hover:bg-accent-cyan-subtle'"
-             th:href="@{/register}">Đăng ký</a>
+            th:classappend="${activePage == 'register'} ? 'bg-accent-cyan-subtle text-primary font-bold' : 'text-secondary hover:text-on-primary-container hover:bg-accent-cyan-subtle'"
+            th:href="@{/register}">Đăng ký</a>
         </div>
 
         <!-- Authenticated State (Desktop: Full pills / Mobile: Compact avatar) -->
         <div id="nav-auth-user" class="hidden items-center gap-1.5 sm:gap-2.5 shrink-0">
           <!-- Admin Panel Button (chỉ hiện desktop lg) -->
-          <a id="nav-admin-link" th:href="@{/admin}" class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-container text-on-primary font-bold text-xs hover:opacity-90 shadow-xs whitespace-nowrap transition-all">
+          <a id="nav-admin-link" th:href="@{/admin}"
+            class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-container text-on-primary font-bold text-xs hover:opacity-90 shadow-xs whitespace-nowrap transition-all">
             <span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
             <span>Quản Trị</span>
           </a>
           <!-- Tutor Panel Button (chỉ hiện desktop lg) -->
-          <a id="nav-tutor-link" th:href="@{/tutor/dashboard}" class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-tertiary-container text-white font-bold text-xs hover:opacity-90 shadow-xs whitespace-nowrap transition-all">
+          <a id="nav-tutor-link" th:href="@{/tutor/dashboard}"
+            class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-tertiary-container text-white font-bold text-xs hover:opacity-90 shadow-xs whitespace-nowrap transition-all">
             <span class="material-symbols-outlined text-[16px]">school</span>
             <span>Cổng Giảng Viên</span>
           </a>
           <!-- Student Panel Button (chỉ hiện desktop lg) -->
-          <a id="nav-student-link" th:href="@{/student/dashboard}" class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-white font-bold text-xs hover:opacity-90 shadow-xs whitespace-nowrap transition-all">
+          <a id="nav-student-link" th:href="@{/student/dashboard}"
+            class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-white font-bold text-xs hover:opacity-90 shadow-xs whitespace-nowrap transition-all">
             <span class="material-symbols-outlined text-[16px]">space_dashboard</span>
             <span>Bàn Học Của Tôi</span>
           </a>
 
           <!-- User Avatar Pill -->
-          <div class="flex items-center gap-1.5 px-2 sm:px-3 py-1 rounded-full bg-surface-container-low border border-surface-container shrink-0">
-            <div id="nav-user-avatar" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
+          <div
+            class="flex items-center gap-1.5 px-2 sm:px-3 py-1 rounded-full bg-surface-container-low border border-surface-container shrink-0">
+            <div id="nav-user-avatar"
+              class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
               U
             </div>
-            <span id="nav-user-name" class="font-bold text-xs text-on-surface max-w-[100px] truncate hidden md:inline-block">
+            <span id="nav-user-name"
+              class="font-bold text-xs text-on-surface max-w-[100px] truncate hidden md:inline-block">
               Người dùng
             </span>
           </div>
 
           <!-- Desktop Logout Button -->
-          <button onclick="handleUserLogout()" type="button" title="Đăng xuất" class="hidden sm:flex w-7 h-7 sm:w-8 sm:h-8 rounded-full items-center justify-center text-error hover:bg-error-container/40 transition-colors shrink-0">
+          <button onclick="handleUserLogout()" type="button" title="Đăng xuất"
+            class="hidden sm:flex w-7 h-7 sm:w-8 sm:h-8 rounded-full items-center justify-center text-error hover:bg-error-container/40 transition-colors shrink-0">
             <span class="material-symbols-outlined text-[18px]">logout</span>
           </button>
         </div>
 
         <!-- Mobile Hamburger Menu Button (chỉ hiện màn hình < lg) -->
-        <button type="button" onclick="openMobileDrawer()" aria-label="Mở menu di động" class="lg:hidden p-2 rounded-xl text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors flex items-center justify-center">
+        <button type="button" onclick="openMobileDrawer()" aria-label="Mở menu di động"
+          class="lg:hidden p-2 rounded-xl text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors flex items-center justify-center">
           <span class="material-symbols-outlined text-[24px]">menu</span>
         </button>
       </div>
@@ -141,26 +169,33 @@
     <!-- ==================== MOBILE SLIDE-OVER DRAWER ==================== -->
     <div id="mobile-drawer" class="fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 opacity-0">
       <!-- Backdrop -->
-      <div id="mobile-drawer-backdrop" onclick="closeMobileDrawer()" class="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-300"></div>
+      <div id="mobile-drawer-backdrop" onclick="closeMobileDrawer()"
+        class="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-300"></div>
 
       <!-- Drawer Content Panel -->
-      <div id="mobile-drawer-panel" class="absolute top-0 right-0 w-[85%] max-w-sm h-full bg-white shadow-2xl p-6 flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out overflow-y-auto pointer-events-auto" style="background-color: #ffffff !important;">
+      <div id="mobile-drawer-panel"
+        class="absolute top-0 right-0 w-[85%] max-w-sm h-full bg-white shadow-2xl p-6 flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out overflow-y-auto pointer-events-auto"
+        style="background-color: #ffffff !important;">
         <!-- Top Drawer Header -->
         <div>
           <div class="flex items-center justify-between pb-4 border-b border-surface-container">
             <div class="flex items-center gap-2">
-              <img th:src="@{/images/logo-icon.png}" src="/images/logo-icon.png" alt="Logo" class="h-8 w-8 object-contain">
+              <img th:src="@{/images/logo-icon.png}" src="/images/logo-icon.png" alt="Logo"
+                class="h-8 w-8 object-contain">
               <span class="font-bold text-base text-primary">StudyWithMe</span>
             </div>
-            <button onclick="closeMobileDrawer()" class="p-1 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low">
+            <button onclick="closeMobileDrawer()"
+              class="p-1 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low">
               <span class="material-symbols-outlined text-[22px]">close</span>
             </button>
           </div>
 
           <!-- User Card in Drawer (Dynamic) -->
-          <div id="drawer-user-info" class="hidden my-4 p-3.5 rounded-2xl bg-surface-container-low border border-surface-container">
+          <div id="drawer-user-info"
+            class="hidden my-4 p-3.5 rounded-2xl bg-surface-container-low border border-surface-container">
             <div class="flex items-center gap-3">
-              <div id="drawer-user-avatar" class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-base shadow-xs">
+              <div id="drawer-user-avatar"
+                class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-base shadow-xs">
                 U
               </div>
               <div class="min-w-0 flex-1">
@@ -170,15 +205,18 @@
             </div>
             <!-- Quick Actions in Drawer -->
             <div class="grid grid-cols-1 gap-2 mt-3 pt-3 border-t border-surface-container/60">
-              <a id="drawer-student-link" th:href="@{/student/dashboard}" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-xs">
+              <a id="drawer-student-link" th:href="@{/student/dashboard}"
+                class="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-xs">
                 <span class="material-symbols-outlined text-[18px]">space_dashboard</span>
                 <span>Vào Bàn Học Của Tôi</span>
               </a>
-              <a id="drawer-tutor-link" th:href="@{/tutor/dashboard}" class="hidden items-center gap-2 px-3 py-2 rounded-xl bg-tertiary-container text-white text-xs font-bold shadow-xs">
+              <a id="drawer-tutor-link" th:href="@{/tutor/dashboard}"
+                class="hidden items-center gap-2 px-3 py-2 rounded-xl bg-tertiary-container text-white text-xs font-bold shadow-xs">
                 <span class="material-symbols-outlined text-[18px]">school</span>
                 <span>Cổng Giảng Viên</span>
               </a>
-              <a id="drawer-admin-link" th:href="@{/admin}" class="hidden items-center gap-2 px-3 py-2 rounded-xl bg-primary-container text-on-primary text-xs font-bold shadow-xs">
+              <a id="drawer-admin-link" th:href="@{/admin}"
+                class="hidden items-center gap-2 px-3 py-2 rounded-xl bg-primary-container text-on-primary text-xs font-bold shadow-xs">
                 <span class="material-symbols-outlined text-[18px]">admin_panel_settings</span>
                 <span>Quản Trị Hệ Thống</span>
               </a>
@@ -187,31 +225,38 @@
 
           <!-- Navigation Links -->
           <div class="py-4 space-y-1">
-            <a th:href="@{/khoa-hoc}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
+            <a th:href="@{/khoa-hoc}"
+              class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
               <span class="material-symbols-outlined text-primary text-[20px]">menu_book</span>
               <span>Khám Phá Khóa Học</span>
             </a>
-            <a th:href="@{/gia-su}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
+            <a th:href="@{/gia-su}"
+              class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
               <span class="material-symbols-outlined text-primary text-[20px]">person_search</span>
               <span>Tìm Gia Sư Trực Tuyến</span>
             </a>
-            <a th:href="@{/#lop-1-kem-1}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
+            <a th:href="@{/#lop-1-kem-1}"
+              class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
               <span class="material-symbols-outlined text-primary text-[20px]">school</span>
               <span>Các Cấp Lớp (1 - 12)</span>
             </a>
-            <a th:href="@{/#gia-su}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
+            <a th:href="@{/#gia-su}"
+              class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
               <span class="material-symbols-outlined text-primary text-[20px]">star</span>
               <span>Gia Sư Tiêu Biểu</span>
             </a>
-            <a id="drawer-become-tutor-link" th:href="@{/tro-thanh-giang-vien}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-primary hover:bg-primary/10 transition-colors">
+            <a id="drawer-become-tutor-link" th:href="@{/tro-thanh-giang-vien}"
+              class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-primary hover:bg-primary/10 transition-colors">
               <span class="material-symbols-outlined text-primary text-[20px]">co_present</span>
               <span>Trở Thành Giảng Viên</span>
             </a>
-            <a th:href="@{/cart}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
+            <a th:href="@{/cart}"
+              class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
               <span class="material-symbols-outlined text-primary text-[20px]">shopping_cart</span>
               <span>Giỏ Hàng Của Bạn</span>
             </a>
-            <a th:href="@{/chat}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
+            <a th:href="@{/chat}"
+              class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:text-primary hover:bg-surface-container-low transition-colors">
               <span class="material-symbols-outlined text-primary text-[20px]">chat</span>
               <span>Tin Nhắn Trực Tuyến</span>
             </a>
@@ -222,11 +267,13 @@
         <div class="pt-4 border-t border-surface-container">
           <!-- Guest state in drawer -->
           <div id="drawer-guest-actions" class="space-y-2">
-            <a th:href="@{/login}" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-primary text-white font-bold text-xs shadow-xs">
+            <a th:href="@{/login}"
+              class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-primary text-white font-bold text-xs shadow-xs">
               <span class="material-symbols-outlined text-[18px]">login</span>
               <span>Đăng nhập</span>
             </a>
-            <a th:href="@{/register}" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-outline-variant text-on-surface font-bold text-xs hover:bg-surface-container-low">
+            <a th:href="@{/register}"
+              class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-outline-variant text-on-surface font-bold text-xs hover:bg-surface-container-low">
               <span class="material-symbols-outlined text-[18px]">person_add</span>
               <span>Đăng ký tài khoản</span>
             </a>
@@ -234,7 +281,8 @@
 
           <!-- Logged in state in drawer -->
           <div id="drawer-user-actions" class="hidden">
-            <button onclick="handleUserLogout()" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-error/10 text-error font-bold text-xs hover:bg-error/20 transition-colors">
+            <button onclick="handleUserLogout()"
+              class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-error/10 text-error font-bold text-xs hover:bg-error/20 transition-colors">
               <span class="material-symbols-outlined text-[18px]">logout</span>
               <span>Đăng xuất tài khoản</span>
             </button>
@@ -314,7 +362,7 @@
               const base64Url = token.split('.')[1];
               if (base64Url) {
                 const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
                   return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                 }).join(''));
                 const decoded = JSON.parse(jsonPayload);
@@ -452,18 +500,18 @@
             const socket = new SockJS('/ws-chat');
             const stompClient = Stomp.over(socket);
             stompClient.debug = null;
-            stompClient.connect({}, function() {
-              stompClient.subscribe('/topic/users/' + user.id + '/notifications', function(msg) {
+            stompClient.connect({}, function () {
+              stompClient.subscribe('/topic/users/' + user.id + '/notifications', function (msg) {
                 try {
                   const notif = JSON.parse(msg.body);
                   const badge = document.getElementById('notification-unread-badge');
                   let currentCount = badge && !badge.classList.contains('hidden') ? parseInt(badge.textContent) || 0 : 0;
                   updateNotificationBadge(currentCount + 1);
-                } catch (err) {}
+                } catch (err) { }
               });
             });
           }
-        } catch (wsErr) {}
+        } catch (wsErr) { }
       }
 
       function updateNotificationBadge(count) {
@@ -540,7 +588,7 @@
               badge.classList.add('hidden');
             }
           }
-        } catch (e) {}
+        } catch (e) { }
 
         if (link && link !== 'null' && link !== '') {
           window.location.href = link;
@@ -562,7 +610,7 @@
       }
 
       // Đóng dropdown thông báo khi click ra ngoài
-      document.addEventListener('click', function(e) {
+      document.addEventListener('click', function (e) {
         const wrapper = document.getElementById('notification-dropdown-wrapper');
         const menu = document.getElementById('notification-dropdown-menu');
         if (wrapper && menu && !wrapper.contains(e.target)) {
@@ -596,4 +644,5 @@
     </script>
   </header>
 </body>
+
 </html>

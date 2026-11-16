@@ -59,7 +59,8 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy học viên ID: " + hocVienId));
 
         HoSoGiangVien giangVien = hoSoGiangVienRepository.findById(request.getGiangVienId())
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy gia sư ID: " + request.getGiangVienId()));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Không tìm thấy gia sư ID: " + request.getGiangVienId()));
 
         if (giangVien.getNguoiDung() != null && giangVien.getNguoiDung().getId().equals(hocVienId)) {
             throw new IllegalArgumentException("Gia sư không thể tự đặt lịch kèm học cho chính mình!");
@@ -78,15 +79,16 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
         }
 
         // Kiểm tra tránh trùng ca học đã có của gia sư
-        boolean isConflicting = datLich1k1Repository.existsByGiangVienIdAndThoiGianBatDauLessThanAndThoiGianKetThucGreaterThanAndTrangThaiNot(
-                giangVien.getId(),
-                request.getThoiGianKetThuc(),
-                request.getThoiGianBatDau(),
-                TrangThaiDatLich.DA_HUY
-        );
+        boolean isConflicting = datLich1k1Repository
+                .existsByGiangVienIdAndThoiGianBatDauLessThanAndThoiGianKetThucGreaterThanAndTrangThaiNot(
+                        giangVien.getId(),
+                        request.getThoiGianKetThuc(),
+                        request.getThoiGianBatDau(),
+                        TrangThaiDatLich.DA_HUY);
 
         if (isConflicting) {
-            throw new IllegalArgumentException("Gia sư đã có ca học khác trong khung giờ này. Vui lòng chọn thời gian khác!");
+            throw new IllegalArgumentException(
+                    "Gia sư đã có ca học khác trong khung giờ này. Vui lòng chọn thời gian khác!");
         }
 
         BigDecimal hocPhi = request.getHocPhiCaHoc() != null ? request.getHocPhiCaHoc() : BigDecimal.ZERO;
@@ -136,8 +138,7 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
                     "Yêu cầu ca học 1-1 mới",
                     "Học viên " + hocVien.getHoTen() + " vừa đặt lịch kèm 1-1 mã " + maDatLich + ". Vui lòng xác nhận.",
                     LoaiThongBao.CA_HOC_MOI,
-                    "/tutor/ca-hoc"
-            );
+                    "/tutor/ca-hoc");
         } catch (Exception e) {
             log.warn("Không thể gửi thông báo ca học mới tới gia sư: {}", e.getMessage());
         }
@@ -156,7 +157,8 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
         }
 
         if (caHoc.getTrangThai() != TrangThaiDatLich.CHO_XAC_NHAN) {
-            throw new IllegalArgumentException("Ca học này hiện không ở trạng thái chờ xác nhận (hiện tại: " + caHoc.getTrangThai().getMoTa() + ")!");
+            throw new IllegalArgumentException("Ca học này hiện không ở trạng thái chờ xác nhận (hiện tại: "
+                    + caHoc.getTrangThai().getMoTa() + ")!");
         }
 
         if (request.isChapNhan()) {
@@ -175,18 +177,18 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
                 thongBaoService.taoThongBao(
                         caHoc.getHocVien().getId(),
                         "Gia sư đã đồng ý ca học kèm 1-1",
-                        "Gia sư " + caHoc.getGiangVien().getNguoiDung().getHoTen() + " đã chấp nhận ca học " + caHoc.getMaDatLich() + ". Vui lòng thanh toán ký quỹ để giữ chỗ.",
+                        "Gia sư " + caHoc.getGiangVien().getNguoiDung().getHoTen() + " đã chấp nhận ca học "
+                                + caHoc.getMaDatLich() + ". Vui lòng thanh toán ký quỹ để giữ chỗ.",
                         LoaiThongBao.DUYET_CA_HOC,
-                        "/student/ca-hoc"
-                );
+                        "/student/ca-hoc");
             } else {
                 thongBaoService.taoThongBao(
                         caHoc.getHocVien().getId(),
                         "Ca học 1-1 không được chấp nhận",
-                        "Gia sư " + caHoc.getGiangVien().getNguoiDung().getHoTen() + " đã từ chối ca học " + caHoc.getMaDatLich() + ". Lý do: " + caHoc.getLyDoHuy(),
+                        "Gia sư " + caHoc.getGiangVien().getNguoiDung().getHoTen() + " đã từ chối ca học "
+                                + caHoc.getMaDatLich() + ". Lý do: " + caHoc.getLyDoHuy(),
                         LoaiThongBao.TU_CHOI_CA_HOC,
-                        "/student/ca-hoc"
-                );
+                        "/student/ca-hoc");
             }
         } catch (Exception e) {
             log.warn("Lỗi khi gửi thông báo phản hồi ca học: {}", e.getMessage());
@@ -226,16 +228,15 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
                     "Ký quỹ ca học thành công!",
                     "Bạn đã ký quỹ học phí ca " + caHoc.getMaDatLich() + ". Phòng học trực tuyến đã sẵn sàng.",
                     LoaiThongBao.KY_QUY_THANH_CONG,
-                    "/student/ca-hoc"
-            );
+                    "/student/ca-hoc");
             // Báo gia sư
             thongBaoService.taoThongBao(
                     caHoc.getGiangVien().getNguoiDung().getId(),
                     "Học viên đã ký quỹ ca học 1-1",
-                    "Học viên " + caHoc.getHocVien().getHoTen() + " đã ký quỹ học phí ca " + caHoc.getMaDatLich() + ". Ca học đã sẵn sàng diễn ra.",
+                    "Học viên " + caHoc.getHocVien().getHoTen() + " đã ký quỹ học phí ca " + caHoc.getMaDatLich()
+                            + ". Ca học đã sẵn sàng diễn ra.",
                     LoaiThongBao.KY_QUY_THANH_CONG,
-                    "/tutor/ca-hoc"
-            );
+                    "/tutor/ca-hoc");
         } catch (Exception e) {
             log.warn("Lỗi khi gửi thông báo ký quỹ ca học: {}", e.getMessage());
         }
@@ -253,8 +254,10 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
             throw new IllegalArgumentException("Bạn không có quyền thanh toán cho ca học này!");
         }
 
-        if (caHoc.getTrangThai() != TrangThaiDatLich.CHO_THANH_TOAN && caHoc.getTrangThai() != TrangThaiDatLich.CHO_XAC_NHAN) {
-            throw new IllegalArgumentException("Ca học này không ở trạng thái cần thanh toán (hiện tại: " + caHoc.getTrangThai().getMoTa() + ")!");
+        if (caHoc.getTrangThai() != TrangThaiDatLich.CHO_THANH_TOAN
+                && caHoc.getTrangThai() != TrangThaiDatLich.CHO_XAC_NHAN) {
+            throw new IllegalArgumentException(
+                    "Ca học này không ở trạng thái cần thanh toán (hiện tại: " + caHoc.getTrangThai().getMoTa() + ")!");
         }
 
         long orderCode = Long.parseLong(String.valueOf(System.currentTimeMillis()).substring(3));
@@ -275,8 +278,7 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
                         .name("Ca hoc 1-1")
                         .quantity(1)
                         .price(amount)
-                        .build()
-        );
+                        .build());
 
         CreatePaymentLinkRequest paymentLinkRequest = CreatePaymentLinkRequest.builder()
                 .orderCode(orderCode)
@@ -289,10 +291,13 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
 
         try {
             CreatePaymentLinkResponse response = payOS.paymentRequests().create(paymentLinkRequest);
-            return response != null ? response.getCheckoutUrl() : (baseUrl + "/payment/payos-callback?type=1k1&id=" + caHoc.getId());
+            return response != null ? response.getCheckoutUrl()
+                    : (baseUrl + "/payment/payos-callback?type=1k1&id=" + caHoc.getId());
         } catch (Exception e) {
-            log.warn("PayOS createPaymentLink không kết nối được gateway thật, chuyển chế độ fallback: {}", e.getMessage());
-            return baseUrl + "/payment/payos-callback?type=1k1&id=" + caHoc.getId() + "&orderCode=" + orderCode + "&status=PAID";
+            log.warn("PayOS createPaymentLink không kết nối được gateway thật, chuyển chế độ fallback: {}",
+                    e.getMessage());
+            return baseUrl + "/payment/payos-callback?type=1k1&id=" + caHoc.getId() + "&orderCode=" + orderCode
+                    + "&status=PAID";
         }
     }
 
@@ -341,7 +346,8 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
             throw new IllegalArgumentException("Bạn không có quyền xác nhận hoàn tất ca học này!");
         }
 
-        if (caHoc.getTrangThai() != TrangThaiDatLich.DA_THANH_TOAN_KY_QUY && caHoc.getTrangThai() != TrangThaiDatLich.DANG_DIEN_RA) {
+        if (caHoc.getTrangThai() != TrangThaiDatLich.DA_THANH_TOAN_KY_QUY
+                && caHoc.getTrangThai() != TrangThaiDatLich.DANG_DIEN_RA) {
             throw new IllegalArgumentException("Chỉ có thể hoàn tất ca học đã được thanh toán ký quỹ!");
         }
 
@@ -363,11 +369,13 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
                 .soDuSau(soDuSau)
                 .loaiGiaoDich(LoaiGiaoDichVi.TIEN_DAY_KEM_1K1)
                 .maThamChieu(caHoc.getId())
-                .moTaGiaoDich("Học phí ca dạy 1-1 mã " + caHoc.getMaDatLich() + " (Đã khấu trừ " + caHoc.getTyLeHoaHongSan() + "% phí sàn)")
+                .moTaGiaoDich("Học phí ca dạy 1-1 mã " + caHoc.getMaDatLich() + " (Đã khấu trừ "
+                        + caHoc.getTyLeHoaHongSan() + "% phí sàn)")
                 .build();
         lichSuViTienRepository.save(ls);
 
-        log.info("Hoan tat ca hoc 1-1 ma {}. Da giai phong {} VND ve vi gia su ID {}", caHoc.getMaDatLich(), thucNhan, giangVienId);
+        log.info("Hoan tat ca hoc 1-1 ma {}. Da giai phong {} VND ve vi gia su ID {}", caHoc.getMaDatLich(), thucNhan,
+                giangVienId);
         DatLich1k1 saved = datLich1k1Repository.save(caHoc);
 
         try {
@@ -375,18 +383,18 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
             thongBaoService.taoThongBao(
                     caHoc.getGiangVien().getNguoiDung().getId(),
                     "Học phí ca dạy đã về ví tiền!",
-                    "Hệ thống đã giải ngân " + thucNhan.longValue() + " đ vào ví của bạn cho ca " + caHoc.getMaDatLich() + ".",
+                    "Hệ thống đã giải ngân " + thucNhan.longValue() + " đ vào ví của bạn cho ca " + caHoc.getMaDatLich()
+                            + ".",
                     LoaiThongBao.GIAI_NGAN_VI,
-                    "/tutor/vi-tien"
-            );
+                    "/tutor/vi-tien");
             // Thông báo hoàn tất cho học viên
             thongBaoService.taoThongBao(
                     caHoc.getHocVien().getId(),
                     "Ca học 1-1 đã hoàn tất",
-                    "Ca học " + caHoc.getMaDatLich() + " đã hoàn tất. Bạn hãy dành ít phút để đánh giá chất lượng gia sư nhé!",
+                    "Ca học " + caHoc.getMaDatLich()
+                            + " đã hoàn tất. Bạn hãy dành ít phút để đánh giá chất lượng gia sư nhé!",
                     LoaiThongBao.HE_THONG,
-                    "/student/ca-hoc"
-            );
+                    "/student/ca-hoc");
         } catch (Exception e) {
             log.warn("Lỗi khi gửi thông báo hoàn tất ca học: {}", e.getMessage());
         }
@@ -404,8 +412,10 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
             throw new IllegalArgumentException("Bạn không phải người đặt ca học này!");
         }
 
-        if (caHoc.getTrangThai() != TrangThaiDatLich.CHO_XAC_NHAN && caHoc.getTrangThai() != TrangThaiDatLich.CHO_THANH_TOAN) {
-            throw new IllegalArgumentException("Chỉ có thể hủy ca học khi đang ở trạng thái chờ xác nhận hoặc chờ thanh toán!");
+        if (caHoc.getTrangThai() != TrangThaiDatLich.CHO_XAC_NHAN
+                && caHoc.getTrangThai() != TrangThaiDatLich.CHO_THANH_TOAN) {
+            throw new IllegalArgumentException(
+                    "Chỉ có thể hủy ca học khi đang ở trạng thái chờ xác nhận hoặc chờ thanh toán!");
         }
 
         caHoc.setTrangThai(TrangThaiDatLich.DA_HUY);

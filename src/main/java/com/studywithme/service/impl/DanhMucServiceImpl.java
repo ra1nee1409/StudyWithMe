@@ -11,6 +11,8 @@ import com.studywithme.repository.LopHocTrucTuyenRepository;
 import com.studywithme.service.DanhMucService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -39,6 +41,7 @@ public class DanhMucServiceImpl implements DanhMucService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable("cayDanhMuc")
     public List<DanhMucResponse> layCayDanhMuc() {
         List<DanhMuc> rootList = danhMucRepository.findByDanhMucChaIsNullOrderByThuTuHienThiAsc();
         return rootList.stream()
@@ -48,6 +51,7 @@ public class DanhMucServiceImpl implements DanhMucService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable("danhMucPhang")
     public List<DanhMucResponse> layTatCaDanhMucPhang() {
         List<DanhMuc> allList = danhMucRepository.findAllByOrderByThuTuHienThiAsc();
         return allList.stream()
@@ -65,6 +69,7 @@ public class DanhMucServiceImpl implements DanhMucService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"cayDanhMuc", "danhMucPhang"}, allEntries = true)
     public DanhMucResponse themDanhMuc(DanhMucRequest request) {
         if (!StringUtils.hasText(request.getTenDanhMuc())) {
             throw new IllegalArgumentException("Tên danh mục không được để trống.");
@@ -100,6 +105,7 @@ public class DanhMucServiceImpl implements DanhMucService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"cayDanhMuc", "danhMucPhang"}, allEntries = true)
     public DanhMucResponse capNhatDanhMuc(Long id, DanhMucRequest request) {
         DanhMuc danhMuc = danhMucRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục với ID: " + id));
@@ -149,6 +155,7 @@ public class DanhMucServiceImpl implements DanhMucService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"cayDanhMuc", "danhMucPhang"}, allEntries = true)
     public DanhMucResponse doiTrangThaiKichHoat(Long id) {
         DanhMuc danhMuc = danhMucRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục với ID: " + id));
@@ -162,6 +169,7 @@ public class DanhMucServiceImpl implements DanhMucService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"cayDanhMuc", "danhMucPhang"}, allEntries = true)
     public void xoaDanhMuc(Long id) {
         DanhMuc danhMuc = danhMucRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục với ID: " + id));

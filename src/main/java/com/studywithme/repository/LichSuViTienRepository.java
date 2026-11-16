@@ -13,6 +13,7 @@ public interface LichSuViTienRepository extends JpaRepository<LichSuViTien, Long
     @EntityGraph(attributePaths = {"giangVien", "giangVien.nguoiDung"})
     List<LichSuViTien> findByGiangVienIdOrderByNgayTaoDesc(Long giangVienId);
 
+    @EntityGraph(attributePaths = {"giangVien", "giangVien.nguoiDung"})
     Page<LichSuViTien> findByGiangVienId(Long giangVienId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"giangVien", "giangVien.nguoiDung"})

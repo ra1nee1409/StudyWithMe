@@ -27,6 +27,7 @@ public interface YeuCauRutTienRepository extends JpaRepository<YeuCauRutTien, Lo
     @EntityGraph(attributePaths = {"giangVien", "giangVien.nguoiDung"})
     Optional<YeuCauRutTien> findById(Long id);
 
+    @EntityGraph(attributePaths = {"giangVien", "giangVien.nguoiDung"})
     Page<YeuCauRutTien> findByTrangThai(TrangThaiRutTien trangThai, Pageable pageable);
     
     long countByTrangThai(TrangThaiRutTien trangThai);

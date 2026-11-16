@@ -217,6 +217,11 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
         DatLich1k1 caHoc = datLich1k1Repository.findById(datLichId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy ca học ID: " + datLichId));
 
+        if (caHoc.getTrangThai() == TrangThaiDatLich.DA_THANH_TOAN_KY_QUY) {
+            log.info("Ca hoc 1-1 ma {} da duoc xac nhan ky quy truoc do (Idempotency check), bo qua xu ly lap.", caHoc.getMaDatLich());
+            return caHoc;
+        }
+
         caHoc.setTrangThai(TrangThaiDatLich.DA_THANH_TOAN_KY_QUY);
         log.info("Ca hoc 1-1 ma {} da duoc hoc vien thanh toan va SAN DANG KY QUY GIU TIEN", caHoc.getMaDatLich());
         DatLich1k1 saved = datLich1k1Repository.save(caHoc);

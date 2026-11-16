@@ -61,6 +61,18 @@ public class OptimizationVerificationTest {
         assertEquals(firstCall.size(), secondCall.size());
     }
 
+    @Autowired
+    private com.studywithme.repository.DonHangRepository donHangRepository;
+
+    @Autowired
+    private com.studywithme.repository.YeuCauRutTienRepository yeuCauRutTienRepository;
+
+    @Autowired
+    private com.studywithme.repository.LichSuViTienRepository lichSuViTienRepository;
+
+    @Autowired
+    private com.studywithme.repository.DanhGiaNhanXetRepository danhGiaNhanXetRepository;
+
     @Test
     @DisplayName("Tối ưu EntityGraph: Truy vấn quan hệ không gây lỗi N+1")
     void testEntityGraphOptimization() {
@@ -68,6 +80,11 @@ public class OptimizationVerificationTest {
             dangKyLopHocRepository.findByLopHocGiangVienId(1L);
             lopHocTrucTuyenRepository.findByGiangVienId(1L);
             lopHocTrucTuyenRepository.findByGiangVienIdOrderByNgayTaoDesc(1L);
+            lopHocTrucTuyenRepository.findByTrangThai(com.studywithme.entity.enums.giaovien.TrangThaiLopHoc.DANG_MO_DANG_KY, org.springframework.data.domain.PageRequest.of(0, 5));
+            donHangRepository.findByTrangThaiThanhToan(com.studywithme.entity.enums.shared.TrangThaiThanhToan.DA_THANH_TOAN, org.springframework.data.domain.PageRequest.of(0, 5));
+            yeuCauRutTienRepository.findByTrangThai(com.studywithme.entity.enums.admin.TrangThaiRutTien.CHO_XU_LY, org.springframework.data.domain.PageRequest.of(0, 5));
+            lichSuViTienRepository.findByGiangVienId(1L, org.springframework.data.domain.PageRequest.of(0, 5));
+            danhGiaNhanXetRepository.findTop5ByDuocHienThiTrueOrderByNgayDanhGiaDesc();
         });
     }
 

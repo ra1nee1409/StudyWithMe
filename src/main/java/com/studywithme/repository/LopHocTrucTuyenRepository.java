@@ -21,6 +21,7 @@ public interface LopHocTrucTuyenRepository extends JpaRepository<LopHocTrucTuyen
 
     long countByGiangVienId(Long giangVienId);
 
+    @EntityGraph(attributePaths = {"danhMuc", "giangVien", "giangVien.nguoiDung"})
     Page<LopHocTrucTuyen> findByTrangThai(TrangThaiLopHoc trangThai, Pageable pageable);
 
     boolean existsByDanhMucId(Long danhMucId);

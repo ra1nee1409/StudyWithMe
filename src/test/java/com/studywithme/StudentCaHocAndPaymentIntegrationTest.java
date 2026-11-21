@@ -274,4 +274,86 @@ class StudentCaHocAndPaymentIntegrationTest {
         DatLich1k1 updated = datLich1k1Repository.findById(caHoc.getId()).orElseThrow();
         assertEquals(TrangThaiDatLich.DA_THANH_TOAN_KY_QUY, updated.getTrangThai());
     }
+
+    @Test
+    @DisplayName("WBS 1.2: Học viên hủy ca học sau khi đã ký quỹ (>2 giờ) -> Tự động hoàn 100% học phí vào ví")
+    void test8_hocVienHuyCaHocSauKhiKyQuy_HoanTienVaoVi() throws Exception {
+        BigDecimal hocPhi = BigDecimal.valueOf(300000);
+        DatCaHoc1k1Request req = DatCaHoc1k1Request.builder()
+                .giangVienId(tutorProfile.getId())
+                .thoiGianBatDau(LocalDateTime.now().plusDays(2).withHour(14).withMinute(0))
+                .thoiGianKetThuc(LocalDateTime.now().plusDays(2).withHour(16).withMinute(0))
+                .hocPhiCaHoc(hocPhi)
+                .build();
+        DatLich1k1 caHoc = datLich1k1Service.taoYeuCauDatLich(studentUser.getId(), req);
+        datLich1k1Service.xacNhanThanhToanKyQuy(caHoc.getId());
+
+        BigDecimal soDuBanDau = studentUser.getSoDuVi();
+
+        mockMvc.perform(put("/api/hoc-vien/dat-lich-1k1/" + caHoc.getId() + "/huy")
+                        .param("lyDoHuy", "Em có việc gia đình đột xuất")
+                        .with(user(studentUser.getEmail()).roles("HOC_VIEN"))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.thanhCong").value(true))
+                .andExpect(jsonPath("$.duLieu.trangThai").value("DA_HUY"));
+
+        NguoiDung studentAfter = nguoiDungRepository.findById(studentUser.getId()).orElseThrow();
+        assertEquals(soDuBanDau.add(hocPhi), studentAfter.getSoDuVi(), "Số dư ví học viên phải được hoàn lại đúng 100% số tiền ca học!");
+    }
+
+    @Test
+    @DisplayName("WBS 1.2: Gia sư hủy ca học sau khi học viên đã ký quỹ -> Tự động hoàn tiền vào ví học viên")
+    void test9_giaSuHuyCaHocSauKhiKyQuy_HoanTienVaoVi() throws Exception {
+        BigDecimal hocPhi = BigDecimal.valueOf(400000);
+        DatCaHoc1k1Request req = DatCaHoc1k1Request.builder()
+                .giangVienId(tutorProfile.getId())
+                .thoiGianBatDau(LocalDateTime.now().plusDays(3).withHour(10).withMinute(0))
+                .thoiGianKetThuc(LocalDateTime.now().plusDays(3).withHour(12).withMinute(0))
+                .hocPhiCaHoc(hocPhi)
+                .build();
+        DatLich1k1 caHoc = datLich1k1Service.taoYeuCauDatLich(studentUser.getId(), req);
+        datLich1k1Service.xacNhanThanhToanKyQuy(caHoc.getId());
+
+        BigDecimal soDuBanDau = studentUser.getSoDuVi();
+
+        mockMvc.perform(post("/api/tutor/ca-hoc/" + caHoc.getId() + "/huy")
+                        .param("lyDoHuy", "Gia sư bận lịch công tác")
+                        .with(user(tutorUser.getEmail()).roles("GIANG_VIEN"))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.thanhCong").value(true))
+                .andExpect(jsonPath("$.duLieu.trangThai").value("DA_HUY"));
+
+        NguoiDung studentAfter = nguoiDungRepository.findById(studentUser.getId()).orElseThrow();
+        assertEquals(soDuBanDau.add(hocPhi), studentAfter.getSoDuVi(), "Ví học viên phải nhận lại tiền khi gia sư hủy ca!");
+    }
+
+    @Test
+    @DisplayName("WBS 1.2: Học viên thanh toán ký quỹ ngay và tự động trừ số dư ví nếu ví đủ tiền")
+    void test10_hocVienThanhToanKyQuyNgay_TruSoDuVi() throws Exception {
+        // Cấp 500.000 VNĐ vào ví học viên
+        studentUser.setSoDuVi(BigDecimal.valueOf(500000));
+        nguoiDungRepository.save(studentUser);
+
+        BigDecimal hocPhi = BigDecimal.valueOf(300000);
+        DatCaHoc1k1Request req = DatCaHoc1k1Request.builder()
+                .giangVienId(tutorProfile.getId())
+                .thoiGianBatDau(LocalDateTime.now().plusDays(1).withHour(19).withMinute(0))
+                .thoiGianKetThuc(LocalDateTime.now().plusDays(1).withHour(21).withMinute(0))
+                .hocPhiCaHoc(hocPhi)
+                .build();
+        DatLich1k1 caHoc = datLich1k1Service.taoYeuCauDatLich(studentUser.getId(), req);
+        datLich1k1Service.giaSuPhanHoiCaHoc(tutorProfile.getId(), caHoc.getId(), new XacNhanCaHocRequest(true, null));
+
+        mockMvc.perform(post("/api/hoc-vien/dat-lich-1k1/" + caHoc.getId() + "/thanh-toan-ky-quy-ngay")
+                        .with(user(studentUser.getEmail()).roles("HOC_VIEN"))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.thanhCong").value(true))
+                .andExpect(jsonPath("$.duLieu.trangThai").value("DA_THANH_TOAN_KY_QUY"));
+
+        NguoiDung studentAfter = nguoiDungRepository.findById(studentUser.getId()).orElseThrow();
+        assertEquals(BigDecimal.valueOf(200000), studentAfter.getSoDuVi(), "Số dư ví học viên phải trừ đúng 300.000 VNĐ (500.000 - 300.000 = 200.000)!");
+    }
 }

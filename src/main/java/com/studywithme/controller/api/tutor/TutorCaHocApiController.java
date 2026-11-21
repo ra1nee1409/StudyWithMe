@@ -88,4 +88,14 @@ public class TutorCaHocApiController {
         DatLich1k1 entity = datLich1k1Service.hoanTatCaHoc(gv.getId(), id);
         return ResponseEntity.ok(ApiResponse.success("Hoàn tất ca dạy và giải phóng học phí vào ví thành công", DatLich1k1Dto.fromEntity(entity)));
     }
+
+    @PostMapping("/{id}/huy")
+    public ResponseEntity<ApiResponse<DatLich1k1Dto>> giaSuHuyCaHoc(
+            @PathVariable Long id,
+            @RequestParam(required = false) String lyDoHuy,
+            Principal principal) {
+        HoSoGiangVien gv = getGiangVienFromPrincipal(principal);
+        DatLich1k1 entity = datLich1k1Service.giaSuHuyCaHoc(gv.getId(), id, lyDoHuy);
+        return ResponseEntity.ok(ApiResponse.success("Đã hủy ca học và hoàn tiền cho học viên thành công", DatLich1k1Dto.fromEntity(entity)));
+    }
 }

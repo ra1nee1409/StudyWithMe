@@ -127,6 +127,52 @@ public class DataSeeder implements CommandLineRunner {
             });
         }
 
+        // 2.2 Khởi tạo tài khoản Giảng viên test: tutor@tutor.com / 123456
+        String tutorCustomEmail = "tutor@tutor.com";
+        NguoiDung tutorCustom = nguoiDungRepository.findByEmail(tutorCustomEmail).orElseGet(() -> {
+            NguoiDung u = NguoiDung.builder()
+                    .email(tutorCustomEmail)
+                    .matKhau(passwordEncoder.encode("123456"))
+                    .hoTen("Thầy Đặng Hoàng Nam (Giảng Viên Test)")
+                    .soDienThoai("0988776655")
+                    .anhDaiDien("https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=400&auto=format&fit=crop&q=80")
+                    .trangThai(TrangThaiNguoiDung.HOAT_DONG)
+                    .danhSachVaiTro(new HashSet<>(Set.of(roleGiangVien, roleHocVien)))
+                    .build();
+            return nguoiDungRepository.save(u);
+        });
+        tutorCustom.setMatKhau(passwordEncoder.encode("123456"));
+        tutorCustom.setTrangThai(TrangThaiNguoiDung.HOAT_DONG);
+        Set<VaiTro> tutorRoles = tutorCustom.getDanhSachVaiTro() != null ? new HashSet<>(tutorCustom.getDanhSachVaiTro()) : new HashSet<>();
+        tutorRoles.add(roleGiangVien);
+        tutorRoles.add(roleHocVien);
+        tutorCustom.setDanhSachVaiTro(tutorRoles);
+        nguoiDungRepository.save(tutorCustom);
+
+        if (hoSoGiangVienRepository.findByNguoiDungId(tutorCustom.getId()).isEmpty()) {
+            HoSoGiangVien hs = HoSoGiangVien.builder()
+                    .nguoiDung(tutorCustom)
+                    .tieuDeChuyenMon("Thạc Sĩ Sư Phạm - Giảng Viên Khóa Học Test")
+                    .gioiThieuBanThan("Tài khoản giảng viên chính thức dùng để kiểm thử hệ thống: Soạn khóa học, quản lý ca dạy, tương tác học viên và thực hiện lệnh rút tiền.")
+                    .linkVideoDayThu("https://www.youtube.com/embed/dQw4w9WgXcQ")
+                    .trangThaiDuyet(TrangThaiGiangVien.DA_DUYET)
+                    .soDuVi(BigDecimal.valueOf(5000000))
+                    .tenNganHang("MB Bank (Quân Đội)")
+                    .soTaiKhoanNganHang("999988886666")
+                    .tenChuTaiKhoan("DANG HOANG NAM")
+                    .build();
+            hoSoGiangVienRepository.save(hs);
+            logger.info(">>> Đã khởi tạo hồ sơ Giảng viên test: {} / 123456", tutorCustomEmail);
+        } else {
+            hoSoGiangVienRepository.findByNguoiDungId(tutorCustom.getId()).ifPresent(hs -> {
+                hs.setTrangThaiDuyet(TrangThaiGiangVien.DA_DUYET);
+                if (hs.getSoDuVi() == null || hs.getSoDuVi().compareTo(BigDecimal.ZERO) == 0) {
+                    hs.setSoDuVi(BigDecimal.valueOf(5000000));
+                }
+                hoSoGiangVienRepository.save(hs);
+            });
+        }
+
         // 3. Khởi tạo cây danh mục chuẩn (Tiểu học, THCS, THPT, Ngoại ngữ) nếu chưa có danh mục nào
         if (danhMucRepository.count() == 0) {
             initDanhMucChuan();

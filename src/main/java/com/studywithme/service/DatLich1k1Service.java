@@ -29,6 +29,10 @@ public interface DatLich1k1Service {
 
     DatLich1k1 hocVienHuyCaHoc(Long hocVienId, Long datLichId, String lyDoHuy);
 
+    DatLich1k1 giaSuHuyCaHoc(Long giangVienId, Long datLichId, String lyDoHuy);
+
+    void hoanTienKyQuyVaoViHocVien(DatLich1k1 caHoc, String lyDo);
+
     List<DatLich1k1Dto> layDanhSachCaHocCuaGiaSu(Long giangVienId, TrangThaiDatLich trangThai);
 
     List<DatLich1k1Dto> layDanhSachCaHocCuaHocVien(Long hocVienId);

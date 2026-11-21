@@ -3,10 +3,12 @@ package com.studywithme.service.impl;
 import com.studywithme.config.PayOSConfig;
 import com.studywithme.entity.*;
 import com.studywithme.entity.enums.admin.LoaiGiaoDichVi;
+import com.studywithme.entity.enums.hocvien.TrangThaiDatLich;
 import com.studywithme.entity.enums.hocvien.TrangThaiThamGiaLop;
 import com.studywithme.entity.enums.shared.LoaiSanPhamDonHang;
 import com.studywithme.entity.enums.shared.TrangThaiThanhToan;
 import com.studywithme.repository.*;
+import com.studywithme.service.DatLich1k1Service;
 import com.studywithme.service.PayOsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +43,8 @@ public class PayOsServiceImpl implements PayOsService {
     private final DangKyLopHocRepository dangKyLopHocRepository;
     private final HoSoGiangVienRepository hoSoGiangVienRepository;
     private final LichSuViTienRepository lichSuViTienRepository;
+    private final DatLich1k1Repository datLich1k1Repository;
+    private final DatLich1k1Service datLich1k1Service;
     private final com.studywithme.service.CauHinhHeThongService cauHinhHeThongService;
 
     @Override
@@ -147,7 +151,24 @@ public class PayOsServiceImpl implements PayOsService {
 
         DonHang donHang = donHangRepository.findByOrderCodePayos(orderCode).orElse(null);
         if (donHang == null) {
-            log.warn("Không tìm thấy đơn hàng với payOS orderCode: {}", orderCode);
+            // WBS 1.1: Tự động tra cứu và kích hoạt ký quỹ cho ca học kèm 1-1 (DatLich1k1)
+            DatLich1k1 caHoc = datLich1k1Repository.findByOrderCodePayos(orderCode).orElse(null);
+            if (caHoc != null) {
+                log.info("Xử lý Webhook PayOS kích hoạt ký quỹ ca học 1-1 mã: {}, orderCode: {}", caHoc.getMaDatLich(), orderCode);
+                if (caHoc.getTrangThai() == TrangThaiDatLich.DA_THANH_TOAN_KY_QUY) {
+                    log.info("Ca học 1-1 #{} đã được xử lý ký quỹ trước đó (Idempotency check).", caHoc.getMaDatLich());
+                    return true;
+                }
+                if (maGiaoDich != null && !maGiaoDich.isBlank()) {
+                    caHoc.setMaGiaoDichPayos(maGiaoDich);
+                    datLich1k1Repository.save(caHoc);
+                }
+                datLich1k1Service.xacNhanThanhToanKyQuy(caHoc.getId());
+                log.info("Kích hoạt ký quỹ ca học 1-1 #{} thành công qua PayOS Webhook!", caHoc.getMaDatLich());
+                return true;
+            }
+
+            log.warn("Không tìm thấy đơn hàng hoặc ca học 1-1 với payOS orderCode: {}", orderCode);
             return false;
         }
 

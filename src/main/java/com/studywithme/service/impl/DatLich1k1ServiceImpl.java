@@ -34,8 +34,10 @@ import vn.payos.model.v2.paymentRequests.PaymentLinkItem;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @Slf4j
 @Service
@@ -316,6 +318,14 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
             throw new IllegalArgumentException("Bạn không có quyền thực hiện thao tác này!");
         }
 
+        NguoiDung hocVien = caHoc.getHocVien();
+        BigDecimal soTien = caHoc.getHocPhiCaHoc() != null ? caHoc.getHocPhiCaHoc() : BigDecimal.ZERO;
+        if (hocVien.getSoDuVi().compareTo(soTien) >= 0 && soTien.compareTo(BigDecimal.ZERO) > 0) {
+            hocVien.setSoDuVi(hocVien.getSoDuVi().subtract(soTien));
+            nguoiDungRepository.save(hocVien);
+            log.info("Đã trừ {} VND từ ví học viên ID {} để thanh toán ký quỹ ca học {}", soTien, hocVienId, caHoc.getMaDatLich());
+        }
+
         caHoc.setTrangThai(TrangThaiDatLich.DA_THANH_TOAN_KY_QUY);
         log.info("Hoc vien ID {} da thanh toan ky quy thanh cong ca hoc 1-1 ma {}", hocVienId, caHoc.getMaDatLich());
         return datLich1k1Repository.save(caHoc);
@@ -418,15 +428,96 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
         }
 
         if (caHoc.getTrangThai() != TrangThaiDatLich.CHO_XAC_NHAN
-                && caHoc.getTrangThai() != TrangThaiDatLich.CHO_THANH_TOAN) {
+                && caHoc.getTrangThai() != TrangThaiDatLich.CHO_THANH_TOAN
+                && caHoc.getTrangThai() != TrangThaiDatLich.DA_THANH_TOAN_KY_QUY) {
             throw new IllegalArgumentException(
-                    "Chỉ có thể hủy ca học khi đang ở trạng thái chờ xác nhận hoặc chờ thanh toán!");
+                    "Chỉ có thể hủy ca học khi đang ở trạng thái chờ xác nhận, chờ thanh toán hoặc đã ký quỹ!");
+        }
+
+        // Nếu đã thanh toán ký quỹ, kiểm tra quy tắc hủy trước giờ học tối thiểu 2 tiếng
+        if (caHoc.getTrangThai() == TrangThaiDatLich.DA_THANH_TOAN_KY_QUY) {
+            if (LocalDateTime.now().isAfter(caHoc.getThoiGianBatDau().minusHours(2))) {
+                throw new IllegalArgumentException(
+                        "Không thể hủy ca học khi còn dưới 2 tiếng trước giờ học theo quy định! Vui lòng liên hệ trực tiếp gia sư hoặc ban quản trị.");
+            }
+            hoanTienKyQuyVaoViHocVien(caHoc, lyDoHuy != null ? lyDoHuy : "Học viên hủy trước 2 tiếng");
+            caHoc.setLyDoHuy((lyDoHuy != null && !lyDoHuy.isBlank() ? lyDoHuy : "Học viên hủy yêu cầu") + " (Đã hoàn 100% học phí vào ví)");
+        } else {
+            caHoc.setLyDoHuy(lyDoHuy != null && !lyDoHuy.isBlank() ? lyDoHuy : "Học viên hủy yêu cầu");
         }
 
         caHoc.setTrangThai(TrangThaiDatLich.DA_HUY);
-        caHoc.setLyDoHuy(lyDoHuy != null && !lyDoHuy.isBlank() ? lyDoHuy : "Học viên hủy yêu cầu");
         log.info("Hoc vien ID {} da huy ca hoc 1-1 ma {}", hocVienId, caHoc.getMaDatLich());
         return datLich1k1Repository.save(caHoc);
+    }
+
+    @Override
+    @Transactional
+    public DatLich1k1 giaSuHuyCaHoc(Long giangVienId, Long datLichId, String lyDoHuy) {
+        DatLich1k1 caHoc = datLich1k1Repository.findById(datLichId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy ca học ID: " + datLichId));
+
+        if (!caHoc.getGiangVien().getId().equals(giangVienId)) {
+            throw new IllegalArgumentException("Bạn không có quyền điều phối ca học này!");
+        }
+
+        if (caHoc.getTrangThai() == TrangThaiDatLich.HOAN_THANH || caHoc.getTrangThai() == TrangThaiDatLich.DA_HUY) {
+            throw new IllegalArgumentException("Không thể hủy ca học đã hoàn tất hoặc đã hủy!");
+        }
+
+        if (caHoc.getTrangThai() == TrangThaiDatLich.DA_THANH_TOAN_KY_QUY) {
+            hoanTienKyQuyVaoViHocVien(caHoc, "Gia sư bận đột xuất hủy ca: " + (lyDoHuy != null ? lyDoHuy : ""));
+            caHoc.setLyDoHuy("Gia sư hủy ca: " + (lyDoHuy != null && !lyDoHuy.isBlank() ? lyDoHuy : "Bận đột xuất") + " (Đã hoàn tiền cho học viên)");
+        } else {
+            caHoc.setLyDoHuy(lyDoHuy != null && !lyDoHuy.isBlank() ? lyDoHuy : "Gia sư hủy yêu cầu");
+        }
+
+        caHoc.setTrangThai(TrangThaiDatLich.DA_HUY);
+        log.info("Gia su ID {} da huy ca hoc 1-1 ma {}", giangVienId, caHoc.getMaDatLich());
+
+        try {
+            thongBaoService.taoThongBao(
+                    caHoc.getHocVien().getId(),
+                    "Gia sư hủy ca học",
+                    "Gia sư " + caHoc.getGiangVien().getNguoiDung().getHoTen() + " đã hủy ca học " + caHoc.getMaDatLich()
+                            + ". Lý do: " + caHoc.getLyDoHuy(),
+                    LoaiThongBao.HE_THONG,
+                    "/student/ca-hoc");
+        } catch (Exception e) {
+            log.warn("Lỗi gửi thông báo gia sư hủy ca: {}", e.getMessage());
+        }
+
+        return datLich1k1Repository.save(caHoc);
+    }
+
+    @Override
+    @Transactional
+    public void hoanTienKyQuyVaoViHocVien(DatLich1k1 caHoc, String lyDo) {
+        NguoiDung hocVien = caHoc.getHocVien();
+        BigDecimal soTien = caHoc.getHocPhiCaHoc() != null ? caHoc.getHocPhiCaHoc() : BigDecimal.ZERO;
+        if (soTien.compareTo(BigDecimal.ZERO) <= 0) {
+            return;
+        }
+
+        BigDecimal soDuTruoc = hocVien.getSoDuVi();
+        BigDecimal soDuSau = soDuTruoc.add(soTien);
+        hocVien.setSoDuVi(soDuSau);
+        nguoiDungRepository.save(hocVien);
+
+        log.info("Đã hoàn {} VND học phí ký quỹ ca {} vào ví học viên ID {} (Số dư trước: {}, sau: {})",
+                soTien, caHoc.getMaDatLich(), hocVien.getId(), soDuTruoc, soDuSau);
+
+        try {
+            thongBaoService.taoThongBao(
+                    hocVien.getId(),
+                    "Hoàn học phí ký quỹ ca học 1-1",
+                    "Bạn đã được hoàn " + NumberFormat.getNumberInstance(Locale.GERMANY).format(soTien) + " đ vào số dư ví do ca học "
+                            + caHoc.getMaDatLich() + " bị hủy. Lý do: " + lyDo,
+                    LoaiThongBao.HE_THONG,
+                    "/student/ca-hoc");
+        } catch (Exception e) {
+            log.warn("Lỗi gửi thông báo hoàn tiền ví học viên: {}", e.getMessage());
+        }
     }
 
     @Override

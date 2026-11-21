@@ -2,6 +2,7 @@ package com.studywithme;
 
 import com.studywithme.entity.ChiTietDonHang;
 import com.studywithme.entity.DanhMuc;
+import com.studywithme.entity.DatLich1k1;
 import com.studywithme.entity.DonHang;
 import com.studywithme.entity.GhiDanhKhoaHoc;
 import com.studywithme.entity.HoSoGiangVien;
@@ -10,12 +11,14 @@ import com.studywithme.entity.LichSuViTien;
 import com.studywithme.entity.NguoiDung;
 import com.studywithme.entity.enums.admin.TrangThaiGiangVien;
 import com.studywithme.entity.enums.admin.TrangThaiKhoaHoc;
+import com.studywithme.entity.enums.hocvien.TrangThaiDatLich;
 import com.studywithme.entity.enums.shared.LoaiSanPhamDonHang;
 import com.studywithme.entity.enums.shared.PhuongThucThanhToan;
 import com.studywithme.entity.enums.shared.TrangThaiNguoiDung;
 import com.studywithme.entity.enums.shared.TrangThaiThanhToan;
 import com.studywithme.repository.ChiTietDonHangRepository;
 import com.studywithme.repository.DanhMucRepository;
+import com.studywithme.repository.DatLich1k1Repository;
 import com.studywithme.repository.DonHangRepository;
 import com.studywithme.repository.GhiDanhKhoaHocRepository;
 import com.studywithme.repository.HoSoGiangVienRepository;
@@ -76,6 +79,9 @@ class PaymentPayOsIntegrationTest {
 
     @Autowired
     private LichSuViTienRepository lichSuViTienRepository;
+
+    @Autowired
+    private DatLich1k1Repository datLich1k1Repository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -283,6 +289,113 @@ class PaymentPayOsIntegrationTest {
 
         DonHang updated = donHangRepository.findById(donHang.getId()).orElseThrow();
         assertThat(updated.getTrangThaiThanhToan()).isEqualTo(TrangThaiThanhToan.DA_THANH_TOAN);
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("WBS 1.1: Webhook PayOS tự động kích hoạt ký quỹ cho ca học 1-1 (DatLich1k1)")
+    void testWebhookKichHoatKyQuyCaHoc1k1() {
+        NguoiDung hocVien = nguoiDungRepository.save(NguoiDung.builder()
+                .email("stu_1k1_" + UUID.randomUUID().toString().substring(0, 8) + "@test.vn")
+                .matKhau(passwordEncoder.encode("123456"))
+                .hoTen("Học Viên Test 1-1")
+                .trangThai(TrangThaiNguoiDung.HOAT_DONG)
+                .build());
+
+        NguoiDung tutorUser = nguoiDungRepository.save(NguoiDung.builder()
+                .email("tut_1k1_" + UUID.randomUUID().toString().substring(0, 8) + "@test.vn")
+                .matKhau(passwordEncoder.encode("123456"))
+                .hoTen("Gia Sư Test 1-1")
+                .trangThai(TrangThaiNguoiDung.HOAT_DONG)
+                .build());
+
+        HoSoGiangVien gv = hoSoGiangVienRepository.save(HoSoGiangVien.builder()
+                .nguoiDung(tutorUser)
+                .soDuVi(BigDecimal.ZERO)
+                .trangThaiDuyet(TrangThaiGiangVien.DA_DUYET)
+                .build());
+
+        long orderCode1k1 = System.currentTimeMillis() + 999;
+        DatLich1k1 caHoc = datLich1k1Repository.save(DatLich1k1.builder()
+                .maDatLich("DL1K1-" + orderCode1k1)
+                .hocVien(hocVien)
+                .giangVien(gv)
+                .thoiGianBatDau(java.time.LocalDateTime.now().plusDays(2).withHour(18).withMinute(0))
+                .thoiGianKetThuc(java.time.LocalDateTime.now().plusDays(2).withHour(20).withMinute(0))
+                .hocPhiCaHoc(BigDecimal.valueOf(300000))
+                .trangThai(TrangThaiDatLich.CHO_THANH_TOAN)
+                .orderCodePayos(orderCode1k1)
+                .build());
+
+        // Giả lập Webhook Data từ PayOS
+        WebhookData webhookData = WebhookData.builder()
+                .orderCode(orderCode1k1)
+                .amount(300000L)
+                .description("KY QUY CA " + caHoc.getId())
+                .accountNumber("12345678")
+                .reference("BANK_REF_" + orderCode1k1)
+                .transactionDateTime("2026-11-17 19:00:00")
+                .currency("VND")
+                .paymentLinkId("LINK_" + orderCode1k1)
+                .code("00")
+                .desc("Thành công")
+                .build();
+
+        boolean xuLyOk = payOsService.xuLyDonHangThanhCong(webhookData);
+        assertThat(xuLyOk).isTrue();
+
+        DatLich1k1 updated = datLich1k1Repository.findById(caHoc.getId()).orElseThrow();
+        assertThat(updated.getTrangThai()).isEqualTo(TrangThaiDatLich.DA_THANH_TOAN_KY_QUY);
+        assertThat(updated.getMaGiaoDichPayos()).isEqualTo("BANK_REF_" + orderCode1k1);
+
+        // Kiểm tra Idempotency cho ca học 1-1: gọi lại lần 2 không gây lỗi
+        boolean xuLyLan2 = payOsService.xuLyDonHangThanhCong(webhookData);
+        assertThat(xuLyLan2).isTrue();
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("WBS 1.1: Endpoint mô phỏng Demo kích hoạt ký quỹ ca học 1-1 qua /demo/kich-hoat/{orderCode}")
+    void testDemoPaymentSimulationChoCaHoc1k1() throws Exception {
+        NguoiDung hocVien = nguoiDungRepository.save(NguoiDung.builder()
+                .email("demo_1k1_stu_" + UUID.randomUUID().toString().substring(0, 8) + "@test.vn")
+                .matKhau(passwordEncoder.encode("123456"))
+                .hoTen("Học viên Demo 1k1")
+                .trangThai(TrangThaiNguoiDung.HOAT_DONG)
+                .build());
+
+        NguoiDung tutorUser = nguoiDungRepository.save(NguoiDung.builder()
+                .email("demo_1k1_tut_" + UUID.randomUUID().toString().substring(0, 8) + "@test.vn")
+                .matKhau(passwordEncoder.encode("123456"))
+                .hoTen("Gia sư Demo 1k1")
+                .trangThai(TrangThaiNguoiDung.HOAT_DONG)
+                .build());
+
+        HoSoGiangVien gv = hoSoGiangVienRepository.save(HoSoGiangVien.builder()
+                .nguoiDung(tutorUser)
+                .soDuVi(BigDecimal.ZERO)
+                .trangThaiDuyet(TrangThaiGiangVien.DA_DUYET)
+                .build());
+
+        long orderCode1k1 = System.currentTimeMillis() + 888;
+        DatLich1k1 caHoc = datLich1k1Repository.save(DatLich1k1.builder()
+                .maDatLich("DL1K1-" + orderCode1k1)
+                .hocVien(hocVien)
+                .giangVien(gv)
+                .thoiGianBatDau(java.time.LocalDateTime.now().plusDays(3).withHour(9).withMinute(0))
+                .thoiGianKetThuc(java.time.LocalDateTime.now().plusDays(3).withHour(11).withMinute(0))
+                .hocPhiCaHoc(BigDecimal.valueOf(250000))
+                .trangThai(TrangThaiDatLich.CHO_THANH_TOAN)
+                .orderCodePayos(orderCode1k1)
+                .build());
+
+        mockMvc.perform(post("/api/payment/demo/kich-hoat/" + orderCode1k1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.thanhCong").value(true))
+                .andExpect(jsonPath("$.duLieu.thanhCong").value(true));
+
+        DatLich1k1 updated = datLich1k1Repository.findById(caHoc.getId()).orElseThrow();
+        assertThat(updated.getTrangThai()).isEqualTo(TrangThaiDatLich.DA_THANH_TOAN_KY_QUY);
     }
 }
 

@@ -43,7 +43,12 @@ public class ChatWebController {
             return "redirect:/login";
         }
 
-        List<CuocTroChuyenDto> conversations = chatMongoService.layDanhSachCuocTroChuyen(currentUser.getId());
+        List<CuocTroChuyenDto> conversations = new java.util.ArrayList<>();
+        try {
+            conversations = chatMongoService.layDanhSachCuocTroChuyen(currentUser.getId());
+        } catch (Exception e) {
+            log.warn("Không thể tải danh sách cuộc trò chuyện từ MongoDB: {}", e.getMessage());
+        }
 
         // Nếu có tham số userId (Ví dụ: click "Nhắn tin với gia sư" từ trang chi tiết gia sư)
         // mà chưa có conversation sẵn, tự động tạo hoặc tìm conversation tương ứng

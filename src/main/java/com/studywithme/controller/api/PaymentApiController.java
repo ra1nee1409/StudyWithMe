@@ -3,9 +3,11 @@ package com.studywithme.controller.api;
 import com.studywithme.dto.cart.CheckoutRequest;
 import com.studywithme.dto.cart.PaymentResultDto;
 import com.studywithme.dto.response.ApiResponse;
+import com.studywithme.entity.DatLich1k1;
 import com.studywithme.entity.DonHang;
 import com.studywithme.entity.NguoiDung;
 import com.studywithme.exception.ResourceNotFoundException;
+import com.studywithme.repository.DatLich1k1Repository;
 import com.studywithme.repository.DonHangRepository;
 import com.studywithme.repository.NguoiDungRepository;
 import com.studywithme.service.PayOsService;
@@ -33,6 +35,7 @@ public class PaymentApiController {
     private final PayOsService payOsService;
     private final NguoiDungRepository nguoiDungRepository;
     private final DonHangRepository donHangRepository;
+    private final DatLich1k1Repository datLich1k1Repository;
 
     /**
      * API Tạo đơn hàng và sinh link thanh toán VietQR payOS
@@ -144,14 +147,26 @@ public class PaymentApiController {
      */
     @PostMapping("/demo/kich-hoat/{orderCode}")
     public ResponseEntity<ApiResponse<PaymentResultDto>> demoKichHoatDonHang(@PathVariable Long orderCode) {
-        DonHang donHang = donHangRepository.findByOrderCodePayos(orderCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng với mã orderCode: " + orderCode));
+        DonHang donHang = donHangRepository.findByOrderCodePayos(orderCode).orElse(null);
+        if (donHang != null) {
+            long amountVal = donHang.getTongTienThanhToan() != null ? donHang.getTongTienThanhToan().longValue() : 0L;
+            payOsService.kichHoatDonHang(orderCode, "DEMO_TXN_" + System.currentTimeMillis(), amountVal);
+            PaymentResultDto result = paymentService.xuLyPayOsCallback(orderCode);
+            return ResponseEntity.ok(ApiResponse.success("Mô phỏng thanh toán VietQR payOS thành công.", result));
+        }
 
-        long amountVal = donHang.getTongTienThanhToan() != null ? donHang.getTongTienThanhToan().longValue() : 0L;
-        payOsService.kichHoatDonHang(orderCode, "DEMO_TXN_" + System.currentTimeMillis(), amountVal);
-        PaymentResultDto result = paymentService.xuLyPayOsCallback(orderCode);
+        DatLich1k1 caHoc = datLich1k1Repository.findByOrderCodePayos(orderCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng hoặc ca học với mã orderCode: " + orderCode));
 
-        return ResponseEntity.ok(ApiResponse.success("Mô phỏng thanh toán VietQR payOS thành công.", result));
+        long amountVal = caHoc.getHocPhiCaHoc() != null ? caHoc.getHocPhiCaHoc().longValue() : 0L;
+        payOsService.kichHoatDonHang(orderCode, "DEMO_1K1_" + System.currentTimeMillis(), amountVal);
+        PaymentResultDto result = PaymentResultDto.builder()
+                .thanhCong(true)
+                .maDonHang(caHoc.getMaDatLich())
+                .soTien(caHoc.getHocPhiCaHoc())
+                .thongDiep("Mô phỏng ký quỹ ca học kèm 1-1 thành công.")
+                .build();
+        return ResponseEntity.ok(ApiResponse.success("Mô phỏng ký quỹ ca học kèm 1-1 thành công.", result));
     }
 
     private String getBaseUrl(HttpServletRequest request) {

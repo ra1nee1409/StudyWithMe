@@ -58,6 +58,10 @@ public class NguoiDung {
     @Builder.Default
     private TrangThaiNguoiDung trangThai = TrangThaiNguoiDung.HOAT_DONG;
 
+    @Column(name = "so_du_vi", precision = 15, scale = 2)
+    @Builder.Default
+    private java.math.BigDecimal soDuVi = java.math.BigDecimal.ZERO;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "nguoi_dung_vai_tro",
@@ -153,6 +157,14 @@ public class NguoiDung {
 
     public void setNgayCapNhat(LocalDateTime ngayCapNhat) {
         this.ngayCapNhat = ngayCapNhat;
+    }
+
+    public java.math.BigDecimal getSoDuVi() {
+        return soDuVi != null ? soDuVi : java.math.BigDecimal.ZERO;
+    }
+
+    public void setSoDuVi(java.math.BigDecimal soDuVi) {
+        this.soDuVi = soDuVi != null ? soDuVi : java.math.BigDecimal.ZERO;
     }
 
     public void addVaiTro(VaiTro vaiTro) {

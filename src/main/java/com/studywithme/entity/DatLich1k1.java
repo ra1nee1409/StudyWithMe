@@ -83,6 +83,9 @@ public class DatLich1k1 {
     @Column(name = "order_code_payos")
     private Long orderCodePayos;
 
+    @Column(name = "ma_giao_dich_payos", length = 100)
+    private String maGiaoDichPayos;
+
     @Column(name = "danh_gia_sao")
     private Integer danhGiaSao;
 

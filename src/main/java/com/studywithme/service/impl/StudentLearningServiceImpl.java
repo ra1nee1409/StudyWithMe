@@ -127,6 +127,15 @@ public class StudentLearningServiceImpl implements StudentLearningService {
 
         String embedUrl = (baiHocHienTai != null) ? formatVideoEmbedUrl(baiHocHienTai.getLinkVideo()) : "";
 
+        // Khởi tạo lazy collection để serialize JSON an toàn khi open-in-view=false
+        if (khoaHoc.getDanhSachChuongHoc() != null) {
+            khoaHoc.getDanhSachChuongHoc().forEach(c -> {
+                if (c.getDanhSachBaiHoc() != null) {
+                    c.getDanhSachBaiHoc().size();
+                }
+            });
+        }
+
         return PhongHocDto.builder()
                 .khoaHoc(khoaHoc)
                 .danhSachChuongHoc(danhSachChuongHoc)

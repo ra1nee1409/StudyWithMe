@@ -60,6 +60,7 @@ public class UserPrincipal implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public String getPassword() {
         return matKhau;
     }

@@ -213,12 +213,36 @@ class StudentLearningIntegrationTest {
                 .build();
         ghiDanhKhoaHocRepository.save(ghiDanh);
 
-        // Trường hợp 2: Đã ghi danh -> truy cập phòng học thành công
+        // Trường hợp 2: Đã ghi danh -> truy cập phòng học thành công (Web + REST API cho Android)
         mockMvc.perform(get("/student/learn/" + slug)
                         .header("Authorization", "Bearer " + studentToken))
                 .andExpect(status().isOk())
                 .andExpect(view().name("student/learning"))
                 .andExpect(model().attributeExists("khoaHoc", "danhSachChuongHoc", "baiHocHienTai", "embedVideoUrl"));
+
+        mockMvc.perform(get("/api/public/khoa-hoc/" + slug))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.thanhCong").value(true))
+                .andExpect(jsonPath("$.duLieu.duongDanSlug").value(slug));
+
+        mockMvc.perform(get("/api/hoc-vien/khoa-hoc")
+                        .header("Authorization", "Bearer " + studentToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.thanhCong").value(true))
+                .andExpect(jsonPath("$.duLieu[0].duongDanSlug").value(slug));
+
+        mockMvc.perform(get("/api/hoc-vien/hoc-tap/" + slug)
+                        .header("Authorization", "Bearer " + studentToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.thanhCong").value(true))
+                .andExpect(jsonPath("$.duLieu.tongSoBaiHoc").value(2))
+                .andExpect(jsonPath("$.duLieu.embedVideoUrl").isNotEmpty());
+
+        mockMvc.perform(get("/api/hoc-vien/don-hang")
+                        .header("Authorization", "Bearer " + studentToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.thanhCong").value(true))
+                .andExpect(jsonPath("$.duLieu").isArray());
 
         // Trường hợp 3: Gọi API đánh dấu hoàn thành bài 1
         String toggleCompleteJson = String.format("{\"baiHocId\":%d,\"daHoanThanh\":true,\"giayDungLai\":100}", bai1.getId());

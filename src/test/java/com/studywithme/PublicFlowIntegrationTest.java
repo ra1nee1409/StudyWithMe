@@ -228,7 +228,9 @@ class PublicFlowIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.thanhCong").value(true))
-                .andExpect(jsonPath("$.duLieu.email").value("admin@studywithme.vn"));
+                .andExpect(jsonPath("$.duLieu.email").value("admin@studywithme.vn"))
+                .andExpect(jsonPath("$.duLieu.password").doesNotExist())
+                .andExpect(jsonPath("$.duLieu.matKhau").doesNotExist());
     }
 
     // =========================================================================

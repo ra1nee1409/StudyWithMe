@@ -53,8 +53,16 @@ public class KhoaHocServiceImpl implements KhoaHocService {
 
     @Override
     public KhoaHoc layChiTietKhoaHocTheoSlug(String slug) {
-        return khoaHocRepository.findByDuongDanSlugAndTrangThai(slug, TrangThaiKhoaHoc.DA_XUAT_BAN)
+        KhoaHoc khoaHoc = khoaHocRepository.findByDuongDanSlugAndTrangThai(slug, TrangThaiKhoaHoc.DA_XUAT_BAN)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy khóa học với đường dẫn: " + slug));
+        if (khoaHoc.getDanhSachChuongHoc() != null) {
+            khoaHoc.getDanhSachChuongHoc().forEach(c -> {
+                if (c.getDanhSachBaiHoc() != null) {
+                    c.getDanhSachBaiHoc().size();
+                }
+            });
+        }
+        return khoaHoc;
     }
 
     @Override

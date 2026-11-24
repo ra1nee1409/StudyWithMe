@@ -105,6 +105,15 @@ public class PublicApiController {
     }
 
     /**
+     * 3b. API Xem chi tiết khóa học & đề cương theo slug
+     */
+    @GetMapping("/khoa-hoc/{slug}")
+    public ResponseEntity<ApiResponse<KhoaHoc>> layChiTietKhoaHoc(@PathVariable String slug) {
+        KhoaHoc khoaHoc = khoaHocService.layChiTietKhoaHocTheoSlug(slug);
+        return ResponseEntity.ok(ApiResponse.success("Lấy chi tiết khóa học thành công", khoaHoc));
+    }
+
+    /**
      * 4. Lấy danh sách gia sư tiêu biểu
      */
     @GetMapping("/giang-vien/tieu-bieu")

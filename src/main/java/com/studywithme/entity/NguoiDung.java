@@ -44,7 +44,7 @@ public class NguoiDung {
     @Column(name = "mat_khau", nullable = false, length = 100)
     private String matKhau;
 
-    @Column(name = "ho_ten", nullable = false, length = 50, columnDefinition = "NVARCHAR(100)")
+    @Column(name = "ho_ten", nullable = false, length = 100, columnDefinition = "NVARCHAR(100)")
     private String hoTen;
 
     @Column(name = "so_dien_thoai", length = 15)

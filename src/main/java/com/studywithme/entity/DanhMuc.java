@@ -30,6 +30,7 @@ public class DanhMuc {
     @Column(name = "duong_dan_slug", nullable = false, unique = true, length = 100)
     private String duongDanSlug;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "danh_muc_cha_id")
     private DanhMuc danhMucCha;

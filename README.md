@@ -10,13 +10,13 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Java-21-orange.svg" alt="Java 21" />
-  <img src="https://img.shields.io/badge/Spring%20Boot-3.3.4-brightgreen.svg" alt="Spring Boot 3.3.4" />
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.1.1-brightgreen.svg" alt="Spring Boot 4.1.1" />
   <img src="https://img.shields.io/badge/SQL%20Server-2022-blue.svg" alt="SQL Server" />
-  <img src="https://img.shields.io/badge/MongoDB-Atlas%20Cloud-green.svg" alt="MongoDB Atlas" />
+  <img src="https://img.shields.io/badge/MongoDB-Atlas%20%2F%20Local-green.svg" alt="MongoDB" />
   <img src="https://img.shields.io/badge/Thymeleaf-3.0-red.svg" alt="Thymeleaf" />
   <img src="https://img.shields.io/badge/TailwindCSS-v3-38B2AC.svg" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/Payment-PayOS%20VietQR-informational.svg" alt="PayOS VietQR" />
-  <img src="https://img.shields.io/badge/Tests-90%2F90%20Passed%20(100%25)-success.svg" alt="Tests" />
+  <img src="https://img.shields.io/badge/Tests-114%2F114%20Passed%20(100%25)-success.svg" alt="Tests" />
 </p>
 
 ---
@@ -34,7 +34,7 @@
 ## 🏗️ 2. Kiến Trúc Công Nghệ (Tech Stack)
 
 ### Backend
-- **Ngôn ngữ & Nền tảng:** Java 21 LTS, Spring Boot 3.3.4
+- **Ngôn ngữ & Nền tảng:** Java 21 LTS, Spring Boot 4.1.1
 - **Bảo mật:** Spring Security 6, JWT Token & Session Cookie, Phân quyền RBAC (`ADMIN`, `GIANG_VIEN`, `HOC_VIEN`)
 - **Tương tác dữ liệu:**
   - `spring-boot-starter-data-jpa` (Hibernate ORM 6.x)
@@ -107,7 +107,7 @@ studywithme/
 │   │       │   ├── tutors/                  # Danh sách & Chi tiết hồ sơ gia sư
 │   │       │   └── ...
 │   │       └── application.properties       # Cấu hình Datasource, MongoDB, PayOS, Port
-│   └── test/java/com/studywithme/           # 15 Test Suites kiểm thử tự động toàn diện
+│   └── test/java/com/studywithme/           # 20 Test Suites kiểm thử tự động toàn diện
 ├── build.gradle                             # Cấu hình thư viện phụ thuộc Gradle
 └── README.md
 ```
@@ -119,16 +119,16 @@ studywithme/
 ### 5.1. Yêu Cầu Môi Trường
 - **Java Development Kit (JDK):** Phiên bản 21 trở lên.
 - **Cơ sở dữ liệu SQL Server:** SQL Server 2019/2022 hoặc SQL Server Express đang chạy tại cổng mặc định `1433`.
-- **Cơ sở dữ liệu MongoDB:** Kết nối trực tiếp tới cụm **MongoDB Atlas Cloud** (đã được cấu hình sẵn trong project).
+- **Cơ sở dữ liệu MongoDB:** MongoDB cục bộ (localhost:27017) hoặc cụm **MongoDB Atlas Cloud**.
 
 ### 5.2. Cấu Hình `application.properties`
 Dự án đã chuẩn bị sẵn file mẫu [application.properties.example](file:///src/main/resources/application.properties.example).
 Bạn sao chép thành `src/main/resources/application.properties` và cấu hình các thông số phù hợp:
 
 - **1. Microsoft SQL Server:**
-  - Cập nhật thông tin `spring.datasource.url`, `username`, `password` tương ứng với cơ sở dữ liệu trên máy bạn.
+  - Cập nhật thông tin `spring.datasource.url` (mặc định Windows Authentication với DLL hoặc đổi qua user `sa`/`password`).
 - **2. MongoDB (Dual Database Chat):**
-  - Cập nhật `spring.data.mongodb.uri` với đường dẫn kết nối MongoDB cục bộ (`mongodb://localhost:27017/studywithme_chat`) hoặc chuỗi kết nối từ cụm MongoDB Atlas Cloud của bạn.
+  - Cập nhật `spring.mongodb.uri` với đường dẫn kết nối MongoDB cục bộ (`mongodb://localhost:27017/studywithme_chat`) hoặc chuỗi kết nối từ cụm MongoDB Atlas Cloud của bạn.
 - **3. Cổng thanh toán VietQR PayOS:**
   - Điền các khóa `payos.client-id`, `payos.api-key`, `payos.checksum-key` được cung cấp từ trang quản trị PayOS.
   *(Lưu ý: File `application.properties` chứa cấu hình riêng đã được đưa vào `.gitignore` để tránh rò rỉ thông tin nhạy cảm).*
@@ -151,26 +151,31 @@ Sau khi khởi chạy thành công, truy cập trình duyệt tại địa chỉ
 
 ## 🧪 6. Kết Quả Kiểm Thử (Automated Test Report)
 
-Dự án áp dụng phương pháp kiểm thử tích hợp tự động (Integration Testing) với độ bao phủ cao. Toàn bộ **90/90 test cases** thuộc **15 test suites** đều đạt kết quả xuất sắc:
+Dự án áp dụng phương pháp kiểm thử tích hợp tự động (Integration Testing) với độ bao phủ cao. Toàn bộ **114/114 test cases** thuộc **20 test suites** đều đạt kết quả xuất sắc:
 
 | Test Suite | Nội Dung Kiểm Thử | Số Tests | Kết Quả |
 | :--- | :--- | :---: | :---: |
+| `AcidTransactionIntegrityIntegrationTest` | Toàn vẹn giao dịch tài chính, Rollback số dư, Check constraint ví | 2 | ✅ PASS |
 | `AdminCoreEnhancementsIntegrationTest` | Dashboard KPI, Phê duyệt KYC, Khóa tài khoản, Báo cáo | 9 | ✅ PASS |
 | `AuthValidationLimitsIntegrationTest` | Đăng ký, Đăng nhập, Giới hạn độ dài, Ràng buộc mật khẩu | 11 | ✅ PASS |
 | `BecomeTutorIntegrationTest` | Nộp hồ sơ ứng tuyển làm giảng viên, Tải lên bằng cấp | 3 | ✅ PASS |
-| `ChatMongoIntegrationTest` | Kết nối MongoDB Atlas, Gửi nhận tin nhắn, Lấy lịch sử chat | 1 | ✅ PASS |
+| `ChatMongoIntegrationTest` | Kết nối MongoDB, Gửi nhận tin nhắn, Thẻ đề xuất ca học 1-1 | 1 | ✅ PASS |
 | `CourseModerationIntegrationTest` | Quy trình kiểm duyệt khóa học, Từ chối kèm lý do | 6 | ✅ PASS |
-| `PaymentPayOsIntegrationTest` | Tạo giao dịch VietQR PayOS, Xử lý Webhook nạp tiền | 3 | ✅ PASS |
+| `MessengerHubIntegrationTest` | Trạm điều phối tin nhắn Realtime & Chatbot tư vấn | 4 | ✅ PASS |
+| `NotificationIntegrationTest` | Trung tâm thông báo hệ thống, Đánh dấu đã đọc | 3 | ✅ PASS |
+| `OptimizationVerificationTest` | Tối ưu hóa truy vấn CSDL, Batching & Caching | 3 | ✅ PASS |
+| `PaymentPayOsIntegrationTest` | Tạo giao dịch VietQR PayOS, Xử lý Webhook nạp tiền | 5 | ✅ PASS |
 | `PayoutApprovalIntegrationTest` | Rút tiền ví gia sư, Kiểm tra số dư, Admin đối soát | 6 | ✅ PASS |
 | `ProfileAndUserManagementIntegrationTest` | Cập nhật hồ sơ cá nhân, Đổi mật khẩu, Avatar | 6 | ✅ PASS |
 | `PublicFlowIntegrationTest` | Trang chủ, Tìm kiếm gia sư, Xem chi tiết, Khóa học video | 22 | ✅ PASS |
+| `StudentCaHocAndPaymentIntegrationTest` | Học viên đặt ca học, Thanh toán trừ số dư ví | 10 | ✅ PASS |
 | `StudentLearningIntegrationTest` | Học khóa học video, Ghi nhận tiến độ xem bài giảng | 2 | ✅ PASS |
 | `StudywithmeApiApplicationTests` | Khởi tạo Spring Application Context & Bean Mapping | 1 | ✅ PASS |
 | `TeacherKycIntegrationTest` | Quy trình đối soát giấy tờ bằng cấp, Cấp quyền gia sư | 4 | ✅ PASS |
 | `TutorCourseStudioIntegrationTest` | Tạo khóa học, Thêm chương/bài học, Định dạng video | 7 | ✅ PASS |
 | `Wbs2TutorSlotAndBookingIntegrationTest` | Ma trận lịch rảnh tuần, Đặt ca 1-1, Ký quỹ Escrow & Giải ngân | 7 | ✅ PASS |
 | `Wbs6EntitiesIntegrationTest` | Kiểm thử thực thể kép Dual Database JPA & Mongo Document | 2 | ✅ PASS |
-| **TỔNG CỘNG** | **Toàn bộ hệ thống kiểm thử tự động** | **90 / 90** | **100% PASSED** |
+| **TỔNG CỘNG** | **Toàn bộ hệ thống kiểm thử tự động** | **114 / 114** | **100% PASSED** |
 
 ---
 

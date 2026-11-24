@@ -30,7 +30,7 @@ public class KhoaHoc {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "nguoiDung"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "nguoiDung", "danhSachChungChi"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "giang_vien_id", nullable = false)
     private HoSoGiangVien giangVien;

@@ -78,6 +78,8 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         capNhatCheckConstraintDonHang();
+        capNhatCheckConstraintLichSuViTien();
+        damBaoCotUnicodeSqlServer();
 
         // 1. Khởi tạo 3 vai trò cơ bản nếu chưa tồn tại
         VaiTro roleQuanTri = initRole(VaiTroName.ROLE_QUAN_TRI, "Quản trị viên hệ thống");
@@ -958,6 +960,41 @@ public class DataSeeder implements CommandLineRunner {
             """);
         } catch (Exception e) {
             logger.warn("Không thể cập nhật check constraint phuong_thuc_thanh_toan: {}", e.getMessage());
+        }
+    }
+
+    private void capNhatCheckConstraintLichSuViTien() {
+        try {
+            jdbcTemplate.execute("""
+                DECLARE @ConstraintName NVARCHAR(200);
+                SELECT @ConstraintName = Name FROM sys.check_constraints
+                WHERE parent_object_id = OBJECT_ID('lich_su_vi_tien')
+                AND parent_column_id = COLUMNPROPERTY(OBJECT_ID('lich_su_vi_tien'), 'loai_giao_dich', 'ColumnId');
+
+                IF @ConstraintName IS NOT NULL
+                BEGIN
+                    EXEC('ALTER TABLE lich_su_vi_tien DROP CONSTRAINT [' + @ConstraintName + ']');
+                END
+                ALTER TABLE lich_su_vi_tien ADD CHECK (loai_giao_dich IN ('TIEN_BAN_KHOA_HOC', 'TIEN_BAN_LOP_HOC', 'TIEN_DAY_KEM_1K1', 'RUT_TIEN_VE_NGAN_HANG', 'HOAN_TIEN', 'DIEU_CHINH_HE_THONG'));
+            """);
+        } catch (Exception e) {
+            logger.warn("Không thể cập nhật check constraint lich_su_vi_tien.loai_giao_dich: {}", e.getMessage());
+        }
+    }
+
+    private void damBaoCotUnicodeSqlServer() {
+        // Phục hồi kiểu NVARCHAR nếu Hibernate bản cũ từng đổi xuống VARCHAR
+        String[] alters = {
+            "IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='nguoi_dung' AND COLUMN_NAME='ho_ten' AND DATA_TYPE='varchar') ALTER TABLE nguoi_dung ALTER COLUMN ho_ten NVARCHAR(100) NOT NULL",
+            "IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='thong_bao' AND COLUMN_NAME='tieu_de' AND DATA_TYPE='varchar') ALTER TABLE thong_bao ALTER COLUMN tieu_de NVARCHAR(255) NOT NULL",
+            "IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='thong_bao' AND COLUMN_NAME='noi_dung' AND DATA_TYPE='varchar') ALTER TABLE thong_bao ALTER COLUMN noi_dung NVARCHAR(1000) NOT NULL"
+        };
+        for (String sql : alters) {
+            try {
+                jdbcTemplate.execute(sql);
+            } catch (Exception e) {
+                logger.warn("Không thể cập nhật cột NVARCHAR: {}", e.getMessage());
+            }
         }
     }
 

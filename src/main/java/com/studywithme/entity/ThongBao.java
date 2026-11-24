@@ -30,10 +30,10 @@ public class ThongBao {
     @JoinColumn(name = "nguoi_dung_id", nullable = false)
     private NguoiDung nguoiDung;
 
-    @Column(name = "tieu_de", nullable = false, length = 255)
+    @Column(name = "tieu_de", nullable = false, length = 255, columnDefinition = "NVARCHAR(255)")
     private String tieuDe;
 
-    @Column(name = "noi_dung", nullable = false, length = 1000)
+    @Column(name = "noi_dung", nullable = false, length = 1000, columnDefinition = "NVARCHAR(1000)")
     private String noiDung;
 
     @Enumerated(EnumType.STRING)

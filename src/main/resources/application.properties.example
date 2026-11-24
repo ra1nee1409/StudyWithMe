@@ -1,13 +1,23 @@
 # ==============================================================================
 # STUDYWITHME API - TEMPLATE CẤU HÌNH MẪU (APPLICATION PROPERTIES EXAMPLE)
-# Copy file này thành application.properties và điều chỉnh thông tin phù hợp
+# Hướng dẫn: Sao chép file này thành application.properties và điều chỉnh thông tin
 # ==============================================================================
 spring.application.name=studywithme-api
 server.port=8080
 
-# Cấu hình DataSource Microsoft SQL Server
+# ==============================================================================
+# CẤU HÌNH DATASOURCE MICROSOFT SQL SERVER
+# ==============================================================================
+# Tùy chọn 1: Windows Authentication (Mặc định - Yêu cầu thư viện mssql-jdbc_auth.dll)
 spring.datasource.url=jdbc:sqlserver://localhost;instanceName=SQLEXPRESS;databaseName=studywithme_db;integratedSecurity=true;encrypt=true;trustServerCertificate=true
 spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+# Tùy chọn 2: Xác thực bằng tài khoản sa (Bỏ comment nếu dùng user/password SQL Server)
+# spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=studywithme_db;encrypt=true;trustServerCertificate=true
+# spring.datasource.username=sa
+# spring.datasource.password=your-password-here
+
+# Cấu hình Connection Pool HikariCP
 spring.datasource.hikari.minimum-idle=5
 spring.datasource.hikari.maximum-pool-size=15
 spring.datasource.hikari.idle-timeout=30000
@@ -34,8 +44,14 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.open-in-view=false
 
-# Cấu hình MongoDB
-spring.data.mongodb.uri=mongodb://localhost:27017/studywithme_chat
+# ==============================================================================
+# CẤU HÌNH MONGODB (CHAT & REAL-TIME MESSAGING)
+# ==============================================================================
+# Tùy chọn 1: MongoDB cục bộ (Localhost)
+spring.mongodb.uri=mongodb://localhost:27017/studywithme_chat
+
+# Tùy chọn 2: Cụm đám mây MongoDB Atlas Cloud (Bỏ comment và thay chuỗi kết nối)
+# spring.mongodb.uri=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/studywithme_chat?retryWrites=true&w=majority
 
 # Cấu hình Upload File
 spring.servlet.multipart.max-file-size=100MB
@@ -53,4 +69,3 @@ payos.api-key=your-api-key-here
 payos.checksum-key=your-checksum-key-here
 payos.return-url=http://localhost:8080/payment/payos-callback
 payos.cancel-url=http://localhost:8080/checkout?cancel=true
-

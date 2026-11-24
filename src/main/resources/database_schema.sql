@@ -1,6 +1,7 @@
 -- ==============================================================================
 -- ĐỒ ÁN TỐT NGHIỆP: NỀN TẢNG HỌC TẬP & KẾT NỐI GIA SƯ STUDYWITHME
--- CƠ SỞ DỮ LIỆU DÀNH CHO MICROSOFT SQL SERVER (T-SQL)
+-- CƠ SỞ DỮ LIỆU ĐẦY ĐỦ DÀNH CHO MICROSOFT SQL SERVER (T-SQL / SSMS)
+-- Hỗ trợ chạy lại an toàn (idempotent): tạo mới nếu chưa có, cập nhật constraint/cột cũ
 -- ==============================================================================
 
 IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'studywithme_db')
@@ -34,10 +35,17 @@ BEGIN
         [so_dien_thoai] NVARCHAR(20) NULL,
         [anh_dai_dien] NVARCHAR(500) NULL,
         [trang_thai] NVARCHAR(20) NOT NULL DEFAULT 'HOAT_DONG' CHECK ([trang_thai] IN ('HOAT_DONG', 'TAM_KHOA', 'BI_CAM')),
+        [so_du_vi] DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
         [ngay_tao] DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
         [ngay_cap_nhat] DATETIME2 NOT NULL DEFAULT SYSDATETIME()
     );
     CREATE INDEX [idx_nguoi_dung_email] ON [nguoi_dung]([email]);
+END
+GO
+
+IF COL_LENGTH('nguoi_dung', 'so_du_vi') IS NULL
+BEGIN
+    ALTER TABLE [nguoi_dung] ADD [so_du_vi] DECIMAL(15, 2) NOT NULL DEFAULT 0.00;
 END
 GO
 
@@ -223,10 +231,18 @@ BEGIN
         [phuong_thuc_thanh_toan] NVARCHAR(30) NOT NULL DEFAULT 'PAYOS' CHECK ([phuong_thuc_thanh_toan] IN ('VNPAY', 'MOMO', 'CHUYEN_KHOAN', 'PAYOS')),
         [trang_thai_thanh_toan] NVARCHAR(30) NOT NULL DEFAULT 'CHO_THANH_TOAN' CHECK ([trang_thai_thanh_toan] IN ('CHO_THANH_TOAN', 'DA_THANH_TOAN', 'THAT_BAI', 'DA_HUY')),
         [ngay_thanh_toan] DATETIME2 NULL,
+        [order_code_payos] BIGINT NULL,
+        [ma_giao_dich_payos] NVARCHAR(100) NULL,
         [ngay_tao_don] DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
         CONSTRAINT [fk_don_hang_nguoi_dung] FOREIGN KEY ([nguoi_dung_id]) REFERENCES [nguoi_dung] ([id])
     );
 END
+GO
+
+IF COL_LENGTH('don_hang', 'order_code_payos') IS NULL
+    ALTER TABLE [don_hang] ADD [order_code_payos] BIGINT NULL;
+IF COL_LENGTH('don_hang', 'ma_giao_dich_payos') IS NULL
+    ALTER TABLE [don_hang] ADD [ma_giao_dich_payos] NVARCHAR(100) NULL;
 GO
 
 -- 13. BẢNG CHI TIẾT ĐƠN HÀNG (Từng khóa học hoặc lớp học trong đơn)
@@ -355,7 +371,7 @@ BEGIN
         [so_tien_bien_dong] DECIMAL(15, 2) NOT NULL,
         [so_du_truoc] DECIMAL(15, 2) NOT NULL,
         [so_du_sau] DECIMAL(15, 2) NOT NULL,
-        [loai_giao_dich] NVARCHAR(40) NOT NULL CHECK ([loai_giao_dich] IN ('TIEN_BAN_KHOA_HOC', 'TIEN_BAN_LOP_HOC', 'RUT_TIEN_VE_NGAN_HANG', 'HOAN_TIEN', 'DIEU_CHINH_HE_THONG')),
+        [loai_giao_dich] NVARCHAR(40) NOT NULL CHECK ([loai_giao_dich] IN ('TIEN_BAN_KHOA_HOC', 'TIEN_BAN_LOP_HOC', 'TIEN_DAY_KEM_1K1', 'RUT_TIEN_VE_NGAN_HANG', 'HOAN_TIEN', 'DIEU_CHINH_HE_THONG')),
         [ma_tham_chieu] BIGINT NULL,
         [mo_ta_giao_dich] NVARCHAR(255) NULL,
         [ngay_tao] DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
@@ -375,46 +391,155 @@ BEGIN
 END
 GO
 
+-- 22. BẢNG LỊCH DẠY GIA SƯ (Ma trận khung giờ rảnh hàng tuần cho dạy kèm 1-1)
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='lich_day_gia_su' AND xtype='U')
+BEGIN
+    CREATE TABLE [lich_day_gia_su] (
+        [id] BIGINT IDENTITY(1,1) PRIMARY KEY,
+        [giang_vien_id] BIGINT NOT NULL,
+        [thu_trong_tuan] NVARCHAR(20) NOT NULL CHECK ([thu_trong_tuan] IN ('THU_HAI', 'THU_BA', 'THU_TU', 'THU_NAM', 'THU_SAU', 'THU_BAY', 'CHU_NHAT')),
+        [gio_bat_dau] TIME NOT NULL,
+        [gio_ket_thuc] TIME NOT NULL,
+        [loai_lich] NVARCHAR(20) NOT NULL DEFAULT 'CO_DINH' CHECK ([loai_lich] IN ('CO_DINH', 'LINH_HOAT')),
+        [trang_thai] NVARCHAR(20) NOT NULL DEFAULT 'CON_TRONG' CHECK ([trang_thai] IN ('CON_TRONG', 'DA_DAT', 'TAM_KHOA')),
+        [hoc_phi_moi_gio] DECIMAL(15, 2) NULL,
+        [ghi_chu] NVARCHAR(MAX) NULL,
+        [ngay_tao] DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+        [ngay_cap_nhat] DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+        CONSTRAINT [fk_lich_day_giang_vien] FOREIGN KEY ([giang_vien_id]) REFERENCES [ho_so_giang_vien] ([id]) ON DELETE CASCADE
+    );
+    CREATE INDEX [idx_lich_day_gv_thu] ON [lich_day_gia_su]([giang_vien_id], [thu_trong_tuan]);
+    CREATE INDEX [idx_lich_day_gv_trang_thai] ON [lich_day_gia_su]([giang_vien_id], [trang_thai]);
+END
+GO
+
+-- 23. BẢNG ĐẶT LỊCH KÈM 1-1 & KÝ QUỸ ESCROW
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='dat_lich_1k1' AND xtype='U')
+BEGIN
+    CREATE TABLE [dat_lich_1k1] (
+        [id] BIGINT IDENTITY(1,1) PRIMARY KEY,
+        [ma_dat_lich] NVARCHAR(50) NOT NULL UNIQUE,
+        [hoc_vien_id] BIGINT NOT NULL,
+        [giang_vien_id] BIGINT NOT NULL,
+        [mon_hoc_id] BIGINT NULL,
+        [lich_day_id] BIGINT NULL,
+        [thoi_gian_bat_dau] DATETIME2 NOT NULL,
+        [thoi_gian_ket_thuc] DATETIME2 NOT NULL,
+        [hoc_phi_ca_hoc] DECIMAL(15, 2) NOT NULL,
+        [ty_le_hoa_hong_san] DECIMAL(5, 2) NOT NULL DEFAULT 20.00,
+        [phi_san_khau_tru] DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
+        [thuc_nhan_gia_su] DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
+        [trang_thai] NVARCHAR(30) NOT NULL DEFAULT 'CHO_XAC_NHAN' CHECK ([trang_thai] IN ('CHO_XAC_NHAN', 'CHO_THANH_TOAN', 'DA_THANH_TOAN_KY_QUY', 'DANG_DIEN_RA', 'HOAN_THANH', 'DA_HUY', 'TRANH_CHAP')),
+        [link_phong_hoc] NVARCHAR(500) NULL,
+        [ghi_chu_hoc_vien] NVARCHAR(MAX) NULL,
+        [ly_do_huy] NVARCHAR(MAX) NULL,
+        [order_code_payos] BIGINT NULL,
+        [ma_giao_dich_payos] NVARCHAR(100) NULL,
+        [danh_gia_sao] INT NULL,
+        [nhan_xet_hoc_vien] NVARCHAR(MAX) NULL,
+        [ngay_tao] DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+        [ngay_cap_nhat] DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+        CONSTRAINT [fk_dat_lich_hoc_vien] FOREIGN KEY ([hoc_vien_id]) REFERENCES [nguoi_dung] ([id]),
+        CONSTRAINT [fk_dat_lich_giang_vien] FOREIGN KEY ([giang_vien_id]) REFERENCES [ho_so_giang_vien] ([id]),
+        CONSTRAINT [fk_dat_lich_mon_hoc] FOREIGN KEY ([mon_hoc_id]) REFERENCES [danh_muc] ([id]),
+        CONSTRAINT [fk_dat_lich_slot] FOREIGN KEY ([lich_day_id]) REFERENCES [lich_day_gia_su] ([id])
+    );
+    CREATE INDEX [idx_dat_lich_gv_thoigian] ON [dat_lich_1k1]([giang_vien_id], [thoi_gian_bat_dau], [thoi_gian_ket_thuc]);
+    CREATE INDEX [idx_dat_lich_hoc_vien] ON [dat_lich_1k1]([hoc_vien_id]);
+    CREATE INDEX [idx_dat_lich_trang_thai] ON [dat_lich_1k1]([trang_thai]);
+END
+GO
+
+-- 24. BẢNG THÔNG BÁO TỨC THỜI (In-app Notifications)
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='thong_bao' AND xtype='U')
+BEGIN
+    CREATE TABLE [thong_bao] (
+        [id] BIGINT IDENTITY(1,1) PRIMARY KEY,
+        [nguoi_dung_id] BIGINT NOT NULL,
+        [tieu_de] NVARCHAR(255) NOT NULL,
+        [noi_dung] NVARCHAR(1000) NOT NULL,
+        [loai_thong_bao] NVARCHAR(50) NOT NULL CHECK ([loai_thong_bao] IN ('CA_HOC_MOI', 'DUYET_CA_HOC', 'TU_CHOI_CA_HOC', 'KY_QUY_THANH_CONG', 'GIAI_NGAN_VI', 'TIN_NHAN_MOI', 'HE_THONG')),
+        [duong_dan_lien_ket] NVARCHAR(500) NULL,
+        [da_doc] BIT NOT NULL DEFAULT 0,
+        [thoi_gian_tao] DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+        CONSTRAINT [fk_thong_bao_nguoi_dung] FOREIGN KEY ([nguoi_dung_id]) REFERENCES [nguoi_dung] ([id]) ON DELETE CASCADE
+    );
+    CREATE INDEX [idx_thongbao_nguoidung_ngaytao] ON [thong_bao]([nguoi_dung_id], [thoi_gian_tao]);
+    CREATE INDEX [idx_thongbao_nguoidung_dadoc] ON [thong_bao]([nguoi_dung_id], [da_doc]);
+END
+GO
+
 -- ==============================================================================
--- DỮ LIỆU BAN ĐẦU (SEED DATA CHO SQL SERVER)
+-- ĐỒNG BỘ CONSTRAINT & CỘT NVARCHAR CHO DB ĐÃ TẠO TỪ BẢN CŨ (IDEMPOTENT)
 -- ==============================================================================
-SET IDENTITY_INSERT [vai_tro] ON;
-INSERT INTO [vai_tro] ([id], [ten_vai_tro], [mo_ta]) VALUES
-(1, 'ROLE_HOC_VIEN', N'Vai trò học viên / khách đăng ký tài khoản'),
-(2, 'ROLE_GIANG_VIEN', N'Vai trò giảng viên / gia sư tham gia dạy học'),
-(3, 'ROLE_QUAN_TRI', N'Vai trò quản trị viên tối cao quản lý hệ thống');
-SET IDENTITY_INSERT [vai_tro] OFF;
+DECLARE @CkVi NVARCHAR(200);
+SELECT @CkVi = Name FROM sys.check_constraints
+WHERE parent_object_id = OBJECT_ID('lich_su_vi_tien')
+  AND parent_column_id = COLUMNPROPERTY(OBJECT_ID('lich_su_vi_tien'), 'loai_giao_dich', 'ColumnId');
+IF @CkVi IS NOT NULL
+    EXEC('ALTER TABLE [lich_su_vi_tien] DROP CONSTRAINT [' + @CkVi + ']');
+ALTER TABLE [lich_su_vi_tien] ADD CHECK ([loai_giao_dich] IN ('TIEN_BAN_KHOA_HOC', 'TIEN_BAN_LOP_HOC', 'TIEN_DAY_KEM_1K1', 'RUT_TIEN_VE_NGAN_HANG', 'HOAN_TIEN', 'DIEU_CHINH_HE_THONG'));
 GO
 
-SET IDENTITY_INSERT [danh_muc] ON;
-INSERT INTO [danh_muc] ([id], [ten_danh_muc], [duong_dan_slug], [danh_muc_cha_id], [loai_danh_muc], [thu_tu_hien_thi], [kich_hoat]) VALUES
-(1, N'Cấp 1 (Tiểu học)', 'cap-1', NULL, 'CAP_HOC_K12', 1, 1),
-(2, N'Toán Lớp 5', 'toan-lop-5', 1, 'MON_HOC', 1, 1),
-(3, N'Tiếng Việt Lớp 5', 'tieng-viet-lop-5', 1, 'MON_HOC', 2, 1),
-(4, N'Cấp 2 (THCS)', 'cap-2', NULL, 'CAP_HOC_K12', 2, 1),
-(5, N'Toán Lớp 9 Ôn Thi Vào 10', 'toan-lop-9-vao-10', 4, 'MON_HOC', 1, 1),
-(6, N'Tiếng Anh Lớp 9', 'tieng-anh-lop-9', 4, 'MON_HOC', 2, 1),
-(7, N'Cấp 3 (THPT)', 'cap-3', NULL, 'CAP_HOC_K12', 3, 1),
-(8, N'Toán 12 - Luyện Thi THPT QG', 'toan-12-thpt-qg', 7, 'MON_HOC', 1, 1),
-(9, N'Vật Lý 12', 'vat-ly-12', 7, 'MON_HOC', 2, 1),
-(10, N'Hóa Học 12', 'hoa-hoc-12', 7, 'MON_HOC', 3, 1),
-(11, N'Luyện Thi IELTS', 'luyen-thi-ielts', NULL, 'CHUNG_CHI_NGOAI_NGU', 4, 1),
-(12, N'IELTS Cấp Tốc Target 6.5+', 'ielts-target-6-5', 11, 'MON_HOC', 1, 1),
-(13, N'IELTS Speaking Master', 'ielts-speaking-master', 11, 'MON_HOC', 2, 1),
-(14, N'Luyện Thi TOEIC', 'luyen-thi-toeic', NULL, 'CHUNG_CHI_NGOAI_NGU', 5, 1),
-(15, N'TOEIC 4 Kỹ Năng 750+', 'toeic-4-ky-nang-750', 14, 'MON_HOC', 1, 1);
-SET IDENTITY_INSERT [danh_muc] OFF;
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='nguoi_dung' AND COLUMN_NAME='ho_ten' AND DATA_TYPE='varchar')
+    ALTER TABLE [nguoi_dung] ALTER COLUMN [ho_ten] NVARCHAR(100) NOT NULL;
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='thong_bao' AND COLUMN_NAME='tieu_de' AND DATA_TYPE='varchar')
+    ALTER TABLE [thong_bao] ALTER COLUMN [tieu_de] NVARCHAR(255) NOT NULL;
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='thong_bao' AND COLUMN_NAME='noi_dung' AND DATA_TYPE='varchar')
+    ALTER TABLE [thong_bao] ALTER COLUMN [noi_dung] NVARCHAR(1000) NOT NULL;
 GO
 
-SET IDENTITY_INSERT [banner_quang_cao] ON;
-INSERT INTO [banner_quang_cao] ([id], [tieu_de], [link_anh_banner], [link_chuyen_huong], [thu_tu_hien_thi], [kich_hoat]) VALUES
-(1, N'Khai giảng Lớp Luyện Thi THPT QG 2026', 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80', '/khoa-hoc/toan-12-thpt-qg', 1, 1),
-(2, N'Khóa Học IELTS 7.5+ Cùng Giảng Viên Chuyên Nghiệp', 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=80', '/khoa-hoc/ielts-target-6-5', 2, 1);
-SET IDENTITY_INSERT [banner_quang_cao] OFF;
+-- ==============================================================================
+-- DỮ LIỆU BAN ĐẦU (SEED DATA AN TOÀN KHI CHẠY LẠI NHIỀU LẦN)
+-- ==============================================================================
+IF NOT EXISTS (SELECT 1 FROM [vai_tro])
+BEGIN
+    SET IDENTITY_INSERT [vai_tro] ON;
+    INSERT INTO [vai_tro] ([id], [ten_vai_tro], [mo_ta]) VALUES
+    (1, 'ROLE_HOC_VIEN', N'Vai trò học viên / khách đăng ký tài khoản'),
+    (2, 'ROLE_GIANG_VIEN', N'Vai trò giảng viên / gia sư tham gia dạy học'),
+    (3, 'ROLE_QUAN_TRI', N'Vai trò quản trị viên tối cao quản lý hệ thống');
+    SET IDENTITY_INSERT [vai_tro] OFF;
+END
 GO
 
-INSERT INTO [cau_hinh_he_thong] ([ma_cau_hinh], [gia_tri_cau_hinh], [mo_ta]) VALUES
-('PHAN_TRAM_HOA_HONG_SAN', '15', N'Tỷ lệ % hoa hồng sàn giữ lại khi giảng viên bán khóa học / lớp học (VD: 15%)'),
-('SO_TIEN_RUT_TOI_THIEU', '200000', N'Số tiền tối thiểu giảng viên được tạo lệnh rút tiền (VND)'),
-('HOTLINE_HO_TRO', '1900 6868', N'Số điện thoại đường dây nóng hỗ trợ học viên và giảng viên');
+IF NOT EXISTS (SELECT 1 FROM [danh_muc])
+BEGIN
+    SET IDENTITY_INSERT [danh_muc] ON;
+    INSERT INTO [danh_muc] ([id], [ten_danh_muc], [duong_dan_slug], [danh_muc_cha_id], [loai_danh_muc], [thu_tu_hien_thi], [kich_hoat]) VALUES
+    (1, N'Cấp 1 (Tiểu học)', 'cap-1', NULL, 'CAP_HOC_K12', 1, 1),
+    (2, N'Toán Lớp 5', 'toan-lop-5', 1, 'MON_HOC', 1, 1),
+    (3, N'Tiếng Việt Lớp 5', 'tieng-viet-lop-5', 1, 'MON_HOC', 2, 1),
+    (4, N'Cấp 2 (THCS)', 'cap-2', NULL, 'CAP_HOC_K12', 2, 1),
+    (5, N'Toán Lớp 9 Ôn Thi Vào 10', 'toan-lop-9-vao-10', 4, 'MON_HOC', 1, 1),
+    (6, N'Tiếng Anh Lớp 9', 'tieng-anh-lop-9', 4, 'MON_HOC', 2, 1),
+    (7, N'Cấp 3 (THPT)', 'cap-3', NULL, 'CAP_HOC_K12', 3, 1),
+    (8, N'Toán 12 - Luyện Thi THPT QG', 'toan-12-thpt-qg', 7, 'MON_HOC', 1, 1),
+    (9, N'Vật Lý 12', 'vat-ly-12', 7, 'MON_HOC', 2, 1),
+    (10, N'Hóa Học 12', 'hoa-hoc-12', 7, 'MON_HOC', 3, 1),
+    (11, N'Luyện Thi IELTS', 'luyen-thi-ielts', NULL, 'CHUNG_CHI_NGOAI_NGU', 4, 1),
+    (12, N'IELTS Cấp Tốc Target 6.5+', 'ielts-target-6-5', 11, 'MON_HOC', 1, 1),
+    (13, N'IELTS Speaking Master', 'ielts-speaking-master', 11, 'MON_HOC', 2, 1),
+    (14, N'Luyện Thi TOEIC', 'luyen-thi-toeic', NULL, 'CHUNG_CHI_NGOAI_NGU', 5, 1),
+    (15, N'TOEIC 4 Kỹ Năng 750+', 'toeic-4-ky-nang-750', 14, 'MON_HOC', 1, 1);
+    SET IDENTITY_INSERT [danh_muc] OFF;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM [banner_quang_cao])
+BEGIN
+    SET IDENTITY_INSERT [banner_quang_cao] ON;
+    INSERT INTO [banner_quang_cao] ([id], [tieu_de], [link_anh_banner], [link_chuyen_huong], [thu_tu_hien_thi], [kich_hoat]) VALUES
+    (1, N'Khai giảng Lớp Luyện Thi THPT QG 2026', 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80', '/khoa-hoc/toan-12-thpt-qg', 1, 1),
+    (2, N'Khóa Học IELTS 7.5+ Cùng Giảng Viên Chuyên Nghiệp', 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=80', '/khoa-hoc/ielts-target-6-5', 2, 1);
+    SET IDENTITY_INSERT [banner_quang_cao] OFF;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM [cau_hinh_he_thong] WHERE [ma_cau_hinh] = 'PHAN_TRAM_HOA_HONG_SAN')
+    INSERT INTO [cau_hinh_he_thong] ([ma_cau_hinh], [gia_tri_cau_hinh], [mo_ta]) VALUES ('PHAN_TRAM_HOA_HONG_SAN', '15', N'Tỷ lệ % hoa hồng sàn giữ lại khi giảng viên bán khóa học / lớp học (VD: 15%)');
+IF NOT EXISTS (SELECT 1 FROM [cau_hinh_he_thong] WHERE [ma_cau_hinh] = 'SO_TIEN_RUT_TOI_THIEU')
+    INSERT INTO [cau_hinh_he_thong] ([ma_cau_hinh], [gia_tri_cau_hinh], [mo_ta]) VALUES ('SO_TIEN_RUT_TOI_THIEU', '200000', N'Số tiền tối thiểu giảng viên được tạo lệnh rút tiền (VND)');
+IF NOT EXISTS (SELECT 1 FROM [cau_hinh_he_thong] WHERE [ma_cau_hinh] = 'HOTLINE_HO_TRO')
+    INSERT INTO [cau_hinh_he_thong] ([ma_cau_hinh], [gia_tri_cau_hinh], [mo_ta]) VALUES ('HOTLINE_HO_TRO', '1900 6868', N'Số điện thoại đường dây nóng hỗ trợ học viên và giảng viên');
 GO

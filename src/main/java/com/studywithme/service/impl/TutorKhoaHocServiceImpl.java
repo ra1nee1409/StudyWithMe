@@ -43,7 +43,9 @@ public class TutorKhoaHocServiceImpl implements TutorKhoaHocService {
     @Override
     @Transactional(readOnly = true)
     public List<KhoaHoc> layDanhSachKhoaHocCuaGiangVien(Long giangVienId) {
-        return khoaHocRepository.findByGiangVienIdOrderByNgayTaoDesc(giangVienId);
+        List<KhoaHoc> list = khoaHocRepository.findByGiangVienIdOrderByNgayTaoDesc(giangVienId);
+        list.forEach(this::khoiTaoDeCuong);
+        return list;
     }
 
     @Override
@@ -53,6 +55,7 @@ public class TutorKhoaHocServiceImpl implements TutorKhoaHocService {
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy khóa học #" + khoaHocId));
 
         kiemTraQuyenSoHuu(kh, giangVienId);
+        khoiTaoDeCuong(kh);
         return kh;
     }
 
@@ -97,7 +100,7 @@ public class TutorKhoaHocServiceImpl implements TutorKhoaHocService {
     @Override
     @Transactional
     public KhoaHoc capNhatKhoaHoc(Long giangVienId, Long khoaHocId, CapNhatKhoaHocRequest request) {
-        KhoaHoc kh = khoaHocRepository.findById(khoaHocId)
+        KhoaHoc kh = khoaHocRepository.findChiTietById(khoaHocId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy khóa học #" + khoaHocId));
 
         kiemTraQuyenSoHuu(kh, giangVienId);
@@ -116,7 +119,9 @@ public class TutorKhoaHocServiceImpl implements TutorKhoaHocService {
         }
         kh.setMoTaChiTiet(request.getMoTaChiTiet());
 
-        return khoaHocRepository.save(kh);
+        KhoaHoc saved = khoaHocRepository.save(kh);
+        khoiTaoDeCuong(saved);
+        return saved;
     }
 
     @Override
@@ -140,6 +145,7 @@ public class TutorKhoaHocServiceImpl implements TutorKhoaHocService {
         kh.setLyDoTuChoi(null); // Xóa lý do từ chối cũ nếu có
 
         KhoaHoc updated = khoaHocRepository.save(kh);
+        khoiTaoDeCuong(updated);
         log.info("Khóa học #{} đã được gửi phê duyệt sang Admin bởi Giảng viên #{}", khoaHocId, giangVienId);
         return updated;
     }
@@ -223,6 +229,16 @@ public class TutorKhoaHocServiceImpl implements TutorKhoaHocService {
 
         kiemTraQuyenSoHuu(baiHoc.getChuongHoc().getKhoaHoc(), giangVienId);
         baiHocRepository.delete(baiHoc);
+    }
+
+    private void khoiTaoDeCuong(KhoaHoc khoaHoc) {
+        if (khoaHoc.getDanhSachChuongHoc() != null) {
+            khoaHoc.getDanhSachChuongHoc().forEach(chuong -> {
+                if (chuong.getDanhSachBaiHoc() != null) {
+                    chuong.getDanhSachBaiHoc().size();
+                }
+            });
+        }
     }
 
     private void kiemTraQuyenSoHuu(KhoaHoc khoaHoc, Long giangVienId) {

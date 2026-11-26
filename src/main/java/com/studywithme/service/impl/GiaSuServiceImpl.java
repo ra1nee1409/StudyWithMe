@@ -32,8 +32,8 @@ public class GiaSuServiceImpl implements GiaSuService {
     private final KhoaHocRepository khoaHocRepository;
 
     public GiaSuServiceImpl(HoSoGiangVienRepository hoSoGiangVienRepository,
-                            LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
-                            KhoaHocRepository khoaHocRepository) {
+            LopHocTrucTuyenRepository lopHocTrucTuyenRepository,
+            KhoaHocRepository khoaHocRepository) {
         this.hoSoGiangVienRepository = hoSoGiangVienRepository;
         this.lopHocTrucTuyenRepository = lopHocTrucTuyenRepository;
         this.khoaHocRepository = khoaHocRepository;
@@ -67,8 +67,18 @@ public class GiaSuServiceImpl implements GiaSuService {
 
     @Override
     public List<KhoaHoc> layKhoaHocCuaGiaSu(Long giangVienId) {
-        return khoaHocRepository.findByGiangVienIdAndTrangThaiOrderByNgayTaoDesc(
+        List<KhoaHoc> list = khoaHocRepository.findByGiangVienIdAndTrangThaiOrderByNgayTaoDesc(
                 giangVienId, TrangThaiKhoaHoc.DA_XUAT_BAN);
+        list.forEach(kh -> {
+            if (kh.getDanhSachChuongHoc() != null) {
+                kh.getDanhSachChuongHoc().forEach(c -> {
+                    if (c.getDanhSachBaiHoc() != null) {
+                        c.getDanhSachBaiHoc().size();
+                    }
+                });
+            }
+        });
+        return list;
     }
 
     @Override

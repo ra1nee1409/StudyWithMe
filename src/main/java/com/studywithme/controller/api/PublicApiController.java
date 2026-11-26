@@ -154,7 +154,9 @@ public class PublicApiController {
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "moi-nhat") String sort) {
 
-        Sort sortObj = Sort.by(Sort.Direction.DESC, "ngayTao");
+        Sort sortObj = "cu-nhat".equals(sort)
+                ? Sort.by(Sort.Direction.ASC, "ngayTao")
+                : ("ten-az".equals(sort) ? Sort.by(Sort.Direction.ASC, "nguoiDung.hoTen") : Sort.by(Sort.Direction.DESC, "ngayTao"));
         Pageable pageable = PageRequest.of(Math.max(0, page), size, sortObj);
         Page<HoSoGiangVien> ketQua = giaSuService.locGiaSu(keyword, loaiChungChi, pageable);
         return ResponseEntity.ok(ApiResponse.success("Tìm kiếm gia sư thành công", ketQua));

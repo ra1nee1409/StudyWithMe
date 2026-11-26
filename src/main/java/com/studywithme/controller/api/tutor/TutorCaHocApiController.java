@@ -54,8 +54,12 @@ public class TutorCaHocApiController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<DatLich1k1Dto>> layChiTietCaHoc(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<DatLich1k1Dto>> layChiTietCaHoc(@PathVariable Long id, Principal principal) {
+        HoSoGiangVien gv = getGiangVienFromPrincipal(principal);
         DatLich1k1Dto dto = datLich1k1Service.layChiTietCaHoc(id);
+        if (!gv.getId().equals(dto.getGiangVienId())) {
+            throw new AccessDeniedException("Bạn không có quyền xem chi tiết ca học này.");
+        }
         return ResponseEntity.ok(ApiResponse.success("Lấy chi tiết ca học thành công", dto));
     }
 

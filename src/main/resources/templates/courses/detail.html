@@ -234,21 +234,22 @@
               <span class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider block">Học Phí Toàn
                 Khóa</span>
               <div class="flex items-baseline gap-3">
-                <span class="text-3xl font-black text-primary" th:if="${course.giaKhuyenMai != null}"
+                <span class="text-3xl font-black text-status-success"
+                  th:if="${(course.giaKhuyenMai != null and course.giaKhuyenMai.compareTo(T(java.math.BigDecimal).ZERO) == 0) or (course.giaKhuyenMai == null and (course.giaGoc == null or course.giaGoc.compareTo(T(java.math.BigDecimal).ZERO) == 0))}">
+                  Miễn phí
+                </span>
+                <span class="text-3xl font-black text-primary"
+                  th:if="${course.giaKhuyenMai != null and course.giaKhuyenMai.compareTo(T(java.math.BigDecimal).ZERO) > 0}"
                   th:text="${#numbers.formatDecimal(course.giaKhuyenMai, 0, 'POINT', 0, 'COMMA')} + ' đ'">
                   699.000 đ
                 </span>
                 <span class="text-3xl font-black text-primary"
-                  th:if="${course.giaKhuyenMai == null and course.giaGoc.compareTo(T(java.math.BigDecimal).ZERO) > 0}"
+                  th:if="${course.giaKhuyenMai == null and course.giaGoc != null and course.giaGoc.compareTo(T(java.math.BigDecimal).ZERO) > 0}"
                   th:text="${#numbers.formatDecimal(course.giaGoc, 0, 'POINT', 0, 'COMMA')} + ' đ'">
                   699.000 đ
                 </span>
-                <span class="text-3xl font-black text-status-success"
-                  th:if="${course.giaGoc.compareTo(T(java.math.BigDecimal).ZERO) == 0}">
-                  Miễn phí
-                </span>
 
-                <span th:if="${course.giaKhuyenMai != null and course.giaKhuyenMai.compareTo(course.giaGoc) < 0}"
+                <span th:if="${course.giaKhuyenMai != null and course.giaGoc != null and course.giaKhuyenMai.compareTo(course.giaGoc) < 0}"
                   class="text-sm text-outline line-through"
                   th:text="${#numbers.formatDecimal(course.giaGoc, 0, 'POINT', 0, 'COMMA')} + ' đ'">
                   899.000 đ

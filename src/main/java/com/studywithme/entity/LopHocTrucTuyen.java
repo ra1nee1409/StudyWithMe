@@ -28,10 +28,12 @@ public class LopHocTrucTuyen {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "danhSachChungChi"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "giang_vien_id", nullable = false)
     private HoSoGiangVien giangVien;
 
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "danh_muc_id", nullable = false)
     private DanhMuc danhMuc;

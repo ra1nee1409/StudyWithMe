@@ -75,8 +75,12 @@ public class StudentLearningServiceImpl implements StudentLearningService {
         for (ChuongHoc chuong : danhSachChuongHoc) {
             List<BaiHoc> baiHocList = baiHocRepository.findByChuongHocIdOrderByThuTuSapXepAsc(chuong.getId());
             if (chuong.getDanhSachBaiHoc() != null) {
-                chuong.getDanhSachBaiHoc().clear();
-                chuong.getDanhSachBaiHoc().addAll(baiHocList);
+                chuong.getDanhSachBaiHoc().size();
+                for (BaiHoc bh : baiHocList) {
+                    if (chuong.getDanhSachBaiHoc().stream().noneMatch(existing -> Objects.equals(existing.getId(), bh.getId()))) {
+                        chuong.getDanhSachBaiHoc().add(bh);
+                    }
+                }
             }
             allLessons.addAll(baiHocList);
         }

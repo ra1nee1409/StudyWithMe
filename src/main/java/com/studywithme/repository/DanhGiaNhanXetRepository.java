@@ -12,6 +12,10 @@ import java.util.List;
 
 @Repository
 public interface DanhGiaNhanXetRepository extends JpaRepository<DanhGiaNhanXet, Long> {
+    @Override
+    @EntityGraph(attributePaths = {"nguoiDung"})
+    List<DanhGiaNhanXet> findAll();
+
     @EntityGraph(attributePaths = {"nguoiDung"})
     Page<DanhGiaNhanXet> findByLoaiDanhGiaAndMucTieuIdAndDuocHienThiTrue(LoaiYeuThich loaiDanhGia, Long mucTieuId, Pageable pageable);
 

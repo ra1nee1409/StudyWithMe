@@ -13,10 +13,14 @@ import java.util.List;
 @Repository
 public interface LopHocTrucTuyenRepository extends JpaRepository<LopHocTrucTuyen, Long> {
 
+    @Override
+    @EntityGraph(attributePaths = {"danhMuc", "giangVien", "giangVien.nguoiDung"})
+    List<LopHocTrucTuyen> findAll();
+
     @EntityGraph(attributePaths = {"danhMuc"})
     List<LopHocTrucTuyen> findByGiangVienId(Long giangVienId);
 
-    @EntityGraph(attributePaths = {"danhMuc"})
+    @EntityGraph(attributePaths = {"danhMuc", "danhSachHocVien"})
     List<LopHocTrucTuyen> findByGiangVienIdOrderByNgayTaoDesc(Long giangVienId);
 
     long countByGiangVienId(Long giangVienId);
@@ -28,6 +32,6 @@ public interface LopHocTrucTuyenRepository extends JpaRepository<LopHocTrucTuyen
 
     long countByDanhMucId(Long danhMucId);
 
-    @EntityGraph(attributePaths = {"danhMuc"})
+    @EntityGraph(attributePaths = {"danhMuc", "giangVien", "giangVien.nguoiDung"})
     List<LopHocTrucTuyen> findByGiangVienIdAndTrangThaiOrderByNgayTaoDesc(Long giangVienId, TrangThaiLopHoc trangThai);
 }

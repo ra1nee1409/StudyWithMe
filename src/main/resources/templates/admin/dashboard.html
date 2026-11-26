@@ -603,7 +603,7 @@
           const d = result.duLieu;
           document.getElementById('kpi-doanh-thu').textContent = new Intl.NumberFormat('vi-VN').format(d.tongDoanhThu);
           document.getElementById('kpi-nguoi-dung').textContent = d.tongNguoiDung;
-          document.getElementById('kpi-khoa-hoc').textContent = d.tongKhoaHocDangHoatDong;
+          document.getElementById('kpi-khoa-hoc').textContent = d.tongCaHoc1k1 ?? d.tongKhoaHocDangHoatDong;
           document.getElementById('kpi-cho-duyet').textContent = d.tongYeuCauChoDuyet;
         }
       } catch (e) {

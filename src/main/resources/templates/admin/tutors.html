@@ -215,7 +215,9 @@
                 </button>
 
                 <!-- Nút Từ chối (mở modal nhập lý do) -->
-                <button type="button" th:onclick="'openRejectModal(' + ${tutor.id} + ', \'' + ${tutor.hoTen} + '\')'"
+                <button type="button"
+                        th:attr="data-id=${tutor.id}, data-name=${tutor.hoTen ?: ''}"
+                        onclick="openRejectModal(Number(this.dataset.id), this.dataset.name)"
                         class="px-4 py-2.5 rounded-lg border border-error/30 text-error hover:bg-error-container text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
                   <span class="material-symbols-outlined text-[16px]">close</span>
                   Từ chối
@@ -269,7 +271,7 @@
                         Video Dạy Thử Demo
                       </h4>
                       <div class="aspect-video w-full rounded-lg overflow-hidden bg-black/10">
-                        <iframe th:src="${tutor.linkVideoDayThu}" class="w-full h-full border-0" allowfullscreen></iframe>
+                        <iframe th:src="${tutor.linkVideoDayThu}" th:attr="data-raw-url=${tutor.linkVideoDayThu}" class="js-tutor-video-iframe w-full h-full border-0" allowfullscreen></iframe>
                       </div>
                     </div>
 
@@ -287,7 +289,8 @@
                       <div th:unless="${#lists.isEmpty(tutor.danhSachChungChi)}" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div th:each="cc : ${tutor.danhSachChungChi}" class="p-4 rounded-xl border border-surface-container bg-surface-container-low/40 flex flex-col gap-2">
                           <div class="h-40 rounded-lg overflow-hidden bg-surface-container border border-surface-container-high cursor-pointer relative group"
-                               th:onclick="'openImagePreview(\'' + ${cc.linkAnhChungChi} + '\', \'' + ${cc.tenChungChi} + '\')'">
+                               th:attr="data-img=${cc.linkAnhChungChi ?: ''}, data-title=${cc.tenChungChi ?: ''}"
+                               onclick="openImagePreview(this.dataset.img, this.dataset.title)">
                             <img th:src="${cc.linkAnhChungChi}" th:alt="${cc.tenChungChi}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
                             <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1 font-semibold text-xs">
                               <span class="material-symbols-outlined text-[18px]">zoom_in</span> Phóng to xem
@@ -335,7 +338,10 @@
                     <button type="button" th:onclick="'closeDetailModal(' + ${tutor.id} + ')'" class="px-4 py-2 rounded-lg border border-surface-container text-on-surface text-xs font-semibold hover:bg-surface-container cursor-pointer">
                       Đóng
                     </button>
-                    <button type="button" th:onclick="'closeDetailModal(' + ${tutor.id} + '); openRejectModal(' + ${tutor.id} + ', \'' + ${tutor.hoTen} + '\');'" class="px-4 py-2 rounded-lg border border-error/30 text-error hover:bg-error-container text-xs font-bold cursor-pointer">
+                    <button type="button"
+                            th:attr="data-id=${tutor.id}, data-name=${tutor.hoTen ?: ''}"
+                            onclick="closeDetailModal(Number(this.dataset.id)); openRejectModal(Number(this.dataset.id), this.dataset.name);"
+                            class="px-4 py-2 rounded-lg border border-error/30 text-error hover:bg-error-container text-xs font-bold cursor-pointer">
                       Từ chối hồ sơ
                     </button>
                     <form th:action="@{/admin/duyet-gia-su/{id}(id=${tutor.id})}" method="post" onsubmit="return confirm('Xác nhận phê duyệt hồ sơ gia sư này?');">
@@ -406,7 +412,9 @@
                   <td class="py-3.5 px-4 text-on-surface-variant text-[11px]" th:text="${#temporals.format(tutor.ngayTao, 'dd/MM/yyyy')}">17/10/2026</td>
                   <td class="py-3.5 px-4 text-right">
                     <div class="flex items-center justify-end gap-1.5">
-                      <button type="button" th:attr="onclick='moModalDinhChi(' + ${tutor.id} + ', \'' + ${tutor.hoTen} + '\')'"
+                      <button type="button"
+                              th:attr="data-id=${tutor.id}, data-name=${tutor.hoTen ?: ''}"
+                              onclick="moModalDinhChi(Number(this.dataset.id), this.dataset.name)"
                               class="px-2.5 py-1.5 rounded-lg bg-error-container/40 text-error hover:bg-error hover:text-white transition-all text-xs font-semibold flex items-center gap-1 cursor-pointer"
                               title="Đình chỉ quyền giảng dạy">
                         <span class="material-symbols-outlined text-[15px]">block</span>
@@ -572,7 +580,17 @@
 
     function openDetailModal(id) {
       const modal = document.getElementById('modal-detail-' + id);
-      if (modal) modal.classList.remove('hidden');
+      if (modal) {
+        const iframe = modal.querySelector('.js-tutor-video-iframe');
+        if (iframe) {
+          const raw = iframe.getAttribute('data-raw-url') || iframe.getAttribute('src') || '';
+          const m = raw.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+          if (m && !raw.includes('youtube.com/embed/')) {
+            iframe.src = 'https://www.youtube.com/embed/' + m[1];
+          }
+        }
+        modal.classList.remove('hidden');
+      }
     }
 
     function closeDetailModal(id) {

@@ -149,7 +149,7 @@
   <footer th:replace="~{components/user/footer :: main-footer}"></footer>
 
   <!-- Clean Cart upon success & Demo simulator handler -->
-  <script>
+  <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', () => {
       const isSuccess = /*[[${result.thanhCong}]]*/ false;
       if (isSuccess) {

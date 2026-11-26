@@ -2,6 +2,7 @@ package com.studywithme.repository;
 
 import com.studywithme.entity.DanhMuc;
 import com.studywithme.entity.enums.shared.LoaiDanhMuc;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +16,7 @@ public interface DanhMucRepository extends JpaRepository<DanhMuc, Long> {
     boolean existsByDuongDanSlugAndIdNot(String duongDanSlug, Long id);
     boolean existsByDanhMucChaId(Long danhMucChaId);
     List<DanhMuc> findAllByOrderByThuTuHienThiAsc();
+    @EntityGraph(attributePaths = {"danhSachDanhMucCon"})
     List<DanhMuc> findByDanhMucChaIsNullOrderByThuTuHienThiAsc();
     List<DanhMuc> findByDanhMucChaIdOrderByThuTuHienThiAsc(Long danhMucChaId);
     List<DanhMuc> findByLoaiDanhMucOrderByThuTuHienThiAsc(LoaiDanhMuc loaiDanhMuc);

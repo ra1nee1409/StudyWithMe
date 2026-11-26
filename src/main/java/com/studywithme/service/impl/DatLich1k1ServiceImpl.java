@@ -318,6 +318,14 @@ public class DatLich1k1ServiceImpl implements DatLich1k1Service {
             throw new IllegalArgumentException("Bạn không có quyền thực hiện thao tác này!");
         }
 
+        if (caHoc.getTrangThai() == TrangThaiDatLich.DA_THANH_TOAN_KY_QUY) {
+            return caHoc;
+        }
+        if (caHoc.getTrangThai() != TrangThaiDatLich.CHO_THANH_TOAN
+                && caHoc.getTrangThai() != TrangThaiDatLich.CHO_XAC_NHAN) {
+            throw new IllegalArgumentException("Ca học này không ở trạng thái có thể thanh toán ký quỹ!");
+        }
+
         NguoiDung hocVien = caHoc.getHocVien();
         BigDecimal soTien = caHoc.getHocPhiCaHoc() != null ? caHoc.getHocPhiCaHoc() : BigDecimal.ZERO;
         if (hocVien.getSoDuVi().compareTo(soTien) >= 0 && soTien.compareTo(BigDecimal.ZERO) > 0) {

@@ -37,20 +37,24 @@ public class GiaSuWebController {
     @GetMapping({"", "/"})
     public String index(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String grade,
             @RequestParam(required = false) String chungChi,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "moi-nhat") String sort,
             Model model) {
 
-        Sort sortObj = Sort.by(Sort.Direction.DESC, "ngayTao");
+        String effectiveKeyword = (keyword != null && !keyword.isBlank()) ? keyword : grade;
+        Sort sortObj = "cu-nhat".equals(sort)
+                ? Sort.by(Sort.Direction.ASC, "ngayTao")
+                : ("ten-az".equals(sort) ? Sort.by(Sort.Direction.ASC, "nguoiDung.hoTen") : Sort.by(Sort.Direction.DESC, "ngayTao"));
         Pageable pageable = PageRequest.of(Math.max(0, page), size, sortObj);
 
-        Page<HoSoGiangVien> tutors = giaSuService.locGiaSu(keyword, chungChi, pageable);
+        Page<HoSoGiangVien> tutors = giaSuService.locGiaSu(effectiveKeyword, chungChi, pageable);
 
         model.addAttribute("tutors", tutors);
         model.addAttribute("totalTutors", tutors.getTotalElements());
-        model.addAttribute("selectedKeyword", keyword != null ? keyword : "");
+        model.addAttribute("selectedKeyword", effectiveKeyword != null ? effectiveKeyword : "");
         model.addAttribute("selectedChungChi", chungChi != null ? chungChi : "");
         model.addAttribute("selectedSort", sort);
         model.addAttribute("currentPage", page);

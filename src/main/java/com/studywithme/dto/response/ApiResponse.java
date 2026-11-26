@@ -73,7 +73,11 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    // Compatibility helpers for JSON clients (status, message, data)
+    // Compatibility helpers for JSON clients (success, status, message, data)
+    public boolean isSuccess() {
+        return this.thanhCong;
+    }
+
     public String getStatus() {
         return this.thanhCong ? "success" : "error";
     }

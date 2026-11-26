@@ -74,7 +74,7 @@
               </span>
 
               <!-- Badge Giảm giá (Top Right) -->
-              <span th:if="${course.giaKhuyenMai != null and course.giaKhuyenMai < course.giaGoc}"
+              <span th:if="${course.giaGoc != null and course.giaGoc.compareTo(T(java.math.BigDecimal).ZERO) > 0 and course.giaKhuyenMai != null and course.giaKhuyenMai.compareTo(course.giaGoc) < 0}"
                 class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md bg-tertiary-container text-white text-[11px] font-black shadow-xs">
                 -<span
                   th:text="${#numbers.formatDecimal((1 - (course.giaKhuyenMai / course.giaGoc)) * 100, 0, 'NONE', 0, 'NONE')}">30</span>%

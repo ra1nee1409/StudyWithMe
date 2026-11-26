@@ -103,37 +103,39 @@ public class AcidTransactionIntegrityIntegrationTest {
         Long caHocId = caHoc.getId();
         Long tutorId = tutor.getId();
 
-        // 2. Chạy khối giao dịch mô phỏng lỗi xảy ra ở bước cuối cùng
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus status = transactionManager.getTransaction(def);
-
         try {
-            // Bước A: Đổi trạng thái ca học
-            DatLich1k1 caHocInTx = datLich1k1Repository.findById(caHocId).orElseThrow();
-            caHocInTx.setTrangThai(TrangThaiDatLich.DA_THANH_TOAN_KY_QUY);
-            datLich1k1Repository.save(caHocInTx);
+            // 2. Chạy khối giao dịch mô phỏng lỗi xảy ra ở bước cuối cùng
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            TransactionStatus status = transactionManager.getTransaction(def);
 
-            // Bước B: Mô phỏng sự cố ngắt kết nối mạng hoặc lỗi hệ thống không mong muốn
-            throw new RuntimeException("Mô phỏng sự cố mạng nghiêm trọng ở bước cuối!");
-        } catch (RuntimeException e) {
-            // Bước C: Rollback toàn bộ giao dịch
-            transactionManager.rollback(status);
+            try {
+                // Bước A: Đổi trạng thái ca học
+                DatLich1k1 caHocInTx = datLich1k1Repository.findById(caHocId).orElseThrow();
+                caHocInTx.setTrangThai(TrangThaiDatLich.DA_THANH_TOAN_KY_QUY);
+                datLich1k1Repository.save(caHocInTx);
+
+                // Bước B: Mô phỏng sự cố ngắt kết nối mạng hoặc lỗi hệ thống không mong muốn
+                throw new RuntimeException("Mô phỏng sự cố mạng nghiêm trọng ở bước cuối!");
+            } catch (RuntimeException e) {
+                // Bước C: Rollback toàn bộ giao dịch
+                transactionManager.rollback(status);
+            }
+
+            // 3. Kiểm tra tính toàn vẹn (ACID): Dữ liệu CSDL phải giữ nguyên trạng thái ban đầu
+            DatLich1k1 caHocAfter = datLich1k1Repository.findById(caHocId).orElseThrow();
+            assertEquals(TrangThaiDatLich.CHO_XAC_NHAN, caHocAfter.getTrangThai(),
+                    "ACID: Trạng thái ca học phải được rollback về CHO_XAC_NHAN, không bị lưu dở dang");
+
+            HoSoGiangVien tutorAfter = hoSoGiangVienRepository.findById(tutorId).orElseThrow();
+            assertEquals(0, BigDecimal.ZERO.compareTo(tutorAfter.getSoDuVi()),
+                    "ACID: Số dư ví gia sư không bị thay đổi khi giao dịch gặp sự cố");
+        } finally {
+            // Dọn dẹp dữ liệu test kể cả khi assert thất bại
+            datLich1k1Repository.deleteById(caHocId);
+            hoSoGiangVienRepository.deleteById(tutorId);
+            nguoiDungRepository.deleteById(tutorUser.getId());
+            nguoiDungRepository.deleteById(student.getId());
         }
-
-        // 3. Kiểm tra tính toàn vẹn (ACID): Dữ liệu CSDL phải giữ nguyên trạng thái ban đầu
-        DatLich1k1 caHocAfter = datLich1k1Repository.findById(caHocId).orElseThrow();
-        assertEquals(TrangThaiDatLich.CHO_XAC_NHAN, caHocAfter.getTrangThai(),
-                "ACID: Trạng thái ca học phải được rollback về CHO_XAC_NHAN, không bị lưu dở dang");
-
-        HoSoGiangVien tutorAfter = hoSoGiangVienRepository.findById(tutorId).orElseThrow();
-        assertEquals(0, BigDecimal.ZERO.compareTo(tutorAfter.getSoDuVi()),
-                "ACID: Số dư ví gia sư không bị thay đổi khi giao dịch gặp sự cố");
-
-        // Dọn dẹp dữ liệu test
-        datLich1k1Repository.delete(caHocAfter);
-        hoSoGiangVienRepository.delete(tutorAfter);
-        nguoiDungRepository.delete(tutorUser);
-        nguoiDungRepository.delete(student);
     }
 
     @Test

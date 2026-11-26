@@ -10,6 +10,7 @@ import com.studywithme.entity.enums.shared.LoaiTinNhan;
 import com.studywithme.entity.enums.shared.TrangThaiNguoiDung;
 import com.studywithme.entity.enums.shared.VaiTroName;
 import com.studywithme.repository.NguoiDungRepository;
+import com.studywithme.repository.ThongBaoRepository;
 import com.studywithme.repository.VaiTroRepository;
 import com.studywithme.repository.mongo.CuocTroChuyenMongoRepository;
 import com.studywithme.repository.mongo.TinNhanMongoRepository;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -57,6 +59,9 @@ class MessengerHubIntegrationTest {
 
     @Autowired
     private NguoiDungRepository nguoiDungRepository;
+
+    @Autowired
+    private ThongBaoRepository thongBaoRepository;
 
     @Autowired
     private VaiTroRepository vaiTroRepository;
@@ -126,12 +131,18 @@ class MessengerHubIntegrationTest {
             } catch (Exception ignored) {}
         }
 
-        // Xóa user trong SQL Server
+        // Xóa thông báo liên quan (tránh lỗi khóa ngoại FK) rồi xóa user trong SQL Server
         if (testStudent != null && testStudent.getId() != null) {
-            try { nguoiDungRepository.deleteById(testStudent.getId()); } catch (Exception ignored) {}
+            try {
+                thongBaoRepository.deleteAll(thongBaoRepository.findByNguoiDungIdOrderByThoiGianTaoDesc(testStudent.getId(), Pageable.unpaged()));
+                nguoiDungRepository.deleteById(testStudent.getId());
+            } catch (Exception ignored) {}
         }
         if (testTutor != null && testTutor.getId() != null) {
-            try { nguoiDungRepository.deleteById(testTutor.getId()); } catch (Exception ignored) {}
+            try {
+                thongBaoRepository.deleteAll(thongBaoRepository.findByNguoiDungIdOrderByThoiGianTaoDesc(testTutor.getId(), Pageable.unpaged()));
+                nguoiDungRepository.deleteById(testTutor.getId());
+            } catch (Exception ignored) {}
         }
     }
 

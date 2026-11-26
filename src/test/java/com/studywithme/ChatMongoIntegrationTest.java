@@ -11,6 +11,7 @@ import com.studywithme.entity.enums.shared.TrangThaiNguoiDung;
 import com.studywithme.entity.enums.shared.VaiTroName;
 import com.studywithme.entity.VaiTro;
 import com.studywithme.repository.NguoiDungRepository;
+import com.studywithme.repository.ThongBaoRepository;
 import com.studywithme.repository.VaiTroRepository;
 import com.studywithme.repository.mongo.CuocTroChuyenMongoRepository;
 import com.studywithme.repository.mongo.TinNhanMongoRepository;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -42,6 +44,9 @@ class ChatMongoIntegrationTest {
 
     @Autowired
     private NguoiDungRepository nguoiDungRepository;
+
+    @Autowired
+    private ThongBaoRepository thongBaoRepository;
 
     @Autowired
     private VaiTroRepository vaiTroRepository;
@@ -86,7 +91,20 @@ class ChatMongoIntegrationTest {
                 tinNhanMongoRepository.deleteAll(tinNhanMongoRepository.findByCuocTroChuyenIdOrderByThoiGianGuiAsc(convId));
                 cuocTroChuyenMongoRepository.deleteById(convId);
             }
+            createdConversationIds.clear();
         } catch (Exception ignored) {
+        }
+        if (sender != null && sender.getId() != null) {
+            try {
+                thongBaoRepository.deleteAll(thongBaoRepository.findByNguoiDungIdOrderByThoiGianTaoDesc(sender.getId(), Pageable.unpaged()));
+                nguoiDungRepository.deleteById(sender.getId());
+            } catch (Exception ignored) {}
+        }
+        if (recipient != null && recipient.getId() != null) {
+            try {
+                thongBaoRepository.deleteAll(thongBaoRepository.findByNguoiDungIdOrderByThoiGianTaoDesc(recipient.getId(), Pageable.unpaged()));
+                nguoiDungRepository.deleteById(recipient.getId());
+            } catch (Exception ignored) {}
         }
     }
 

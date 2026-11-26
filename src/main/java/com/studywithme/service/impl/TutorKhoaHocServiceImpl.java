@@ -132,7 +132,7 @@ public class TutorKhoaHocServiceImpl implements TutorKhoaHocService {
 
         kiemTraQuyenSoHuu(kh, giangVienId);
 
-        if (kh.getDanhSachChuongHoc() == null || kh.getDanhSachChuongHoc().isEmpty()) {
+        if (chuongHocRepository.findByKhoaHocIdOrderByThuTuSapXepAsc(khoaHocId).isEmpty()) {
             throw new IllegalArgumentException("Khóa học cần có ít nhất 1 chương học trước khi gửi phê duyệt.");
         }
 

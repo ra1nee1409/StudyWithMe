@@ -494,13 +494,18 @@
         }
       }
 
+      function getNotificationAuthHeaders() {
+        const token = localStorage.getItem('studywithme_token');
+        return token ? { 'Authorization': 'Bearer ' + token } : {};
+      }
+
       async function initNotificationModule() {
         const token = localStorage.getItem('studywithme_token');
         const userStr = localStorage.getItem('studywithme_user');
         if (!token || !userStr) return;
 
         try {
-          const res = await fetch('/api/notifications/unread-count');
+          const res = await fetch('/api/notifications/unread-count', { headers: getNotificationAuthHeaders() });
           if (res.ok) {
             const data = await res.json();
             const count = (data.duLieu && data.duLieu.count) || 0;
@@ -513,12 +518,13 @@
         // Đăng ký nhận thông báo realtime qua WebSocket STOMP nếu có thư viện Stomp
         try {
           const user = JSON.parse(userStr);
-          if (window.SockJS && window.Stomp && user.id) {
+          const uid = user.id || user.userId;
+          if (window.SockJS && window.Stomp && uid) {
             const socket = new SockJS('/ws-chat');
             const stompClient = Stomp.over(socket);
             stompClient.debug = null;
             stompClient.connect({}, function () {
-              stompClient.subscribe('/topic/users/' + user.id + '/notifications', function (msg) {
+              stompClient.subscribe('/topic/users/' + uid + '/notifications', function (msg) {
                 try {
                   const notif = JSON.parse(msg.body);
                   const badge = document.getElementById('notification-unread-badge');
@@ -547,7 +553,7 @@
         if (!container) return;
 
         try {
-          const res = await fetch('/api/notifications?limit=8');
+          const res = await fetch('/api/notifications?limit=8', { headers: getNotificationAuthHeaders() });
           if (!res.ok) {
             container.innerHTML = '<div class="p-4 text-center text-xs text-error">Vui lòng đăng nhập để xem thông báo</div>';
             return;
@@ -595,7 +601,7 @@
 
       async function handleNotificationClick(id, link) {
         try {
-          await fetch('/api/notifications/' + id + '/read', { method: 'POST' });
+          await fetch('/api/notifications/' + id + '/read', { method: 'POST', headers: getNotificationAuthHeaders() });
           const badge = document.getElementById('notification-unread-badge');
           if (badge && !badge.classList.contains('hidden')) {
             let count = parseInt(badge.textContent) || 0;
@@ -616,7 +622,7 @@
 
       async function markAllNotificationsAsRead() {
         try {
-          const res = await fetch('/api/notifications/read-all', { method: 'POST' });
+          const res = await fetch('/api/notifications/read-all', { method: 'POST', headers: getNotificationAuthHeaders() });
           if (res.ok) {
             updateNotificationBadge(0);
             fetchNotificationsList();

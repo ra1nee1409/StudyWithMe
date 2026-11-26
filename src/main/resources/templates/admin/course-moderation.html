@@ -540,8 +540,9 @@
       try {
         const res = await fetch('/api/admin/khoa-hoc/' + courseId + '/chi-tiet');
         const json = await res.json();
-        if (json.status === 'SUCCESS' && json.data) {
-          renderCourseDetail(json.data);
+        const detail = json.duLieu || json.data;
+        if ((json.thanhCong || json.success) && detail) {
+          renderCourseDetail(detail);
         } else {
           document.getElementById('modalChaptersList').innerHTML = '<div class="text-error text-xs">Không thể nạp chi tiết khóa học.</div>';
         }

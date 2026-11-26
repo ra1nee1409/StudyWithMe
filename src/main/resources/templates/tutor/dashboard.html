@@ -221,7 +221,7 @@
             <div th:unless="${#lists.isEmpty(danhSachHocVien)}" class="space-y-3">
               <div th:each="dk : ${danhSachHocVien}" class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-full bg-primary text-white font-bold text-xs flex items-center justify-center shrink-0 uppercase"
-                     th:text="${dk.hocVien != null && dk.hocVien.hoTen != null ? #strings.substring(dk.hocVien.hoTen.trim(), 0, 1) : 'H'}">
+                     th:text="${dk.hocVien != null && dk.hocVien.hoTen != null && !dk.hocVien.hoTen.trim().isEmpty() ? #strings.substring(dk.hocVien.hoTen.trim(), 0, 1) : 'H'}">
                   HV
                 </div>
                 <div class="min-w-0 flex-1">

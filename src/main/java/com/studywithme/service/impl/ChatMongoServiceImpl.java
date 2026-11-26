@@ -32,6 +32,7 @@ public class ChatMongoServiceImpl implements ChatMongoService {
     private final CuocTroChuyenMongoRepository cuocTroChuyenMongoRepository;
     private final TinNhanMongoRepository tinNhanMongoRepository;
     private final NguoiDungRepository nguoiDungRepository;
+    private final com.studywithme.repository.HoSoGiangVienRepository hoSoGiangVienRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final com.studywithme.service.ThongBaoService thongBaoService;
 
@@ -65,6 +66,16 @@ public class ChatMongoServiceImpl implements ChatMongoService {
                 });
 
         // 2. Tạo tin nhắn mới trên MongoDB
+        Map<String, Object> duLieuDinhKem = request.getDuLieuDinhKem();
+        if (request.getLoaiTinNhan() == LoaiTinNhan.DE_XUAT_CA_HOC) {
+            Map<String, Object> proposalMeta = duLieuDinhKem != null ? new java.util.HashMap<>(duLieuDinhKem) : new java.util.HashMap<>();
+            // Gắn đúng HoSoGiangVien.id của bên là gia sư để học viên bấm "Chấp nhận & Đặt ca" không bị nhầm NguoiDung.id
+            hoSoGiangVienRepository.findByNguoiDungId(nguoiGuiId)
+                    .or(() -> hoSoGiangVienRepository.findByNguoiDungId(request.getNguoiNhanId()))
+                    .ifPresent(gv -> proposalMeta.put("giangVienId", gv.getId()));
+            duLieuDinhKem = proposalMeta;
+        }
+
         String previewContent = (request.getLoaiTinNhan() == LoaiTinNhan.DE_XUAT_CA_HOC)
                 ? "[Đề xuất ca học 1-1]"
                 : (request.getNoiDung() != null ? request.getNoiDung().trim() : "");
@@ -77,7 +88,7 @@ public class ChatMongoServiceImpl implements ChatMongoService {
                 .nguoiNhanId(request.getNguoiNhanId())
                 .noiDung(previewContent)
                 .loaiTinNhan(request.getLoaiTinNhan() != null ? request.getLoaiTinNhan() : LoaiTinNhan.VAN_BAN)
-                .duLieuDinhKem(request.getDuLieuDinhKem())
+                .duLieuDinhKem(duLieuDinhKem)
                 .daDoc(false)
                 .thoiGianGui(LocalDateTime.now())
                 .build();

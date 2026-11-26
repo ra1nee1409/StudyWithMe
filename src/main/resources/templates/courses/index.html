@@ -330,25 +330,25 @@
               <div class="p-5 pt-0 border-t border-surface-container/60 mt-auto flex items-center justify-between gap-3">
                 <div class="flex flex-col">
                   <!-- Original price if discounted -->
-                  <span th:if="${course.giaKhuyenMai != null and course.giaKhuyenMai.compareTo(course.giaGoc) < 0}" 
+                  <span th:if="${course.giaKhuyenMai != null and course.giaGoc != null and course.giaKhuyenMai.compareTo(course.giaGoc) < 0}" 
                         class="text-[11px] text-outline line-through" 
                         th:text="${#numbers.formatDecimal(course.giaGoc, 0, 'POINT', 0, 'COMMA')} + ' đ'">
                     899.000 đ
                   </span>
                   <!-- Current price -->
+                  <span class="text-base font-extrabold text-status-success"
+                        th:if="${(course.giaKhuyenMai != null and course.giaKhuyenMai.compareTo(T(java.math.BigDecimal).ZERO) == 0) or (course.giaKhuyenMai == null and (course.giaGoc == null or course.giaGoc.compareTo(T(java.math.BigDecimal).ZERO) == 0))}">
+                    Miễn phí
+                  </span>
                   <span class="text-base font-extrabold text-primary" 
-                        th:if="${course.giaKhuyenMai != null}" 
+                        th:if="${course.giaKhuyenMai != null and course.giaKhuyenMai.compareTo(T(java.math.BigDecimal).ZERO) > 0}" 
                         th:text="${#numbers.formatDecimal(course.giaKhuyenMai, 0, 'POINT', 0, 'COMMA')} + ' đ'">
                     699.000 đ
                   </span>
                   <span class="text-base font-extrabold text-primary" 
-                        th:if="${course.giaKhuyenMai == null and course.giaGoc.compareTo(T(java.math.BigDecimal).ZERO) > 0}" 
+                        th:if="${course.giaKhuyenMai == null and course.giaGoc != null and course.giaGoc.compareTo(T(java.math.BigDecimal).ZERO) > 0}" 
                         th:text="${#numbers.formatDecimal(course.giaGoc, 0, 'POINT', 0, 'COMMA')} + ' đ'">
                     699.000 đ
-                  </span>
-                  <span class="text-base font-extrabold text-status-success" 
-                        th:if="${course.giaGoc.compareTo(T(java.math.BigDecimal).ZERO) == 0}">
-                    Miễn phí
                   </span>
                 </div>
 

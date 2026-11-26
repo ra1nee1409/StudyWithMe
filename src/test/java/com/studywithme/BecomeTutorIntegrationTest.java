@@ -108,6 +108,7 @@ class BecomeTutorIntegrationTest {
                         .param("tenNganHang", "MB Bank")
                         .param("soTaiKhoanNganHang", "0988445566")
                         .param("tenChuTaiKhoan", "HOC VIEN NOP CV")
+                        .param("loaiChungChi", "IELTS")
                         .param("tenChungChi", "Bằng Thạc Sĩ Sư Phạm Toán")
                         .param("noiCap", "Đại học Sư phạm Hà Nội")
                         .param("diemSoHoacXepLoai", "Xuất sắc"))

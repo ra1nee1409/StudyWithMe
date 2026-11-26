@@ -122,13 +122,15 @@ public class StudentApiController {
             item.put("ngayTaoDon", dh.getNgayTaoDon());
             item.put("ngayThanhToan", dh.getNgayThanhToan());
             item.put("orderCodePayos", dh.getOrderCodePayos());
-            item.put("chiTiet", dh.getDanhSachChiTiet().stream().map(ct -> Map.of(
-                    "id", ct.getId(),
-                    "loaiSanPham", ct.getLoaiSanPham(),
-                    "sanPhamId", ct.getSanPhamId(),
-                    "tenSanPham", ct.getTenSanPham(),
-                    "donGia", ct.getDonGia()
-            )).toList());
+            item.put("chiTiet", dh.getDanhSachChiTiet().stream().map(ct -> {
+                Map<String, Object> ctMap = new HashMap<>();
+                ctMap.put("id", ct.getId());
+                ctMap.put("loaiSanPham", ct.getLoaiSanPham());
+                ctMap.put("sanPhamId", ct.getSanPhamId());
+                ctMap.put("tenSanPham", ct.getTenSanPham());
+                ctMap.put("donGia", ct.getDonGia());
+                return ctMap;
+            }).toList());
             return item;
         }).toList();
         return ResponseEntity.ok(ApiResponse.success("Lấy lịch sử đơn hàng thành công", data));

@@ -266,6 +266,12 @@
             window.location.href = url.toString();
         }
 
+        function toYoutubeEmbedUrl(rawUrl) {
+            if (!rawUrl) return '';
+            const m = rawUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+            return m ? ('https://www.youtube.com/embed/' + m[1]) : rawUrl;
+        }
+
         function openDemoModal(videoUrl, tutorName) {
             const modal = document.getElementById('videoDemoModal');
             const iframe = document.getElementById('videoModalIframe');
@@ -273,8 +279,9 @@
 
             if (!videoUrl) return;
             title.textContent = 'Video Dạy Thử - ' + (tutorName || 'Gia Sư');
-            iframe.src = videoUrl;
+            iframe.src = toYoutubeEmbedUrl(videoUrl);
             modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
         function closeDemoModal() {
@@ -282,6 +289,7 @@
             const iframe = document.getElementById('videoModalIframe');
             iframe.src = '';
             modal.classList.add('hidden');
+            modal.classList.remove('flex');
         }
 
         // Đóng modal khi bấm phím ESC hoặc click ngoài backdrop

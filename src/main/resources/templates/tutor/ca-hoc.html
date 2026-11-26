@@ -199,7 +199,10 @@
             <!-- Card Actions -->
             <div class="flex flex-wrap items-center justify-end gap-2 pt-3 border-t border-surface-container/40">
               <!-- Nút gắn/sửa link Google Meet -->
-              <button type="button" th:onclick="'openMeetModal(' + ${caHoc.id} + ', \'' + ${caHoc.linkPhongHoc ?: ''} + '\')'" class="px-3 py-1.5 rounded-xl border border-surface-container text-xs font-bold text-on-surface hover:bg-surface-container transition-all flex items-center gap-1">
+              <button type="button"
+                      th:attr="data-id=${caHoc.id}, data-link=${caHoc.linkPhongHoc ?: ''}"
+                      onclick="openMeetModal(Number(this.dataset.id), this.dataset.link)"
+                      class="px-3 py-1.5 rounded-xl border border-surface-container text-xs font-bold text-on-surface hover:bg-surface-container transition-all flex items-center gap-1">
                 <span class="material-symbols-outlined text-[16px]">link</span>
                 <span th:text="${caHoc.linkPhongHoc != null && !caHoc.linkPhongHoc.isEmpty()} ? 'Đổi Link Meet' : 'Gắn Link Meet'">Gắn Link Meet</span>
               </button>

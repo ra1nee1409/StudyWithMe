@@ -4,7 +4,7 @@
 <body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col">
 
   <!-- Header Navigation -->
-  <header th:replace="~{components/user/header :: main-header('become-tutor')}"></header>
+  <header th:replace="~{components/user/header :: main-header('tutor-apply')}"></header>
 
   <main class="flex-1 pt-24 pb-16">
     <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -272,9 +272,9 @@
                 <select name="loaiChungChi" class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-surface-container text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30">
                   <option value="BANG_DAI_HOC">Bằng Cử nhân / Thạc sĩ Đại học</option>
                   <option value="CHUNG_CHI_SU_PHAM">Chứng chỉ nghiệp vụ Sư phạm</option>
-                  <option value="CHUNG_CHI_NGOAI_NGU">Chứng chỉ Ngoại ngữ (IELTS / TOEIC / HSK...)</option>
-                  <option value="CHUNG_CHI_CHUYEN_MON">Chứng chỉ chuyên môn quốc tế</option>
-                  <option value="KHAC">Bằng khen / Giấy chứng nhận khác</option>
+                  <option value="IELTS">Chứng chỉ IELTS</option>
+                  <option value="TOEIC">Chứng chỉ TOEIC</option>
+                  <option value="KHAC">Chứng chỉ ngoại ngữ / Chuyên môn khác</option>
                 </select>
               </div>
 

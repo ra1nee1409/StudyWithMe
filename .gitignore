@@ -6,11 +6,12 @@ HELP.md
 !HUONG_DAN_TICH_HOP_PAYOS.md
 *.dll
 
-# Configuration & Sensitive files
-src/main/resources/application.properties
+# Configuration & Sensitive files (secrets live in .env; .env.example & secret-free application.properties are tracked)
 src/main/resources/application-*.properties
-src/main/resources/application*.yml
+src/main/resources/application-*.yml
 .env
+.env.*
+!.env.example
 
 .gradle
 build/

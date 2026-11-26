@@ -479,9 +479,9 @@
         let match = false;
         if (type === 'ALL') {
           match = true;
-        } else if (type === 'CONG_TIEN' && rowType === 'CONG_TIEN') {
+        } else if (type === 'CONG_TIEN' && ['CONG_TIEN', 'TIEN_BAN_KHOA_HOC', 'TIEN_BAN_LOP_HOC', 'TIEN_DAY_KEM_1K1', 'DIEU_CHINH_HE_THONG'].includes(rowType)) {
           match = true;
-        } else if (type === 'RUT_TIEN' && (rowType === 'RUT_TIEN' || rowType === 'TRU_TIEN')) {
+        } else if (type === 'RUT_TIEN' && ['RUT_TIEN', 'TRU_TIEN', 'RUT_TIEN_VE_NGAN_HANG'].includes(rowType)) {
           match = true;
         } else if (type === 'HOAN_TIEN' && rowType === 'HOAN_TIEN') {
           match = true;

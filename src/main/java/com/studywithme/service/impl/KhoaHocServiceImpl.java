@@ -30,31 +30,37 @@ public class KhoaHocServiceImpl implements KhoaHocService {
     }
 
     @Override
-    public Page<KhoaHoc> locKhoaHoc(String keyword, 
-                                     Long danhMucId, 
-                                     String thePhanLoai, 
-                                     BigDecimal giaMin, 
-                                     BigDecimal giaMax, 
-                                     BigDecimal soSaoMin, 
-                                     Pageable pageable) {
+    public Page<KhoaHoc> locKhoaHoc(String keyword,
+            Long danhMucId,
+            String thePhanLoai,
+            BigDecimal giaMin,
+            BigDecimal giaMax,
+            BigDecimal soSaoMin,
+            Pageable pageable) {
         String cleanKeyword = StringUtils.hasText(keyword) ? keyword.trim() : null;
         String cleanThePhanLoai = StringUtils.hasText(thePhanLoai) ? thePhanLoai.trim() : null;
 
-        return khoaHocRepository.locKhoaHoc(
-                cleanKeyword, 
-                danhMucId, 
-                cleanThePhanLoai, 
-                giaMin, 
-                giaMax, 
-                soSaoMin, 
-                pageable
-        );
+        Page<KhoaHoc> page = khoaHocRepository.locKhoaHoc(
+                cleanKeyword,
+                danhMucId,
+                cleanThePhanLoai,
+                giaMin,
+                giaMax,
+                soSaoMin,
+                pageable);
+        page.getContent().forEach(this::khoiTaoDeCuong);
+        return page;
     }
 
     @Override
     public KhoaHoc layChiTietKhoaHocTheoSlug(String slug) {
         KhoaHoc khoaHoc = khoaHocRepository.findByDuongDanSlugAndTrangThai(slug, TrangThaiKhoaHoc.DA_XUAT_BAN)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy khóa học với đường dẫn: " + slug));
+        khoiTaoDeCuong(khoaHoc);
+        return khoaHoc;
+    }
+
+    private void khoiTaoDeCuong(KhoaHoc khoaHoc) {
         if (khoaHoc.getDanhSachChuongHoc() != null) {
             khoaHoc.getDanhSachChuongHoc().forEach(c -> {
                 if (c.getDanhSachBaiHoc() != null) {
@@ -62,7 +68,6 @@ public class KhoaHocServiceImpl implements KhoaHocService {
                 }
             });
         }
-        return khoaHoc;
     }
 
     @Override
@@ -71,28 +76,27 @@ public class KhoaHocServiceImpl implements KhoaHocService {
             return List.of();
         }
         return khoaHocRepository.findTop4ByDanhMucIdAndIdNotAndTrangThaiOrderByTongSoHocVienDesc(
-                danhMucId, 
-                khoaHocId, 
-                TrangThaiKhoaHoc.DA_XUAT_BAN
-        );
+                danhMucId,
+                khoaHocId,
+                TrangThaiKhoaHoc.DA_XUAT_BAN);
     }
 
     @Override
     public List<TopKhoaHocDto> layTop8KhoaHocNoiBat() {
-        List<KhoaHoc> courses = khoaHocRepository.findTop8ByTrangThaiOrderByTongSoHocVienDesc(TrangThaiKhoaHoc.DA_XUAT_BAN);
-        
+        List<KhoaHoc> courses = khoaHocRepository
+                .findTop8ByTrangThaiOrderByTongSoHocVienDesc(TrangThaiKhoaHoc.DA_XUAT_BAN);
+
         return courses.stream().map(k -> TopKhoaHocDto.builder()
                 .id(k.getId())
                 .tieuDe(k.getTieuDe())
                 .duongDanSlug(k.getDuongDanSlug())
                 .anhDaiDien(k.getAnhDaiDienKhoaHoc())
-                .tenGiangVien(k.getGiangVien() != null && k.getGiangVien().getNguoiDung() != null 
-                        ? k.getGiangVien().getNguoiDung().getHoTen() 
+                .tenGiangVien(k.getGiangVien() != null && k.getGiangVien().getNguoiDung() != null
+                        ? k.getGiangVien().getNguoiDung().getHoTen()
                         : "Gia sư StudyWithMe")
                 .giaGoc(k.getGiaGoc())
                 .giaHienTai(k.getGiaKhuyenMai() != null ? k.getGiaKhuyenMai() : k.getGiaGoc())
                 .soHocVien(k.getTongSoHocVien())
-                .build()
-        ).toList();
+                .build()).toList();
     }
 }

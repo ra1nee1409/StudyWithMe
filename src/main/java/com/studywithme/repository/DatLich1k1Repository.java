@@ -15,6 +15,10 @@ import java.util.Optional;
 @Repository
 public interface DatLich1k1Repository extends JpaRepository<DatLich1k1, Long> {
 
+    @Override
+    @EntityGraph(attributePaths = {"hocVien", "giangVien", "giangVien.nguoiDung", "monHoc"})
+    Optional<DatLich1k1> findById(Long id);
+
     Optional<DatLich1k1> findByMaDatLich(String maDatLich);
 
     Optional<DatLich1k1> findByOrderCodePayos(Long orderCodePayos);

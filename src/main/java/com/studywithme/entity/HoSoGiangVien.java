@@ -28,6 +28,7 @@ public class HoSoGiangVien {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "danhSachVaiTro", "soDuVi"})
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nguoi_dung_id", nullable = false, unique = true)
     private NguoiDung nguoiDung;

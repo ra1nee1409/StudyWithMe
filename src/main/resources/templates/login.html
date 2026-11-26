@@ -964,6 +964,7 @@
           localStorage.setItem('studywithme_token', payload.accessToken);
           document.cookie = "studywithme_token=" + payload.accessToken + "; path=/; max-age=86400";
           localStorage.setItem('studywithme_user', JSON.stringify({
+            id: payload.id || payload.userId,
             userId: payload.id || payload.userId,
             hoTen: payload.hoTen,
             email: payload.email,
@@ -1089,19 +1090,24 @@
             });
             if (loginRes.ok) {
               const loginData = await loginRes.json();
-              localStorage.setItem('auth_token', loginData.accessToken);
-              const payloadJwt = JSON.parse(atob(loginData.accessToken.split('.')[1]));
-              localStorage.setItem('user', JSON.stringify({
-                id: payloadJwt.sub,
-                hoTen: payloadJwt.hoTen,
-                email: payloadJwt.email,
-                roles: payloadJwt.roles || []
-              }));
-              setTimeout(() => {
-                const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
-                window.location.href = redirectUrl || '/';
-              }, 800);
-              return;
+              const loginPayload = loginData.duLieu || loginData.data;
+              if (loginPayload && loginPayload.accessToken) {
+                const roles = loginPayload.danhSachVaiTro || loginPayload.roles || [];
+                localStorage.setItem('studywithme_token', loginPayload.accessToken);
+                document.cookie = "studywithme_token=" + loginPayload.accessToken + "; path=/; max-age=86400";
+                localStorage.setItem('studywithme_user', JSON.stringify({
+                  id: loginPayload.id || loginPayload.userId,
+                  userId: loginPayload.id || loginPayload.userId,
+                  hoTen: loginPayload.hoTen,
+                  email: loginPayload.email,
+                  roles: roles
+                }));
+                setTimeout(() => {
+                  const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
+                  window.location.href = redirectUrl || '/';
+                }, 800);
+                return;
+              }
             }
           } catch (e) {
             console.warn("Tự động đăng nhập lỗi, chuyển sang tab đăng nhập:", e);

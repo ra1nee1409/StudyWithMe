@@ -252,7 +252,8 @@
 
                 <!-- Nút Xóa khóa học -->
                 <button type="button"
-                        th:onclick="'confirmDeleteCourse(' + ${kh.id} + ', \'' + ${kh.tieuDe} + '\')'"
+                        th:attr="data-id=${kh.id}, data-title=${kh.tieuDe}"
+                        onclick="confirmDeleteCourse(Number(this.dataset.id), this.dataset.title)"
                         class="p-2 rounded-xl bg-surface-container-low hover:bg-primary/10 text-on-surface-variant hover:text-primary transition-all cursor-pointer"
                         title="Xóa khóa học">
                   <span class="material-symbols-outlined text-[18px]">delete</span>
@@ -270,7 +271,7 @@
 
               <!-- Nút Xem trên sàn (nếu Đã xuất bản) -->
               <a th:if="${kh.trangThai.name() == 'DA_XUAT_BAN'}"
-                 th:href="@{'/courses/' + ${kh.duongDanSlug}}"
+                 th:href="@{'/khoa-hoc/' + ${kh.duongDanSlug}}"
                  target="_blank"
                  class="w-full py-2 px-3 rounded-xl bg-status-success/15 hover:bg-status-success/25 text-status-success text-xs font-bold flex items-center justify-center gap-1.5 border border-status-success/30 transition-all">
                 <span class="material-symbols-outlined text-[16px]">open_in_new</span>

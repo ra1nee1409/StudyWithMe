@@ -121,17 +121,17 @@ studywithme/
 - **Cơ sở dữ liệu SQL Server:** SQL Server 2019/2022 hoặc SQL Server Express đang chạy tại cổng mặc định `1433`.
 - **Cơ sở dữ liệu MongoDB:** MongoDB cục bộ (localhost:27017) hoặc cụm **MongoDB Atlas Cloud**.
 
-### 5.2. Cấu Hình `application.properties`
-Dự án đã chuẩn bị sẵn file mẫu [application.properties.example](file:///src/main/resources/application.properties.example).
-Bạn sao chép thành `src/main/resources/application.properties` và cấu hình các thông số phù hợp:
+### 5.2. Cấu Hình Biến Môi Trường (`.env`)
+Dự án sử dụng file `.env` tại thư mục gốc (được Spring Boot tự nạp qua `spring.config.import=optional:file:.env[.properties]`) và đã có sẵn file mẫu [`.env.example`](.env.example).
 
-- **1. Microsoft SQL Server:**
-  - Cập nhật thông tin `spring.datasource.url` (mặc định Windows Authentication với DLL hoặc đổi qua user `sa`/`password`).
-- **2. MongoDB (Dual Database Chat):**
-  - Cập nhật `spring.mongodb.uri` với đường dẫn kết nối MongoDB cục bộ (`mongodb://localhost:27017/studywithme_chat`) hoặc chuỗi kết nối từ cụm MongoDB Atlas Cloud của bạn.
-- **3. Cổng thanh toán VietQR PayOS:**
-  - Điền các khóa `payos.client-id`, `payos.api-key`, `payos.checksum-key` được cung cấp từ trang quản trị PayOS.
-  *(Lưu ý: File `application.properties` chứa cấu hình riêng đã được đưa vào `.gitignore` để tránh rò rỉ thông tin nhạy cảm).*
+Sao chép file mẫu thành `.env` và điền thông tin cục bộ của bạn:
+```powershell
+Copy-Item .env.example .env
+```
+- **1. Microsoft SQL Server (`DB_URL`):** Mặc định dùng Windows Authentication với `mssql-jdbc_auth.dll` (hoặc đổi sang `DB_USERNAME`/`DB_PASSWORD` nếu dùng tài khoản `sa`).
+- **2. MongoDB (`MONGODB_URI`):** Dùng MongoDB cục bộ (`mongodb://localhost:27017/studywithme_chat`) hoặc chuỗi kết nối MongoDB Atlas.
+- **3. JWT & PayOS (`JWT_SECRET`, `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY`):** Điền khóa thật trong `.env`.
+*(Lưu ý: File `.env` đã được chặn trong `.gitignore`, khi đẩy lên Git chỉ đẩy `.env.example` và `application.properties` không chứa bí mật).*
 
 ### 5.3. Khởi Chạy Hệ Thống
 Mở Terminal tại thư mục gốc của dự án:

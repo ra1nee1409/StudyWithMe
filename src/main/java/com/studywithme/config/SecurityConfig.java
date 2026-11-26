@@ -67,7 +67,9 @@ public class SecurityConfig {
                     "/index.html",
                     "/auth",
                     "/login",
+                    "/dang-nhap",
                     "/register",
+                    "/dang-ky",
                     "/khoa-hoc",
                     "/khoa-hoc/**",
                     "/gia-su",
@@ -95,8 +97,8 @@ public class SecurityConfig {
                     "/v3/api-docs/**"
                 ).permitAll()
                 .requestMatchers("/admin", "/admin/**", "/api/admin/**").hasAuthority("ROLE_QUAN_TRI")
-                .requestMatchers("/tutor", "/tutor/**", "/api/giang-vien/**").hasAuthority("ROLE_GIANG_VIEN")
-                .requestMatchers("/student", "/student/**", "/api/hoc-vien/**").authenticated()
+                .requestMatchers("/tutor", "/tutor/**", "/api/giang-vien/**", "/api/tutor/**").hasAuthority("ROLE_GIANG_VIEN")
+                .requestMatchers("/student", "/student/**", "/api/hoc-vien/**", "/api/student/**").authenticated()
                 .anyRequest().authenticated()
             );
 

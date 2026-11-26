@@ -464,6 +464,25 @@
                   studentLink.classList.remove('hidden');
                   studentLink.classList.add('lg:inline-flex');
                 }
+
+                // Đồng bộ lại họ tên & vai trò mới nhất từ /api/auth/me (tránh cache cũ trong localStorage)
+                fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } })
+                  .then(r => r.ok ? r.json() : null)
+                  .then(res => {
+                    const me = res && (res.duLieu || res.data);
+                    if (!me) return;
+                    const freshRoles = Array.isArray(me.authorities) ? me.authorities.map(a => a.authority || a) : (user.roles || []);
+                    localStorage.setItem('studywithme_user', JSON.stringify({
+                      id: me.id, userId: me.id, hoTen: me.hoTen, email: me.email, roles: freshRoles
+                    }));
+                    if (me.hoTen) {
+                      if (nameEl) nameEl.textContent = me.hoTen;
+                      if (drawerUserName) drawerUserName.textContent = me.hoTen;
+                      const firstLetter = me.hoTen.trim().charAt(0).toUpperCase();
+                      if (avatarEl) avatarEl.textContent = firstLetter;
+                      if (drawerUserAvatar) drawerUserAvatar.textContent = firstLetter;
+                    }
+                  }).catch(() => {});
               }
             }
           } else {

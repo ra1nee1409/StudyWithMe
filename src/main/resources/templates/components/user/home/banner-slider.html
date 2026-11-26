@@ -4,47 +4,47 @@
 <body>
   <!-- ==================== HERO PROMOTION BANNER SLIDER ==================== -->
   <section th:fragment="banner-slider" class="w-full pt-4 pb-6 relative overflow-hidden" id="hero-slider-section">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-margin-desktop">
+    <div class="max-w-7xl mx-auto px-6 lg:px-margin-desktop">
 
       <!-- Carousel Wrapper -->
       <div id="home-banner-carousel"
-        class="relative group rounded-2xl lg:rounded-3xl overflow-hidden shadow-[0_12px_40px_-10px_rgba(0,165,223,0.18)] border border-surface-container/60 bg-surface-container-low">
+        class="relative group rounded-2xl lg:rounded-3xl overflow-hidden shadow-[0_16px_40px_-14px_rgba(13,28,46,0.22)] border border-on-surface/10 bg-slate-950">
 
         <!-- Slides Container (Stabilized aspect-ratio & min-height to prevent layout shift < 480px) -->
-        <div class="relative w-full min-h-[220px] h-[220px] xs:h-[260px] sm:h-[360px] md:h-[420px] lg:h-[460px] overflow-hidden bg-slate-950">
+        <div class="relative w-full min-h-[240px] h-[240px] sm:h-[360px] md:h-[420px] lg:h-[460px] overflow-hidden bg-slate-950">
 
           <!-- When banners exist in database -->
           <div th:if="${!#lists.isEmpty(banners)}" class="w-full h-full">
             <div th:each="banner, iter : ${banners}" th:id="'banner-slide-' + ${iter.index}"
-              class="banner-slide absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out"
+              class="banner-slide absolute inset-0 w-full h-full transition-opacity duration-700 ease-out"
               th:classappend="${iter.first} ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'">
 
-              <!-- Background Image with Zoom Effect -->
+              <!-- Background Image with Subtle Zoom Effect -->
               <img th:src="${banner.linkAnhBanner}" th:alt="${banner.tieuDe}" fetchpriority="high" decoding="async"
-                class="w-full h-full object-cover object-center transform transition-transform duration-1000 scale-100 group-hover:scale-105" />
+                class="w-full h-full object-cover object-center transform transition-transform duration-700 ease-out scale-100 group-hover:scale-[1.03]" />
 
-              <!-- Gradient Overlay (Cinema style for crisp text readability) -->
+              <!-- Scrim Overlay (High contrast over any photo) -->
               <div
-                class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/50 to-transparent sm:bg-gradient-to-r sm:from-slate-950/85 sm:via-slate-900/60 sm:to-transparent flex items-end sm:items-center">
-                <div class="p-6 sm:p-10 md:p-14 max-w-2xl text-white">
+                class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/65 to-slate-950/20 sm:bg-gradient-to-r sm:from-slate-950/90 sm:via-slate-950/65 sm:to-slate-950/15 flex items-end sm:items-center">
+                <div class="p-6 pb-12 sm:p-10 md:p-14 max-w-2xl text-white">
 
                   <!-- Tag Badge -->
                   <div
-                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/80 backdrop-blur-md text-white font-label-sm text-label-sm font-bold uppercase tracking-wider mb-3 shadow-sm border border-white/20">
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-white font-label-sm text-label-sm uppercase tracking-wider mb-3 border border-white/25">
                     <span class="material-symbols-outlined text-[15px]">campaign</span>
                     <span>Sự Kiện &amp; Khóa Học Mới</span>
                   </div>
 
                   <!-- Banner Title -->
                   <h2
-                    class="text-xl sm:text-2xl md:text-4xl font-extrabold tracking-tight leading-tight mb-3 text-white drop-shadow-md"
+                    class="text-xl sm:text-3xl md:text-[38px] font-extrabold tracking-tight leading-[1.18] mb-3 text-white text-balance drop-shadow-sm"
                     th:text="${banner.tieuDe}">
                     Tiêu đề chương trình ưu đãi
                   </h2>
 
                   <!-- Description / Subtitle -->
                   <p
-                    class="hidden sm:block text-slate-200 text-xs sm:text-sm md:text-base mb-6 font-normal line-clamp-2 max-w-xl text-balance">
+                    class="hidden sm:block text-slate-100/95 text-sm md:text-[15px] leading-relaxed mb-6 font-normal line-clamp-2 max-w-xl text-balance">
                     Đồng hành cùng học sinh bứt phá thành tích học tập với phương pháp hiện đại và đội ngũ gia sư hàng
                     đầu.
                   </p>
@@ -52,12 +52,12 @@
                   <!-- CTA Button -->
                   <div class="flex items-center gap-3">
                     <a th:href="${banner.linkChuyenHuong ?: '#tim-gia-su'}"
-                      class="inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-gradient-to-r from-tertiary to-tertiary-container hover:opacity-95 text-on-tertiary font-bold text-xs sm:text-sm shadow-[0_4px_20px_rgba(255,109,32,0.4)] transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+                      class="inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-tertiary-container hover:bg-tertiary text-on-tertiary font-bold text-xs sm:text-sm transition-all duration-200 active:scale-[0.98] shadow-sm">
                       <span>Khám Phá Ngay</span>
                       <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                     </a>
                     <a href="#khoa-hoc-noi-bat"
-                      class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white/15 hover:bg-white/25 text-white backdrop-blur-md text-xs sm:text-sm font-semibold transition-all border border-white/20">
+                      class="hidden sm:inline-flex items-center gap-1.5 px-4 py-3 rounded-full bg-white/15 hover:bg-white/25 text-white backdrop-blur-md text-xs sm:text-sm font-semibold transition-all duration-200 active:scale-[0.98] border border-white/25">
                       <span>Xem Tất Cả Khóa Học</span>
                     </a>
                   </div>
@@ -70,16 +70,16 @@
 
           <!-- Fallback when no active banner exists -->
           <div th:if="${#lists.isEmpty(banners)}"
-            class="absolute inset-0 w-full h-full bg-gradient-to-r from-primary/90 to-secondary/80 flex items-center p-8 sm:p-14 text-white">
+            class="absolute inset-0 w-full h-full bg-gradient-to-r from-primary to-secondary flex items-center p-8 sm:p-14 text-white">
             <div class="max-w-2xl">
               <span
-                class="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold uppercase tracking-wider mb-3 inline-block">Chương
+                class="px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider mb-3 inline-block">Chương
                 Trình Đào Tạo 2026</span>
-              <h2 class="text-2xl sm:text-4xl font-extrabold mb-3">Kết Nối Học Tập Đột Phá Cùng StudyWithMe</h2>
-              <p class="text-slate-100 text-sm mb-5">Học trực tuyến 1-kèm-1 và khoá học video bản quyền chất lượng cao.
+              <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight mb-3 text-balance">Kết Nối Học Tập Đột Phá Cùng StudyWithMe</h2>
+              <p class="text-slate-100/95 text-sm leading-relaxed mb-5">Học trực tuyến 1-kèm-1 và khoá học video bản quyền chất lượng cao.
               </p>
               <a href="#tim-gia-su"
-                class="px-5 py-2.5 rounded-full bg-tertiary-container text-white font-bold text-sm inline-flex items-center gap-2 shadow-md">
+                class="px-5 py-2.5 rounded-full bg-tertiary-container hover:bg-tertiary text-white font-bold text-sm inline-flex items-center gap-2 transition-all active:scale-[0.98] shadow-sm">
                 <span>Tìm Gia Sư Ngay</span>
                 <span class="material-symbols-outlined text-[18px]">search</span>
               </a>
@@ -88,24 +88,29 @@
 
         </div>
 
-        <!-- Navigation Arrows (Glassmorphic) -->
-        <button id="slider-prev-btn" type="button" aria-label="Slide trước" onclick="chuyenBannerTruoc()"
-          class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-slate-950/40 hover:bg-slate-950/80 text-white backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 cursor-pointer shadow-md border border-white/20">
-          <span class="material-symbols-outlined text-[24px]">chevron_left</span>
+        <!-- Navigation Arrows (Accessible on touch, hover & keyboard focus) -->
+        <button th:if="${!#lists.isEmpty(banners) and #lists.size(banners) > 1}" id="slider-prev-btn" type="button" aria-label="Slide trước" onclick="chuyenBannerTruoc()"
+          class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-slate-950/50 hover:bg-slate-950/80 text-white backdrop-blur-md flex items-center justify-center opacity-80 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-all duration-200 active:scale-95 z-20 cursor-pointer border border-white/20">
+          <span class="material-symbols-outlined text-[22px]">chevron_left</span>
         </button>
-        <button id="slider-next-btn" type="button" aria-label="Slide tiếp theo" onclick="chuyenBannerSau()"
-          class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-slate-950/40 hover:bg-slate-950/80 text-white backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 cursor-pointer shadow-md border border-white/20">
-          <span class="material-symbols-outlined text-[24px]">chevron_right</span>
+        <button th:if="${!#lists.isEmpty(banners) and #lists.size(banners) > 1}" id="slider-next-btn" type="button" aria-label="Slide tiếp theo" onclick="chuyenBannerSau()"
+          class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-slate-950/50 hover:bg-slate-950/80 text-white backdrop-blur-md flex items-center justify-center opacity-80 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-all duration-200 active:scale-95 z-20 cursor-pointer border border-white/20">
+          <span class="material-symbols-outlined text-[22px]">chevron_right</span>
         </button>
 
-        <!-- Dot Indicators -->
+        <!-- Dot Indicators + Pause/Play Toggle -->
         <div th:if="${!#lists.isEmpty(banners) and #lists.size(banners) > 1}"
-          class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20 bg-slate-950/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+          class="absolute bottom-3.5 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20 bg-slate-950/45 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15">
           <button th:each="banner, iter : ${banners}" th:id="'banner-dot-' + ${iter.index}"
             th:onclick="'nhayToiBanner(' + ${iter.index} + ')'" type="button"
             th:aria-label="'Chuyển đến slide ' + ${iter.count}"
             class="banner-dot h-2 rounded-full transition-all duration-300 cursor-pointer"
-            th:classappend="${iter.first} ? 'w-6 bg-primary' : 'w-2 bg-white/50 hover:bg-white/80'">
+            th:classappend="${iter.first} ? 'w-6 bg-white' : 'w-2 bg-white/45 hover:bg-white/80'">
+          </button>
+          <span class="w-px h-3 bg-white/25 mx-0.5" aria-hidden="true"></span>
+          <button id="slider-toggle-btn" type="button" onclick="batTatTuDongChuyenBanner()" aria-label="Tạm dừng tự chuyển slide" aria-pressed="false"
+            class="w-5 h-5 rounded-full text-white/85 hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+            <span id="slider-toggle-icon" class="material-symbols-outlined text-[15px]">pause</span>
           </button>
         </div>
 
@@ -119,17 +124,27 @@
       (function initBannerSlider() {
         const slides = document.querySelectorAll('.banner-slide');
         const dots = document.querySelectorAll('.banner-dot');
+        const toggleBtn = document.getElementById('slider-toggle-btn');
+        const toggleIcon = document.getElementById('slider-toggle-icon');
         const total = slides.length;
         if (total <= 1) return;
 
         let currentIndex = 0;
         let autoplayTimer = null;
-        const intervalTime = 5000;
+        let isPausedByUser = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const intervalTime = 5500;
+
+        function syncToggleUi() {
+          if (!toggleBtn || !toggleIcon) return;
+          toggleIcon.textContent = isPausedByUser ? 'play_arrow' : 'pause';
+          toggleBtn.setAttribute('aria-label', isPausedByUser ? 'Tiếp tục tự chuyển slide' : 'Tạm dừng tự chuyển slide');
+          toggleBtn.setAttribute('aria-pressed', String(isPausedByUser));
+        }
 
         function updateSlide(newIndex) {
           slides.forEach((slide, idx) => {
             if (idx === newIndex) {
-              slide.classList.remove('opacity-0', 'pointer-events-none');
+              slide.classList.remove('opacity-0', 'pointer-events-none', 'z-0');
               slide.classList.add('opacity-100', 'pointer-events-auto', 'z-10');
             } else {
               slide.classList.remove('opacity-100', 'pointer-events-auto', 'z-10');
@@ -139,11 +154,11 @@
 
           dots.forEach((dot, idx) => {
             if (idx === newIndex) {
-              dot.classList.remove('w-2', 'bg-white/50');
-              dot.classList.add('w-6', 'bg-primary');
+              dot.classList.remove('w-2', 'bg-white/45');
+              dot.classList.add('w-6', 'bg-white');
             } else {
-              dot.classList.remove('w-6', 'bg-primary');
-              dot.classList.add('w-2', 'bg-white/50');
+              dot.classList.remove('w-6', 'bg-white');
+              dot.classList.add('w-2', 'bg-white/45');
             }
           });
 
@@ -151,14 +166,12 @@
         }
 
         window.chuyenBannerSau = function () {
-          const next = (currentIndex + 1) % total;
-          updateSlide(next);
+          updateSlide((currentIndex + 1) % total);
           resetTimer();
         };
 
         window.chuyenBannerTruoc = function () {
-          const prev = (currentIndex - 1 + total) % total;
-          updateSlide(prev);
+          updateSlide((currentIndex - 1 + total) % total);
           resetTimer();
         };
 
@@ -169,29 +182,43 @@
           }
         };
 
+        window.batTatTuDongChuyenBanner = function () {
+          isPausedByUser = !isPausedByUser;
+          syncToggleUi();
+          if (isPausedByUser) {
+            stopAutoplay();
+          } else {
+            startAutoplay();
+          }
+        };
+
+        function stopAutoplay() {
+          if (autoplayTimer) {
+            clearInterval(autoplayTimer);
+            autoplayTimer = null;
+          }
+        }
+
         function startAutoplay() {
+          stopAutoplay();
+          if (isPausedByUser) return;
           autoplayTimer = setInterval(() => {
-            const next = (currentIndex + 1) % total;
-            updateSlide(next);
+            updateSlide((currentIndex + 1) % total);
           }, intervalTime);
         }
 
         function resetTimer() {
-          if (autoplayTimer) clearInterval(autoplayTimer);
-          startAutoplay();
+          if (!isPausedByUser) startAutoplay();
         }
 
-        // Pause on mouse hover
+        // Pause on hover/focus
         const carousel = document.getElementById('home-banner-carousel');
         if (carousel) {
-          carousel.addEventListener('mouseenter', () => {
-            if (autoplayTimer) clearInterval(autoplayTimer);
-          });
-          carousel.addEventListener('mouseleave', () => {
-            startAutoplay();
-          });
+          carousel.addEventListener('mouseenter', stopAutoplay);
+          carousel.addEventListener('mouseleave', startAutoplay);
         }
 
+        syncToggleUi();
         startAutoplay();
       })();
       /*]]>*/

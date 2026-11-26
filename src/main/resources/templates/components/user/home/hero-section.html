@@ -4,30 +4,24 @@
 <body>
   <!-- ==================== SECTION 1: HERO & SMART TUTOR FINDER ==================== -->
   <section th:fragment="hero-section"
-    class="relative overflow-hidden bg-gradient-to-b from-surface-container-low/60 via-background to-surface-bright pb-space-xl"
+    class="relative overflow-hidden bg-gradient-to-b from-surface-container-low/55 via-background to-background pb-14 sm:pb-16"
     id="tim-gia-su">
-    <div
-      class="absolute -top-32 left-1/2 -translate-x-1/2 w-[720px] h-[360px] bg-gradient-to-r from-primary-container/15 via-secondary-container/20 to-tertiary-container/10 blur-3xl pointer-events-none rounded-full">
-    </div>
-    <div class="absolute top-48 -right-24 w-96 h-96 bg-accent-cyan-subtle/80 blur-2xl pointer-events-none rounded-full">
-    </div>
-
     <div class="max-w-7xl mx-auto px-6 lg:px-margin-desktop pt-8 sm:pt-12 relative z-10">
       <!-- Badge Giới thiệu -->
-      <div class="flex items-center justify-center mb-5">
+      <div class="flex items-center justify-center mb-5 swm-fade-up">
         <div
-          class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent-cyan-subtle text-primary font-label-md text-label-md border border-primary/20 shadow-xs">
-          <span class="material-symbols-outlined text-[18px]">verified</span>
-          <span class="font-bold">Nền Tảng Kết Nối Gia Sư Trực Tuyến & 1-Kèm-1</span>
+          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-primary font-label-md text-label-md border border-primary/20 shadow-[0_1px_2px_rgba(13,28,46,0.04)]">
+          <span class="material-symbols-outlined text-[17px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+          <span class="font-bold">Nền Tảng Kết Nối Gia Sư Trực Tuyến &amp; 1-Kèm-1</span>
         </div>
       </div>
 
       <!-- Headline & Subtitle -->
-      <div class="text-center max-w-4xl mx-auto mb-10">
-        <h1 class="font-display text-display text-on-surface tracking-tight font-extrabold mb-4">
+      <div class="text-center max-w-4xl mx-auto mb-9 swm-fade-up">
+        <h1 class="font-display text-display-mobile sm:text-display lg:text-[44px] lg:leading-[1.16] text-on-surface tracking-tight font-extrabold mb-4 text-balance">
           Tìm Kiếm Gia Sư Phù Hợp Cùng <span class="text-primary">StudyWithMe</span>
         </h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl mx-auto">
+        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed text-balance">
           Hệ thống kết nối trực tiếp học sinh với đội ngũ gia sư chất lượng cao, đồng hành từ Lớp 1 đến Lớp 12, luyện
           thi đại học và bồi dưỡng kiến thức chuyên sâu.
         </p>
@@ -35,20 +29,20 @@
 
       <!-- Smart Tutor Finder Box -->
       <div
-        class="bg-surface-container-lowest rounded-xl shadow-[0_12px_32px_-6px_rgba(0,165,223,0.14)] p-6 sm:p-8 max-w-5xl mx-auto border border-surface-container">
-        <div class="flex items-center gap-2 mb-6">
-          <span class="w-2.5 h-6 rounded-full bg-tertiary-container inline-block"></span>
-          <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Tìm Gia Sư Theo Yêu Cầu Của Bạn</h2>
+        class="swm-fade-up-delay bg-surface-container-lowest rounded-2xl shadow-[0_14px_34px_-12px_rgba(13,28,46,0.10),0_1px_3px_rgba(13,28,46,0.05)] p-6 sm:p-8 max-w-5xl mx-auto border border-surface-container-high/80">
+        <div class="flex items-center gap-2.5 mb-6">
+          <span class="w-1.5 h-6 rounded-full bg-tertiary-container inline-block"></span>
+          <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">Tìm Gia Sư Theo Yêu Cầu Của Bạn</h2>
         </div>
 
         <form th:action="@{/gia-su}" method="get"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
           <!-- Step 1: Grade Selection -->
           <div class="lg:col-span-3 space-y-1.5">
-            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">1. Khối Lớp Học</label>
+            <label for="finder-grade" class="block font-label-md text-label-md text-on-surface-variant font-semibold">1. Khối Lớp Học</label>
             <div class="relative">
-              <select name="grade"
-                class="w-full h-12 pl-10 pr-8 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container appearance-none transition-all cursor-pointer">
+              <select id="finder-grade" name="grade"
+                class="w-full h-12 pl-10 pr-8 bg-surface-canvas border border-surface-container hover:border-primary/40 rounded-xl font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/15 appearance-none transition-all cursor-pointer">
                 <option value="">Tất cả các khối lớp</option>
                 <option value="Tiểu học">Tiểu học (Lớp 1 - 5)</option>
                 <option selected value="THCS">THCS (Lớp 6 - 9)</option>
@@ -56,7 +50,7 @@
                 <option value="Luyện thi">Luyện thi ĐH / IELTS</option>
               </select>
               <span
-                class="material-symbols-outlined text-secondary absolute left-3 top-1/2 -translate-y-1/2 text-[20px] pointer-events-none">school</span>
+                class="material-symbols-outlined text-primary absolute left-3 top-1/2 -translate-y-1/2 text-[20px] pointer-events-none">school</span>
               <span
                 class="material-symbols-outlined text-outline absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] pointer-events-none">expand_more</span>
             </div>
@@ -64,13 +58,12 @@
 
           <!-- Step 2: Subject -->
           <div class="lg:col-span-3 space-y-1.5">
-            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">2. Môn Cần Bổ
-              Trợ</label>
+            <label for="finder-subject" class="block font-label-md text-label-md text-on-surface-variant font-semibold">2. Môn Cần Bổ Trợ</label>
             <div class="relative">
-              <select name="keyword"
-                class="w-full h-12 pl-10 pr-8 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container appearance-none transition-all cursor-pointer">
+              <select id="finder-subject" name="keyword"
+                class="w-full h-12 pl-10 pr-8 bg-surface-canvas border border-surface-container hover:border-primary/40 rounded-xl font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/15 appearance-none transition-all cursor-pointer">
                 <option selected value="Toán">Toán học</option>
-                <option value="Tiếng Anh">Tiếng Anh & IELTS</option>
+                <option value="Tiếng Anh">Tiếng Anh &amp; IELTS</option>
                 <option value="Ngữ Văn">Ngữ Văn</option>
                 <option value="Vật Lý">Vật Lý</option>
                 <option value="Hóa Học">Hóa Học</option>
@@ -78,7 +71,7 @@
                 <option value="Tin Học">Lập trình / Tin học</option>
               </select>
               <span
-                class="material-symbols-outlined text-secondary absolute left-3 top-1/2 -translate-y-1/2 text-[20px] pointer-events-none">menu_book</span>
+                class="material-symbols-outlined text-primary absolute left-3 top-1/2 -translate-y-1/2 text-[20px] pointer-events-none">menu_book</span>
               <span
                 class="material-symbols-outlined text-outline absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] pointer-events-none">expand_more</span>
             </div>
@@ -86,17 +79,16 @@
 
           <!-- Step 3: Format -->
           <div class="lg:col-span-3 space-y-1.5">
-            <label class="block font-label-md text-label-md text-on-surface-variant font-medium">3. Hình Thức
-              Học</label>
+            <label for="finder-format" class="block font-label-md text-label-md text-on-surface-variant font-semibold">3. Hình Thức Học</label>
             <div class="relative">
-              <select name="format"
-                class="w-full h-12 pl-10 pr-8 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container appearance-none transition-all cursor-pointer">
+              <select id="finder-format" name="format"
+                class="w-full h-12 pl-10 pr-8 bg-surface-canvas border border-surface-container hover:border-primary/40 rounded-xl font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/15 appearance-none transition-all cursor-pointer">
                 <option selected value="online">Online 1-kèm-1 (Google Meet)</option>
                 <option value="offline">Gia sư tại nhà</option>
                 <option value="hybrid">Linh hoạt theo ca</option>
               </select>
               <span
-                class="material-symbols-outlined text-secondary absolute left-3 top-1/2 -translate-y-1/2 text-[20px] pointer-events-none">devices</span>
+                class="material-symbols-outlined text-primary absolute left-3 top-1/2 -translate-y-1/2 text-[20px] pointer-events-none">devices</span>
               <span
                 class="material-symbols-outlined text-outline absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] pointer-events-none">expand_more</span>
             </div>
@@ -105,7 +97,7 @@
           <!-- CTA Button -->
           <div class="lg:col-span-3">
             <button
-              class="w-full h-12 px-5 bg-tertiary-container hover:bg-tertiary text-on-tertiary font-label-lg text-label-lg rounded-full flex items-center justify-center gap-2 shadow-[0_4px_16px_-2px_rgba(255,109,32,0.5)] transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+              class="w-full h-12 px-5 bg-tertiary-container hover:bg-tertiary text-on-tertiary font-label-lg text-label-lg font-bold rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all duration-200 active:scale-[0.98] cursor-pointer"
               type="submit">
               <span class="material-symbols-outlined text-[20px]">search_check</span>
               <span>Tìm Gia Sư Ngay (30s)</span>
@@ -115,70 +107,70 @@
 
         <!-- Quick filter chips -->
         <div
-          class="mt-5 pt-4 flex flex-wrap items-center gap-2 text-body-sm font-body-sm text-on-surface-variant border-t border-surface-container">
-          <span class="font-bold text-on-surface text-label-md font-label-md">Gợi ý phổ biến:</span>
+          class="mt-5 pt-4 flex flex-wrap items-center gap-2 text-body-sm font-body-sm text-on-surface-variant border-t border-surface-container/80">
+          <span class="font-bold text-on-surface text-label-md font-label-md mr-1">Gợi ý phổ biến:</span>
           <a th:href="@{/gia-su(keyword='Toán')}"
-            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">Toán
+            class="px-3 py-1.5 rounded-full bg-surface-canvas border border-surface-container hover:border-primary/40 hover:bg-accent-cyan-subtle text-on-surface-variant hover:text-primary font-medium transition-all duration-200">Toán
             9 Luyện thi vào 10</a>
           <a th:href="@{/gia-su(keyword='IELTS', chungChi='IELTS')}"
-            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">IELTS
+            class="px-3 py-1.5 rounded-full bg-surface-canvas border border-surface-container hover:border-primary/40 hover:bg-accent-cyan-subtle text-on-surface-variant hover:text-primary font-medium transition-all duration-200">IELTS
             Cấp tốc 6.5+</a>
           <a th:href="@{/gia-su(keyword='Hóa')}"
-            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">Lấy
-            gốc Hóa 10 & 11</a>
+            class="px-3 py-1.5 rounded-full bg-surface-canvas border border-surface-container hover:border-primary/40 hover:bg-accent-cyan-subtle text-on-surface-variant hover:text-primary font-medium transition-all duration-200">Lấy
+            gốc Hóa 10 &amp; 11</a>
           <a th:href="@{/gia-su(keyword='Tiếng Anh')}"
-            class="px-3 py-1 rounded-full bg-surface-container hover:bg-secondary-container/40 text-secondary transition-colors">Tiếng
+            class="px-3 py-1.5 rounded-full bg-surface-canvas border border-surface-container hover:border-primary/40 hover:bg-accent-cyan-subtle text-on-surface-variant hover:text-primary font-medium transition-all duration-200">Tiếng
             Anh Tiểu học Cambridge</a>
         </div>
       </div>
 
       <!-- Key Features Overview -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto mt-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto mt-7">
         <div
-          class="bg-surface-container-lowest/90 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
+          class="bg-surface-container-lowest p-4 rounded-2xl flex items-center gap-3.5 swm-card border border-surface-container/90 hover:border-primary/25 transition-all duration-200 hover:-translate-y-0.5">
           <div
-            class="w-12 h-12 rounded-xl bg-accent-cyan-subtle flex items-center justify-center shrink-0 text-primary">
-            <span class="material-symbols-outlined text-[26px]">school</span>
+            class="w-11 h-11 rounded-xl bg-accent-cyan-subtle flex items-center justify-center shrink-0 text-primary">
+            <span class="material-symbols-outlined text-[24px]">school</span>
           </div>
-          <div>
-            <div class="font-label-lg text-label-lg text-on-surface font-bold">Môn Học Đa Dạng</div>
-            <div class="font-body-sm text-body-sm text-on-surface-variant">Toán, Ngoại ngữ, KHTN, Tin học</div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-bold leading-snug">Môn Học Đa Dạng</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Toán, Ngoại ngữ, KHTN, Tin học</div>
           </div>
         </div>
 
         <div
-          class="bg-surface-container-lowest/90 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
+          class="bg-surface-container-lowest p-4 rounded-2xl flex items-center gap-3.5 swm-card border border-surface-container/90 hover:border-primary/25 transition-all duration-200 hover:-translate-y-0.5">
           <div
-            class="w-12 h-12 rounded-xl bg-accent-coral-subtle flex items-center justify-center shrink-0 text-tertiary-container">
-            <span class="material-symbols-outlined text-[26px]">verified_user</span>
+            class="w-11 h-11 rounded-xl bg-accent-coral-subtle flex items-center justify-center shrink-0 text-tertiary-container">
+            <span class="material-symbols-outlined text-[24px]">verified_user</span>
           </div>
-          <div>
-            <div class="font-label-lg text-label-lg text-on-surface font-bold">Hồ Sơ Xác Thực</div>
-            <div class="font-body-sm text-body-sm text-on-surface-variant">Duyệt bằng cấp &amp; kinh nghiệm</div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-bold leading-snug">Hồ Sơ Xác Thực</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Duyệt bằng cấp &amp; kinh nghiệm</div>
           </div>
         </div>
 
         <div
-          class="bg-surface-container-lowest/90 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
+          class="bg-surface-container-lowest p-4 rounded-2xl flex items-center gap-3.5 swm-card border border-surface-container/90 hover:border-primary/25 transition-all duration-200 hover:-translate-y-0.5">
           <div
-            class="w-12 h-12 rounded-xl bg-accent-navy-subtle flex items-center justify-center shrink-0 text-secondary">
-            <span class="material-symbols-outlined text-[26px]">devices</span>
+            class="w-11 h-11 rounded-xl bg-accent-navy-subtle flex items-center justify-center shrink-0 text-secondary">
+            <span class="material-symbols-outlined text-[24px]">devices</span>
           </div>
-          <div>
-            <div class="font-label-lg text-label-lg text-on-surface font-bold">Linh Hoạt Thời Gian</div>
-            <div class="font-body-sm text-body-sm text-on-surface-variant">Chủ động chọn ca học phù hợp</div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-bold leading-snug">Linh Hoạt Thời Gian</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Chủ động chọn ca học phù hợp</div>
           </div>
         </div>
 
         <div
-          class="bg-surface-container-lowest/90 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3.5 shadow-sm border border-surface-container">
+          class="bg-surface-container-lowest p-4 rounded-2xl flex items-center gap-3.5 swm-card border border-surface-container/90 hover:border-primary/25 transition-all duration-200 hover:-translate-y-0.5">
           <div
-            class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 text-status-success">
-            <span class="material-symbols-outlined text-[26px]">person_pin</span>
+            class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 text-status-success">
+            <span class="material-symbols-outlined text-[24px]">person_pin</span>
           </div>
-          <div>
-            <div class="font-label-lg text-label-lg text-on-surface font-bold">Kèm Cặp 1-Kèm-1</div>
-            <div class="font-body-sm text-body-sm text-on-surface-variant">Tập trung tối đa vào học viên</div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-bold leading-snug">Kèm Cặp 1-Kèm-1</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Tập trung tối đa vào học viên</div>
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@
 <head th:fragment="common-head(pageTitle)">
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="description" content="StudyWithMe - Nền tảng kết nối gia sư 1-kèm-1 và khóa học trực tuyến chất lượng cao từ Lớp 1 đến Lớp 12, luyện thi ĐH và IELTS.">
   <title th:text="${pageTitle}">StudyWithMe</title>
   <link rel="icon" type="image/png" th:href="@{/images/logo-icon.png}" href="/images/logo-icon.png">
 
@@ -12,19 +13,50 @@
   <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 
   <style>
     @layer base {
-      html, body { margin: 0; padding: 0; scrollbar-width: none; }
-      body { overscroll-behavior: none; }
+      html { scroll-behavior: smooth; scrollbar-width: none; }
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; text-rendering: optimizeLegibility; }
       main > :first-child { margin-top: 0 !important; }
       main > :last-child { margin-bottom: 0 !important; }
     }
-    html { scrollbar-width: none; }
     ::-webkit-scrollbar { display: none; }
+
+    /* Accessible keyboard focus ring */
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid #00658b;
+      outline-offset: 2px;
+    }
+
+    /* Unified architectural card elevation */
+    .swm-card {
+      box-shadow: 0 1px 2px rgba(13, 28, 46, 0.04), 0 6px 18px -8px rgba(13, 28, 46, 0.08);
+    }
+    .swm-card:hover {
+      box-shadow: 0 12px 28px -12px rgba(0, 101, 139, 0.16), 0 2px 6px rgba(13, 28, 46, 0.05);
+    }
+
+    /* One-shot subtle entrance for hero elements */
+    @keyframes swmFadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .swm-fade-up {
+      animation: swmFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .swm-fade-up-delay {
+      animation: swmFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .swm-fade-up, .swm-fade-up-delay { animation: none !important; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
 
     /* Modern Web Guidance: Dialog overscroll containment */
     dialog:modal {

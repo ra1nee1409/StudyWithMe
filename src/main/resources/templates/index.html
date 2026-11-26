@@ -3,12 +3,17 @@
 
 <head th:replace="~{components/common/head :: common-head(${title})}"></head>
 
-<body class="bg-background font-body-md text-body-md text-on-surface antialiased">
+<body class="bg-background font-body-md text-body-md text-on-surface antialiased selection:bg-primary/15 selection:text-primary">
+
+  <a href="#main-content"
+    class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-primary focus:text-on-primary focus:font-semibold focus:shadow-lg">
+    Chuyển đến nội dung chính
+  </a>
 
   <!-- ==================== 1. MAIN HEADER COMPONENT ==================== -->
   <header th:replace="~{components/user/header :: main-header('home')}"></header>
 
-  <main class="w-full pt-20 bg-background min-h-screen">
+  <main id="main-content" class="w-full pt-20 bg-background min-h-screen">
     <!-- ==================== 1. HERO PROMOTION BANNER SLIDER (CMS) ==================== -->
     <section th:replace="~{components/user/home/banner-slider :: banner-slider}"></section>
 
